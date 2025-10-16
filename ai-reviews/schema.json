@@ -1,0 +1,48 @@
+{
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "The title of the paper"
+    },
+    "summary": {
+      "type": "string",
+      "description": "A short summary of the paper and its contribution"
+    },
+    "methods": {
+      "type": "string",
+      "description": "A summary of the methods used in the paper"
+    },
+    "results": {
+      "type": "string",
+      "description": "A summary of the results presented in the paper"
+    },
+    "strengths": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Strengths of the paper, numbered as S1, S2, etc."
+    },
+    "weaknesses": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Weaknesses of the paper, numbered as W1, W2, etc."
+    },
+    "recommendation": {
+      "type": "string",
+      "enum": [
+        "REJECT (-2)",
+        "WEAK REJECT (-1)",
+        "BORDERLINE (0)",
+        "ACCEPT (1)",
+        "STRONG ACCEPT (2)"
+      ],
+      "description": "Recommendation from the given scale"
+    }
+  },
+  "required": ["title", "summary", "methods", "results", "strengths", "weaknesses", "recommendation"],
+  "additionalProperties": false
+}
