@@ -147,19 +147,27 @@ def generate_random_paper(
         raise RuntimeError(f"OpenAI API error: {e}")
 
 
-def get_random_authors(
-    client: openreview.api.OpenReviewClient, num_authors: int
+def get_random_profiles(
+    client: openreview.api.OpenReviewClient, num_profiles: int, placeholder_prefix: str = "Random User"
 ) -> tuple[list[str], list[str]]:
     """
-    Get random authors by searching with random two-letter strings.
+    Get random profiles by searching with random two-letter strings.
+
+    Args:
+        client: OpenReview client
+        num_profiles: Number of random profiles to retrieve
+        placeholder_prefix: Prefix for placeholder names if not enough profiles found
+
+    Returns:
+        Tuple of (names, profile_ids)
     """
-    authors: list[str] = []
-    authorids: list[str] = []
+    names: list[str] = []
+    profile_ids: list[str] = []
 
     max_attempts = 50  # Prevent infinite loops
     attempts = 0
 
-    while len(authors) < num_authors and attempts < max_attempts:
+    while len(profile_ids) < num_profiles and attempts < max_attempts:
         # Generate random two-letter search string
         search_term = "".join(random.choices(string.ascii_lowercase, k=2))
 
@@ -172,26 +180,35 @@ def get_random_authors(
                 profile_id: str = profile.id
 
                 # Avoid duplicates
-                if profile_id not in authorids:
-                    authorids.append(profile_id)
+                if profile_id not in profile_ids:
+                    profile_ids.append(profile_id)
                     # Get preferred name
                     name = (
                         profile.get_preferred_name()
                         if hasattr(profile, "get_preferred_name")
                         else profile_id
                     )
-                    authors.append(name)
+                    names.append(name)
         except Exception:
             pass  # Continue trying with different search terms
 
         attempts += 1
 
-    # If we couldn't find enough authors, pad with placeholder
-    while len(authors) < num_authors:
-        authors.append(f"Random Author {len(authors) + 1}")
-        authorids.append(f"random{len(authors)}@example.com")
+    # If we couldn't find enough profiles, pad with placeholder
+    while len(names) < num_profiles:
+        names.append(f"{placeholder_prefix} {len(names) + 1}")
+        profile_ids.append(f"random{len(names)}@example.com")
 
-    return authors, authorids
+    return names, profile_ids
+
+
+def get_random_authors(
+    client: openreview.api.OpenReviewClient, num_authors: int
+) -> tuple[list[str], list[str]]:
+    """
+    Get random authors by searching with random two-letter strings.
+    """
+    return get_random_profiles(client, num_authors, placeholder_prefix="Random Author")
 
 
 def create_dummy_pdf(title: str, authors: list[str], abstract: str) -> str:

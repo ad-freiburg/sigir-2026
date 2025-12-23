@@ -75,12 +75,12 @@ def main() -> None:
     subparsers = parser.add_subparsers(dest="command_name", help="Available commands")
     discovered_commands = discover_commands()
     for command in discovered_commands:
-        command_parser = subparsers.add_parser(command.name, help=command.help)
+        command_parser = subparsers.add_parser(command.name, help=command.help, description=command.help)
         command.add_arguments(command_parser)
         command_parser.set_defaults(command=command)
 
     # Parse arguments with argcomplete support.
-    argcomplete.autocomplete(parser)
+    argcomplete.autocomplete(parser, always_complete_options="long")
     args = parser.parse_args()
     if hasattr(args, "command"):
         args.command.execute(args)

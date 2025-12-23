@@ -27,13 +27,11 @@ class SubmissionsCommand(Command):
         Add submissions command arguments.
         """
         parser.add_argument(
-            "-o",
             "--output",
-            help="Output file path (default: submissions.json)",
-            default="submissions.json",
+            help="Output file path (default: stdout)",
+            default=None,
         )
         parser.add_argument(
-            "-v",
             "--verbose",
             action="store_true",
             help="Print detailed information about each submission",
@@ -43,25 +41,34 @@ class SubmissionsCommand(Command):
         """
         Download all information about current submissions.
         """
+        import sys
+
         # Fetch submissions
         submission_invitation = f"{args.venue_id}/-/Submission"
         print(
             f"Fetching all submissions from {args.venue_id} "
-            f"using invitation  {submission_invitation} ..."
+            f"using invitation {submission_invitation}...",
+            file=sys.stderr,
         )
         client = get_client(args.api_url, args.username, args.password)
         submissions = client.get_all_notes(invitation=submission_invitation)
 
-        # Save to JSON file
-        output_file = args.output or "submissions.json"
-        print(f"Submissions found: {len(submissions)}, saving to {output_file}")
+        print(f"Submissions found: {len(submissions)}", file=sys.stderr)
+
+        # Convert to JSON
         submissions_data = [note.to_json() for note in submissions]
-        with open(output_file, "w") as f:
-            json.dump(submissions_data, f, indent=2)
+
+        # Output to file or stdout
+        if args.output:
+            with open(args.output, "w") as f:
+                json.dump(submissions_data, f, indent=2)
+            print(f"Submissions saved to {args.output}", file=sys.stderr)
+        else:
+            print(json.dumps(submissions_data, indent=2))
 
         # Print summary
         if args.verbose:
             for i, note in enumerate(submissions, 1):
-                print(f"\n{i}. {note.content.get('title', 'No title')}")
-                print(f"   ID: {note.id}")
-                print(f"   Authors: {note.content.get('authors', 'N/A')}")
+                print(f"\n{i}. {note.content.get('title', 'No title')}", file=sys.stderr)
+                print(f"   ID: {note.id}", file=sys.stderr)
+                print(f"   Authors: {note.content.get('authors', 'N/A')}", file=sys.stderr)
