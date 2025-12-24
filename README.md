@@ -17,7 +17,7 @@ orsig --help
 You can set the API URL, username, password, and conference via command-line options, or, more conveniently, via a `.env` file like the following (adapt as needed):
 
 ```
-OPENREVIEW_API_URL=https://dev-api2.openreview.net
+OPENREVIEW_API_URL=https://devapi2.openreview.net
 OPENREVIEW_USERNAME=...
 OPENREVIEW_PASSWORD=...
 OPENREVIEW_VENUE_ID=ACM.org/SIGIR/2026/Conference
