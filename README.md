@@ -14,13 +14,14 @@ eval "$(register-python-argcomplete review)"
 orsig --help
 ```
 
-You can set the API URL, username, password, and conference via command-line options, or, more conveniently, via a `.env` file like the following (adapt as needed):
+You can set the API URL, username, password, and conference via command-line options, or, more conveniently, via a `.env` file like the following (adapt as needed). The `OPENAI_API_KEY` is only needed for commands that generate content, like `orsig submit`.
 
 ```
 OPENREVIEW_API_URL=https://devapi2.openreview.net
 OPENREVIEW_USERNAME=...
 OPENREVIEW_PASSWORD=...
 OPENREVIEW_VENUE_ID=ACM.org/SIGIR/2026/Conference
+OPENAI_API_KEY=...
 ```
 
 ## AI Reviews
