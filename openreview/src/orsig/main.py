@@ -69,6 +69,11 @@ def main() -> None:
         default=os.environ.get("OPENREVIEW_VENUE_ID"),
         help="Venue ID (default: $OPENREVIEW_VENUE_ID)",
     )
+    parser.add_argument(
+        "--impersonate",
+        default=os.environ.get("OPENREVIEW_IMPERSONATE_GROUP"),
+        help="Group ID to impersonate (for venue organizers) (default: $OPENREVIEW_IMPERSONATE_GROUP)",
+    )
 
     # Add subparser for each command (the arguments are in the respective
     # command class).

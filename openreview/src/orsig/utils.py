@@ -16,15 +16,21 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 
 
-def get_client(baseurl: str, username: str, password: str) -> openreview.api.OpenReviewClient:
+def get_client(baseurl: str, username: str, password: str, impersonate_group: str = None) -> openreview.api.OpenReviewClient:
     """
     Initialize and return OpenReview client.
     """
-    return openreview.api.OpenReviewClient(
+    client = openreview.api.OpenReviewClient(
         baseurl=baseurl,
         username=username,
         password=password,
     )
+
+    # If impersonate_group is provided, impersonate that group
+    if impersonate_group:
+        client.impersonate(impersonate_group)
+
+    return client
 
 
 def format_author_name(author_id: str) -> str:
