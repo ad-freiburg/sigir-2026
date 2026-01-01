@@ -74,13 +74,20 @@ def main() -> None:
         default=os.environ.get("OPENREVIEW_IMPERSONATE_GROUP"),
         help="Group ID to impersonate (for venue organizers) (default: $OPENREVIEW_IMPERSONATE_GROUP)",
     )
+    parser.add_argument(
+        "--cache-dir",
+        default=os.environ.get("CACHE_DIR", "orsig-cache"),
+        help="Cache directory (default: $CACHE_DIR or 'orsig-cache')",
+    )
 
     # Add subparser for each command (the arguments are in the respective
     # command class).
     subparsers = parser.add_subparsers(dest="command_name", help="Available commands")
     discovered_commands = discover_commands()
     for command in discovered_commands:
-        command_parser = subparsers.add_parser(command.name, help=command.help, description=command.help)
+        command_parser = subparsers.add_parser(
+            command.name, help=command.help, description=command.help
+        )
         command.add_arguments(command_parser)
         command_parser.set_defaults(command=command)
 
@@ -92,6 +99,7 @@ def main() -> None:
         # Set client parameters from command-line arguments (if provided)
         # The client will be created lazily when first needed
         from .client import set_client_params
+
         set_client_params(args.api_url, args.username, args.password, args.impersonate)
 
         args.command.execute(args)

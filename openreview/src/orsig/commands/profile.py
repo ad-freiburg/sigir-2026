@@ -48,7 +48,7 @@ class ProfileCommand(Command):
         """
         # Client is already initialized in main.py
         try:
-            profile_with_papers = ProfileWithPapers()
+            profile_with_papers = ProfileWithPapers(cache_dir=args.cache_dir)
             profile_with_papers.get_profile(args.profile_id)
 
             if args.as_rdf:

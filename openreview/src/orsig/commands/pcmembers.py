@@ -74,6 +74,11 @@ class PcmembersCommand(Command):
             action="store_true",
             help="Include full profile information for each member",
         )
+        parser.add_argument(
+            "--recache",
+            action="store_true",
+            help="Fetch fresh profiles from OpenReview and update the cache",
+        )
 
     def execute(self, args: Namespace) -> None:
         """
@@ -395,14 +400,14 @@ class PcmembersCommand(Command):
         group_id = f"{args.venue_id}/{group_suffix}"
         role_display = self._get_role_display_name(args.role)
 
-        # Get all related groups in one call (main group, /Invited, /Declined)
+        # Get all related groups in one call (main, `/Invited`, `/Declined`)
         try:
             groups = client.get_groups(prefix=group_id)
         except Exception as e:
             log.error(f"Could not fetch groups with prefix {group_id}: {e}")
             return
 
-        # Parse the groups by their suffix
+        # Determine which members are confirmed, invited, or declined.
         confirmed_members = set()
         invited_members = set()
         declined_members = set()
@@ -413,8 +418,6 @@ class PcmembersCommand(Command):
                 invited_members = set(group.members or [])
             elif group.id == f"{group_id}/Declined":
                 declined_members = set(group.members or [])
-
-        # All members is the union of all three groups
         all_members = list(confirmed_members | invited_members | declined_members)
         confirmed_count = len(confirmed_members)
         declined_count = len(declined_members)
@@ -431,7 +434,9 @@ class PcmembersCommand(Command):
         # Create shared ProfileWithPapers instance for --with-profiles
         profile_with_papers = None
         if args.with_profiles:
-            profile_with_papers = ProfileWithPapers()
+            profile_with_papers = ProfileWithPapers(
+                cache_dir=args.cache_dir, recache=args.recache
+            )
 
         for member_id in all_members:
             # Determine member status
@@ -522,7 +527,9 @@ class PcmembersCommand(Command):
                     if args.with_profiles:
                         # Add profile RDF information using shared instance
                         if profile_with_papers is None:
-                            profile_with_papers = ProfileWithPapers()
+                            profile_with_papers = ProfileWithPapers(
+                                cache_dir=args.cache_dir, recache=args.recache
+                            )
                         try:
                             profile_with_papers.get_profile(profile_id)
                             profile_with_papers.addToRdf(

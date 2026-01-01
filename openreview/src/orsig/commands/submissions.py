@@ -74,7 +74,7 @@ class SubmissionsCommand(Command):
 
         # Get profile for each distinct author.
         author_profiles = {}
-        profile_with_papers = ProfileWithPapers()
+        profile_with_papers = ProfileWithPapers(cache_dir=args.cache_dir)
         if args.with_profiles:
             log.info(
                 f"Fetching profiles for {len(all_author_ids)} distinct authors ..."

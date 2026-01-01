@@ -16,14 +16,22 @@ class ProfileWithPapers:
     Class for managing OpenReview profile data with imported DBLP papers.
     """
 
-    def __init__(self, cache_profiles: bool = True, cache_dir: str = "./profiles"):
+    def __init__(
+        self,
+        cache_profiles: bool = True,
+        cache_dir: str = "orsig-cache",
+        recache: bool = False,
+    ):
         """
         Initialize ProfileWithPapers with caching options.
+        The cache_dir is the top-level cache directory; profiles are stored in cache_dir/profiles.
+        If recache is True, skip reading from cache but still write fresh data to cache.
         """
         self.profile = None
         self.papers = []
         self.cache_profiles = cache_profiles
-        self.cache_dir = cache_dir
+        self.cache_dir = str(Path(cache_dir) / "profiles")
+        self.recache = recache
 
     def get_profile(self, profile_id: str) -> None:
         """
@@ -42,8 +50,8 @@ class ProfileWithPapers:
         # Get the canonical profile ID for caching
         canonical_profile_id = self.profile.id
 
-        # Check cache using canonical ID
-        if self.cache_profiles:
+        # Check cache using canonical ID (skip if recache is True)
+        if self.cache_profiles and not self.recache:
             cached_data = self._load_from_cache(canonical_profile_id)
             if cached_data:
                 log.debug(
