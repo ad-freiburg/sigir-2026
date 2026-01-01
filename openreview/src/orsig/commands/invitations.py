@@ -6,6 +6,7 @@ from argparse import ArgumentParser, Namespace
 
 from ..command import Command
 from ..utils import get_client
+from ..log import log
 
 
 class InvitationsCommand(Command):
@@ -35,8 +36,8 @@ class InvitationsCommand(Command):
         # Get the singleton client (initialized in main.py)
         client = get_client()
 
-        print(f"Fetching invitations for venue: {args.venue_id}...")
+        log.info(f"Fetching invitations for venue: {args.venue_id}...")
         invitations = client.get_all_invitations(prefix=args.venue_id)
-        print(f"Found {len(invitations)} invitations:")
+        log.info(f"Found {len(invitations)} invitations:")
         for inv in invitations:
             print(f"  - {inv.id}")

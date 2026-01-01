@@ -7,8 +7,8 @@ import sys
 from argparse import ArgumentParser, Namespace
 
 from ..command import Command
-from ..utils import get_client
 from ..profile import ProfileWithPapers
+from ..log import log
 
 
 class ProfileCommand(Command):
@@ -58,12 +58,12 @@ class ProfileCommand(Command):
 
             # Output to file or stdout
             if args.output:
-                with open(args.output, 'w') as f:
+                with open(args.output, "w") as f:
                     f.write(result_content)
-                print(f"Profile information saved to {args.output}")
+                log.info(f"Profile information saved to {args.output}")
             else:
                 print(result_content)
 
         except Exception as e:
-            print(f"Error retrieving profile for '{args.profile_id}': {e}", file=sys.stderr)
+            log.error(f"Error retrieving profile for '{args.profile_id}': {e}")
             sys.exit(1)

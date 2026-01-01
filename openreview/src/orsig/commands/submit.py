@@ -11,6 +11,7 @@ import numpy as np
 import openreview
 
 from ..command import Command
+from ..log import log
 from ..utils import (
     create_dummy_pdf,
     generate_random_paper,
@@ -103,7 +104,7 @@ class SubmitCommand(Command):
         """
         Submit papers to OpenReview.
         """
-                # Get the singleton client (initialized in main.py)
+        # Get the singleton client (initialized in main.py)
         client = get_client()
 
         # Construct the submission invitation ID
@@ -118,15 +119,17 @@ class SubmitCommand(Command):
         self._submit_pdf_files(args, client, submission_invitation)
 
     def _submit_random_papers(
-        self, args: Namespace, client: openreview.api.OpenReviewClient, submission_invitation: str
+        self,
+        args: Namespace,
+        client: openreview.api.OpenReviewClient,
+        submission_invitation: str,
     ) -> None:
         """
         Generate and submit random papers.
         """
-        print(f"Generating {args.random} random paper submissions...")
-        print(f"Mean number of authors (Poisson λ): {args.mean_num_authors}")
-        print(f"Using OpenAI model: {args.paper_model}")
-        print()
+        log.info(f"Generating {args.random} random paper submissions...")
+        log.info(f"Mean number of authors (Poisson λ): {args.mean_num_authors}")
+        log.info(f"Using OpenAI model: {args.paper_model}")
 
         # ANSI codes for bold
         BOLD = "\033[1m"
@@ -139,15 +142,15 @@ class SubmitCommand(Command):
             # Generate number of authors from Poisson distribution
             num_authors = max(1, np.random.poisson(args.mean_num_authors))
 
-            print(f"{BOLD}Paper {i + 1}/{args.random}{RESET}")
-            print(f"Number of authors: {num_authors}")
+            log.info(f"{BOLD}Paper {i + 1}/{args.random}{RESET}")
+            log.info(f"Number of authors: {num_authors}")
 
             # Get random author IDs
-            print(f"Finding {num_authors} random authors...")
+            log.info(f"Finding {num_authors} random authors...")
             _, authorids = get_random_authors(client, num_authors)
 
             # Generate random title, abstract, and author names
-            print(
+            log.info(
                 f"Generating title, abstract, and author names using {args.paper_model}..."
             )
             title, abstract, authors = generate_random_paper(
@@ -155,16 +158,16 @@ class SubmitCommand(Command):
             )
 
             # Print metadata
-            print(f"Title: {title}")
-            print(f"Authors: {', '.join(authors)}")
-            print(f"Author IDs: {', '.join(authorids)}")
-            print(f"Abstract: {abstract}")
+            log.info(f"Title: {title}")
+            log.info(f"Authors: {', '.join(authors)}")
+            log.info(f"Author IDs: {', '.join(authorids)}")
+            log.info(f"Abstract: {abstract}")
 
             # Submit or just show
             if not args.only_show:
                 pdf_path = None
                 try:
-                    print("Submitting to OpenReview...")
+                    log.info("Submitting to OpenReview...")
 
                     # Get the logged-in user's profile ID for signatures
                     user_profile = client.get_profile(args.username)
@@ -178,11 +181,11 @@ class SubmitCommand(Command):
                     )
 
                     # Create dummy PDF
-                    print("Creating PDF...")
+                    log.info("Creating PDF...")
                     pdf_path = create_dummy_pdf(title, authors, abstract)
 
                     # Upload PDF
-                    print("Uploading PDF...")
+                    log.info("Uploading PDF...")
                     pdf_url = client.put_attachment(
                         pdf_path, submission_invitation, "pdf"
                     )
@@ -207,36 +210,37 @@ class SubmitCommand(Command):
                     )
 
                     submission_id = submission["note"]["id"]
-                    print(f"✓ Submitted successfully: {submission_id}")
+                    log.info(f"Submitted successfully: {submission_id}")
                     successful += 1
 
                 except Exception as e:
-                    print(f"✗ Submission failed: {e}")
+                    log.error(f"Submission failed: {e}")
                     failed += 1
                 finally:
                     # Clean up temporary PDF
                     if pdf_path and os.path.exists(pdf_path):
                         os.unlink(pdf_path)
 
-            print()
-
         # Print summary if actually submitting
         if not args.only_show and args.random > 0:
-            print(f"{BOLD}Summary{RESET}")
-            print(f"Successful: {successful}")
-            print(f"Failed: {failed}")
-            print(f"Total: {args.random}")
+            log.info(f"{BOLD}Summary{RESET}")
+            log.info(f"Successful: {successful}")
+            log.info(f"Failed: {failed}")
+            log.info(f"Total: {args.random}")
 
     def _submit_pdf_files(
-        self, args: Namespace, client: openreview.api.OpenReviewClient, submission_invitation: str
+        self,
+        args: Namespace,
+        client: openreview.api.OpenReviewClient,
+        submission_invitation: str,
     ) -> None:
         """
         Submit papers from PDF files with corresponding JSON metadata.
         """
         # Get author information
         if not args.authors or not args.authorids:
-            print("ERROR: --authors and --authorids are required for submission")
-            print(
+            log.error("--authors and --authorids are required for submission")
+            log.error(
                 "Example: --authors 'Alice Smith,Bob Jones' --authorids 'alice@example.com,bob@example.com'"
             )
             sys.exit(1)
@@ -245,8 +249,8 @@ class SubmitCommand(Command):
         authorids = [a.strip() for a in args.authorids.split(",")]
 
         if len(authors) != len(authorids):
-            print(
-                f"ERROR: Number of authors ({len(authors)}) must match number of authorids ({len(authorids)})"
+            log.error(
+                f"Number of authors ({len(authors)}) must match number of authorids ({len(authorids)})"
             )
             sys.exit(1)
 
@@ -257,7 +261,7 @@ class SubmitCommand(Command):
         for pdf_path in args.pdf_files:
             # Check if PDF exists
             if not os.path.exists(pdf_path):
-                print(f"ERROR: PDF not found: {pdf_path}")
+                log.error(f"PDF not found: {pdf_path}")
                 failed += 1
                 continue
 
@@ -266,7 +270,7 @@ class SubmitCommand(Command):
             json_path = base_name + ".json"
 
             if not os.path.exists(json_path):
-                print(f"ERROR: JSON file not found for {pdf_path}: {json_path}")
+                log.error(f"JSON file not found for {pdf_path}: {json_path}")
                 failed += 1
                 continue
 
@@ -275,7 +279,7 @@ class SubmitCommand(Command):
                 with open(json_path, "r") as f:
                     metadata = json.load(f)
             except json.JSONDecodeError as e:
-                print(f"ERROR: Invalid JSON in {json_path}: {e}")
+                log.error(f"Invalid JSON in {json_path}: {e}")
                 failed += 1
                 continue
 
@@ -284,29 +288,29 @@ class SubmitCommand(Command):
             abstract = metadata.get("summary", "")
 
             if not title:
-                print(f"ERROR: No title found in {json_path}")
+                log.error(f"No title found in {json_path}")
                 failed += 1
                 continue
 
             if not abstract:
-                print(
-                    f"WARNING: No summary/abstract found in {json_path}, using empty abstract"
+                log.warning(
+                    f"No summary/abstract found in {json_path}, using empty abstract"
                 )
 
             # Extract keywords if available
             keywords = args.keywords.split(",") if args.keywords else []
 
-            print(f"\nSubmitting: {title}")
-            print(f"  PDF: {pdf_path}")
-            print(f"  Authors: {', '.join(authors)}")
+            log.info(f"Submitting: {title}")
+            log.info(f"  PDF: {pdf_path}")
+            log.info(f"  Authors: {', '.join(authors)}")
 
             try:
                 # Upload PDF
-                print("  Uploading PDF...")
+                log.info("  Uploading PDF...")
                 pdf_url = client.put_attachment(pdf_path, submission_invitation, "pdf")
 
                 # Create submission note
-                print("  Creating submission...")
+                log.info("  Creating submission...")
                 note = openreview.api.Note(
                     content={
                         "title": {"value": title},
@@ -325,16 +329,16 @@ class SubmitCommand(Command):
                     note=note,
                 )
 
-                print(f"  ✓ SUCCESS: Submitted with ID: {submission['note']['id']}")
+                log.info(f"  SUCCESS: Submitted with ID: {submission['note']['id']}")
                 successful += 1
 
             except Exception as e:
-                print(f"  ✗ FAILED: {e}")
+                log.error(f"  FAILED: {e}")
                 failed += 1
 
         # Summary
-        print(f"\n{'=' * 50}")
-        print("Submission Summary:")
-        print(f"  Successful: {successful}")
-        print(f"  Failed: {failed}")
-        print(f"  Total: {successful + failed}")
+        log.info(f"{'=' * 50}")
+        log.info("Submission Summary:")
+        log.info(f"  Successful: {successful}")
+        log.info(f"  Failed: {failed}")
+        log.info(f"  Total: {successful + failed}")

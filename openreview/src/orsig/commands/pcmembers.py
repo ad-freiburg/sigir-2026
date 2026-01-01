@@ -3,7 +3,6 @@ Program committee members command for managing reviewers, area chairs, and senio
 """
 
 import json
-import sys
 from argparse import ArgumentParser, Namespace
 
 from ..command import Command
@@ -142,7 +141,7 @@ class PcmembersCommand(Command):
         """
         user_ids = args.add
         role_display = self._get_role_display_name(args.role)
-        print(f"Adding {len(user_ids)} {role_display} to {args.venue_id}...")
+        log.info(f"Adding {len(user_ids)} {role_display} to {args.venue_id}...")
 
         # Get the group
         group_suffix = self._get_group_suffix(args.role)
@@ -150,15 +149,15 @@ class PcmembersCommand(Command):
 
         try:
             group = client.get_group(group_id)
-            print(f"Found existing group: {group_id}")
+            log.info(f"Found existing group: {group_id}")
             existing_members = set(group.members or [])
         except Exception:
-            print(f"Group {group_id} does not exist yet.")
-            print("Creating it would require appropriate permissions.")
+            log.info(f"Group {group_id} does not exist yet.")
+            log.info("Creating it would require appropriate permissions.")
             existing_members = set()
 
         # Fetch profile information and check for duplicates
-        print(f"\n{role_display.capitalize()} to add:")
+        log.info(f"\n{role_display.capitalize()} to add:")
         new_count = 0
         duplicate_count = 0
         names = []
@@ -181,47 +180,47 @@ class PcmembersCommand(Command):
             names.append(name)
 
             if user_id in existing_members:
-                print(f"  - {name} ({user_id}) [ALREADY A MEMBER]")
+                log.info(f"  - {name} ({user_id}) [ALREADY A MEMBER]")
                 duplicate_count += 1
             else:
-                print(f"  - {name} ({user_id})")
+                log.info(f"  - {name} ({user_id})")
                 new_count += 1
 
-        print("\nSummary:")
-        print(f"  New {role_display}: {new_count}")
-        print(f"  Already members: {duplicate_count}")
-        print(f"  Total: {len(user_ids)}")
+        log.info("\nSummary:")
+        log.info(f"  New {role_display}: {new_count}")
+        log.info(f"  Already members: {duplicate_count}")
+        log.info(f"  Total: {len(user_ids)}")
 
         if new_count > 0:
             # Prepare the updated members list
             new_members = list(existing_members.union(set(user_ids)))
 
             if args.only_show:
-                print(
+                log.info(
                     f"\nTo add these {role_display}, the group would need to be updated with:"
                 )
-                print(f"  Group ID: {group_id}")
-                print(f"  Total members after addition: {len(new_members)}")
-                print(
+                log.info(f"  Group ID: {group_id}")
+                log.info(f"  Total members after addition: {len(new_members)}")
+                log.info(
                     f"\nNote: This is a preview only. Run without --only-show to actually add {role_display}."
                 )
             else:
                 # Actually add the members
-                print("\nUpdating group...")
+                log.info("\nUpdating group...")
                 try:
                     # Add only the new members (not duplicates)
                     new_member_ids = [
                         uid for uid in user_ids if uid not in existing_members
                     ]
                     client.add_members_to_group(group_id, new_member_ids)
-                    print(
-                        f"✓ Successfully added {new_count} new {role_display} to {group_id}"
+                    log.info(
+                        f"Successfully added {new_count} new {role_display} to {group_id}"
                     )
-                    print(f"  Total members now: {len(new_members)}")
+                    log.info(f"  Total members now: {len(new_members)}")
                 except Exception as e:
-                    print(f"Error: Failed to update group: {e}")
+                    log.error(f" Failed to update group: {e}")
         else:
-            print(f"\nNo new {role_display} to add (all are already members).")
+            log.info(f"\nNo new {role_display} to add (all are already members).")
 
     def _remove_specific_members(self, args: Namespace, client) -> None:
         """
@@ -229,7 +228,7 @@ class PcmembersCommand(Command):
         """
         user_ids = args.remove
         role_display = self._get_role_display_name(args.role)
-        print(f"Removing {len(user_ids)} {role_display} from {args.venue_id}...")
+        log.info(f"Removing {len(user_ids)} {role_display} from {args.venue_id}...")
 
         # Get the group
         group_suffix = self._get_group_suffix(args.role)
@@ -237,14 +236,14 @@ class PcmembersCommand(Command):
 
         try:
             group = client.get_group(group_id)
-            print(f"Found existing group: {group_id}")
+            log.info(f"Found existing group: {group_id}")
             existing_members = set(group.members or [])
         except Exception as e:
-            print(f"Error: Could not fetch group {group_id}: {e}")
+            log.error(f" Could not fetch group {group_id}: {e}")
             return
 
         # Fetch profile information and check membership
-        print(f"\n{role_display.capitalize()} to remove:")
+        log.info(f"\n{role_display.capitalize()} to remove:")
         remove_count = 0
         not_member_count = 0
         names = []
@@ -267,47 +266,47 @@ class PcmembersCommand(Command):
             names.append(name)
 
             if user_id in existing_members:
-                print(f"  - {name} ({user_id})")
+                log.info(f"  - {name} ({user_id})")
                 remove_count += 1
             else:
-                print(f"  - {name} ({user_id}) [NOT A MEMBER]")
+                log.info(f"  - {name} ({user_id}) [NOT A MEMBER]")
                 not_member_count += 1
 
-        print("\nSummary:")
-        print(f"  To remove: {remove_count}")
-        print(f"  Not members: {not_member_count}")
-        print(f"  Total: {len(user_ids)}")
+        log.info("\nSummary:")
+        log.info(f"  To remove: {remove_count}")
+        log.info(f"  Not members: {not_member_count}")
+        log.info(f"  Total: {len(user_ids)}")
 
         if remove_count > 0:
             # Prepare the updated members list
             remaining_members = [m for m in existing_members if m not in user_ids]
 
             if args.only_show:
-                print(
+                log.info(
                     f"\nTo remove these {role_display}, the group would need to be updated with:"
                 )
-                print(f"  Group ID: {group_id}")
-                print(f"  Total members after removal: {len(remaining_members)}")
-                print(
+                log.info(f"  Group ID: {group_id}")
+                log.info(f"  Total members after removal: {len(remaining_members)}")
+                log.info(
                     f"\nNote: This is a preview only. Run without --only-show to actually remove {role_display}."
                 )
             else:
                 # Actually remove the members
-                print("\nUpdating group...")
+                log.info("\nUpdating group...")
                 try:
                     # Remove only the members that exist
                     members_to_remove = [
                         uid for uid in user_ids if uid in existing_members
                     ]
                     client.remove_members_from_group(group_id, members_to_remove)
-                    print(
-                        f"✓ Successfully removed {remove_count} {role_display} from {group_id}"
+                    log.info(
+                        f"Successfully removed {remove_count} {role_display} from {group_id}"
                     )
-                    print(f"  Total members now: {len(remaining_members)}")
+                    log.info(f"  Total members now: {len(remaining_members)}")
                 except Exception as e:
-                    print(f"Error: Failed to update group: {e}")
+                    log.error(f" Failed to update group: {e}")
         else:
-            print(f"\nNo {role_display} to remove (none are members).")
+            log.info(f"\nNo {role_display} to remove (none are members).")
 
     def _add_random_members(self, args: Namespace, client) -> None:
         """
@@ -315,10 +314,10 @@ class PcmembersCommand(Command):
         """
         num_members = args.add_random
         role_display = self._get_role_display_name(args.role)
-        print(f"Adding {num_members} random {role_display} to {args.venue_id}...")
+        log.info(f"Adding {num_members} random {role_display} to {args.venue_id}...")
 
         # Get random profiles
-        print(f"Finding {num_members} random profiles...")
+        log.info(f"Finding {num_members} random profiles...")
         names, profile_ids = get_random_profiles(
             client,
             num_members,
@@ -331,61 +330,61 @@ class PcmembersCommand(Command):
 
         try:
             group = client.get_group(group_id)
-            print(f"Found existing group: {group_id}")
+            log.info(f"Found existing group: {group_id}")
             existing_members = set(group.members or [])
         except Exception:
-            print(f"Group {group_id} does not exist yet.")
-            print("Creating it would require appropriate permissions.")
+            log.info(f"Group {group_id} does not exist yet.")
+            log.info("Creating it would require appropriate permissions.")
             existing_members = set()
 
         # Display the members that would be added
-        print(f"\n{role_display.capitalize()} to add:")
+        log.info(f"\n{role_display.capitalize()} to add:")
         new_count = 0
         duplicate_count = 0
 
         for name, profile_id in zip(names, profile_ids):
             if profile_id in existing_members:
-                print(f"  - {name} ({profile_id}) [ALREADY A MEMBER]")
+                log.info(f"  - {name} ({profile_id}) [ALREADY A MEMBER]")
                 duplicate_count += 1
             else:
-                print(f"  - {name} ({profile_id})")
+                log.info(f"  - {name} ({profile_id})")
                 new_count += 1
 
-        print("\nSummary:")
-        print(f"  New {role_display}: {new_count}")
-        print(f"  Already members: {duplicate_count}")
-        print(f"  Total: {len(profile_ids)}")
+        log.info("\nSummary:")
+        log.info(f"  New {role_display}: {new_count}")
+        log.info(f"  Already members: {duplicate_count}")
+        log.info(f"  Total: {len(profile_ids)}")
 
         if new_count > 0:
             # Prepare the updated members list
             new_members = list(existing_members.union(set(profile_ids)))
 
             if args.only_show:
-                print(
+                log.info(
                     f"\nTo add these {role_display}, the group would need to be updated with:"
                 )
-                print(f"  Group ID: {group_id}")
-                print(f"  Total members after addition: {len(new_members)}")
-                print(
+                log.info(f"  Group ID: {group_id}")
+                log.info(f"  Total members after addition: {len(new_members)}")
+                log.info(
                     f"\nNote: This is a preview only. Run without --only-show to actually add {role_display}."
                 )
             else:
                 # Actually add the members
-                print("\nUpdating group...")
+                log.info("\nUpdating group...")
                 try:
                     # Add only the new members (not duplicates)
                     new_member_ids = [
                         pid for pid in profile_ids if pid not in existing_members
                     ]
                     client.add_members_to_group(group_id, new_member_ids)
-                    print(
-                        f"✓ Successfully added {new_count} new {role_display} to {group_id}"
+                    log.info(
+                        f"Successfully added {new_count} new {role_display} to {group_id}"
                     )
-                    print(f"  Total members now: {len(new_members)}")
+                    log.info(f"  Total members now: {len(new_members)}")
                 except Exception as e:
-                    print(f"Error: Failed to update group: {e}")
+                    log.error(f" Failed to update group: {e}")
         else:
-            print(f"\nNo new {role_display} to add (all are already members).")
+            log.info(f"\nNo new {role_display} to add (all are already members).")
 
     def _list_members(self, args: Namespace, client) -> None:
         """
@@ -396,47 +395,34 @@ class PcmembersCommand(Command):
         group_id = f"{args.venue_id}/{group_suffix}"
         role_display = self._get_role_display_name(args.role)
 
-        # Get confirmed members from the group
+        # Get all related groups in one call (main group, /Invited, /Declined)
         try:
-            group = client.get_group(group_id)
-            confirmed_members = set(group.members or [])
+            groups = client.get_groups(prefix=group_id)
         except Exception as e:
-            print(f"Error: Could not fetch group {group_id}: {e}", file=sys.stderr)
+            log.error(f"Could not fetch groups with prefix {group_id}: {e}")
             return
 
-        # Get all invited members
+        # Parse the groups by their suffix
+        confirmed_members = set()
         invited_members = set()
-        try:
-            invited_group_id = f"{group_id}/Invited"
-            invited_group = client.get_group(invited_group_id)
-            invited_members = set(invited_group.members or [])
-        except Exception as e:
-            print(
-                f"Warning: Could not fetch invited group {invited_group_id}: {e}",
-                file=sys.stderr,
-            )
-            # If no invited group exists, assume all confirmed members were invited
-            invited_members = confirmed_members.copy()
-
-        # Get declined members
         declined_members = set()
-        try:
-            declined_group_id = f"{group_id}/Declined"
-            declined_group = client.get_group(declined_group_id)
-            declined_members = set(declined_group.members or [])
-        except Exception:
-            # Declined group might not exist
-            pass
+        for group in groups:
+            if group.id == group_id:
+                confirmed_members = set(group.members or [])
+            elif group.id == f"{group_id}/Invited":
+                invited_members = set(group.members or [])
+            elif group.id == f"{group_id}/Declined":
+                declined_members = set(group.members or [])
 
-        # Use all invited members as the complete list
-        all_members = list(invited_members)
+        # All members is the union of all three groups
+        all_members = list(confirmed_members | invited_members | declined_members)
         confirmed_count = len(confirmed_members)
         declined_count = len(declined_members)
         pending_count = len(all_members) - confirmed_count - declined_count
 
-        print(
-            f"Fetching information for {len(all_members)} {role_display} ({confirmed_count} accepted, {declined_count} declined, {pending_count} pending)...",
-            file=sys.stderr,
+        log.info(
+            f"Fetching information for {len(all_members)} {role_display} "
+            f"({confirmed_count} accepted, {declined_count} declined, {pending_count} pending)..."
         )
 
         # First fetch the member data to get profile IDs
@@ -591,9 +577,6 @@ class PcmembersCommand(Command):
             with open(args.output, "w") as f:
                 f.write(output_content)
             format_type = "RDF" if args.as_rdf else "JSON"
-            print(
-                f"Members saved to {args.output} in {format_type} format",
-                file=sys.stderr,
-            )
+            log.info(f"Members saved to {args.output} in {format_type} format")
         else:
             print(output_content)

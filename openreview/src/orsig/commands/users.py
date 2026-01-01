@@ -6,6 +6,7 @@ from argparse import ArgumentParser, Namespace
 
 from ..command import Command
 from ..utils import get_client
+from ..log import log
 
 
 class UsersCommand(Command):
@@ -45,15 +46,15 @@ class UsersCommand(Command):
         """
         List users/profiles and groups for the venue.
         """
-                # Get the singleton client (initialized in main.py)
+        # Get the singleton client (initialized in main.py)
         client = get_client()
 
         if args.search:
             # Search for profiles
-            print(f"Searching profiles with term: {args.search}...")
+            log.info(f"Searching profiles with term: {args.search}...")
             profiles = client.search_profiles(term=args.search)
 
-            print(f"Found {len(profiles)} profiles:")
+            log.info(f"Found {len(profiles)} profiles:")
             for profile in profiles:
                 preferred_name = (
                     profile.get_preferred_name()
@@ -71,10 +72,10 @@ class UsersCommand(Command):
 
         elif args.groups:
             # List all groups for venue
-            print(f"Fetching groups for venue: {args.venue_id}...")
+            log.info(f"Fetching groups for venue: {args.venue_id}...")
             groups = client.get_all_groups(prefix=args.venue_id)
 
-            print(f"Found {len(groups)} groups:")
+            log.info(f"Found {len(groups)} groups:")
             for group in groups:
                 member_count = len(group.members) if group.members else 0
                 print(f"  - {group.id} ({member_count} members)")
@@ -87,7 +88,7 @@ class UsersCommand(Command):
 
         else:
             # Get all users across all venue groups
-            print(f"Fetching all users for venue: {args.venue_id}...")
+            log.info(f"Fetching all users for venue: {args.venue_id}...")
             groups = client.get_all_groups(prefix=args.venue_id)
 
             # Collect all unique user IDs (not group IDs)
@@ -100,7 +101,7 @@ class UsersCommand(Command):
                             all_users.add(member)
 
             all_users_list = sorted(all_users)
-            print(f"Found {len(all_users_list)} unique users:")
+            log.info(f"Found {len(all_users_list)} unique users:")
 
             for user in all_users_list:
                 print(f"  - {user}")
@@ -124,4 +125,4 @@ class UsersCommand(Command):
                             print(f"    Name: {name}, Email: {email}")
                     except Exception as e:
                         if args.verbose:
-                            print(f"    Could not fetch profile: {e}")
+                            log.error(f"Could not fetch profile for {user}: {e}")
