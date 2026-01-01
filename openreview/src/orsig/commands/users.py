@@ -45,7 +45,8 @@ class UsersCommand(Command):
         """
         List users/profiles and groups for the venue.
         """
-        client = get_client(args.api_url, args.username, args.password)
+                # Get the singleton client (initialized in main.py)
+        client = get_client()
 
         if args.search:
             # Search for profiles

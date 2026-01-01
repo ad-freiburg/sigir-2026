@@ -7,8 +7,9 @@ import sys
 from argparse import ArgumentParser, Namespace
 
 from ..command import Command
-from ..utils import get_client, get_random_profiles
-from ..rdf import format_rdf_prefixes, Rdf
+from ..client import get_client
+from ..utils import get_random_profiles
+from ..rdf import Rdf
 from ..profile import ProfileWithPapers
 from ..log import log
 
@@ -79,7 +80,8 @@ class PcmembersCommand(Command):
         """
         Manage program committee members for the venue.
         """
-        client = get_client(args.api_url, args.username, args.password, args.impersonate)
+        # Get the singleton client (initialized in main.py)
+        client = get_client()
 
         if args.add:
             self._add_specific_members(args, client)
@@ -166,7 +168,11 @@ class PcmembersCommand(Command):
             try:
                 if user_id.startswith("~") or "@" in user_id:
                     profile = client.get_profile(user_id)
-                    name = profile.get_preferred_name() if hasattr(profile, "get_preferred_name") else user_id
+                    name = (
+                        profile.get_preferred_name()
+                        if hasattr(profile, "get_preferred_name")
+                        else user_id
+                    )
                 else:
                     name = user_id
             except Exception:
@@ -181,7 +187,7 @@ class PcmembersCommand(Command):
                 print(f"  - {name} ({user_id})")
                 new_count += 1
 
-        print(f"\nSummary:")
+        print("\nSummary:")
         print(f"  New {role_display}: {new_count}")
         print(f"  Already members: {duplicate_count}")
         print(f"  Total: {len(user_ids)}")
@@ -191,18 +197,26 @@ class PcmembersCommand(Command):
             new_members = list(existing_members.union(set(user_ids)))
 
             if args.only_show:
-                print(f"\nTo add these {role_display}, the group would need to be updated with:")
+                print(
+                    f"\nTo add these {role_display}, the group would need to be updated with:"
+                )
                 print(f"  Group ID: {group_id}")
                 print(f"  Total members after addition: {len(new_members)}")
-                print(f"\nNote: This is a preview only. Run without --only-show to actually add {role_display}.")
+                print(
+                    f"\nNote: This is a preview only. Run without --only-show to actually add {role_display}."
+                )
             else:
                 # Actually add the members
-                print(f"\nUpdating group...")
+                print("\nUpdating group...")
                 try:
                     # Add only the new members (not duplicates)
-                    new_member_ids = [uid for uid in user_ids if uid not in existing_members]
+                    new_member_ids = [
+                        uid for uid in user_ids if uid not in existing_members
+                    ]
                     client.add_members_to_group(group_id, new_member_ids)
-                    print(f"✓ Successfully added {new_count} new {role_display} to {group_id}")
+                    print(
+                        f"✓ Successfully added {new_count} new {role_display} to {group_id}"
+                    )
                     print(f"  Total members now: {len(new_members)}")
                 except Exception as e:
                     print(f"Error: Failed to update group: {e}")
@@ -240,7 +254,11 @@ class PcmembersCommand(Command):
             try:
                 if user_id.startswith("~") or "@" in user_id:
                     profile = client.get_profile(user_id)
-                    name = profile.get_preferred_name() if hasattr(profile, "get_preferred_name") else user_id
+                    name = (
+                        profile.get_preferred_name()
+                        if hasattr(profile, "get_preferred_name")
+                        else user_id
+                    )
                 else:
                     name = user_id
             except Exception:
@@ -255,7 +273,7 @@ class PcmembersCommand(Command):
                 print(f"  - {name} ({user_id}) [NOT A MEMBER]")
                 not_member_count += 1
 
-        print(f"\nSummary:")
+        print("\nSummary:")
         print(f"  To remove: {remove_count}")
         print(f"  Not members: {not_member_count}")
         print(f"  Total: {len(user_ids)}")
@@ -265,18 +283,26 @@ class PcmembersCommand(Command):
             remaining_members = [m for m in existing_members if m not in user_ids]
 
             if args.only_show:
-                print(f"\nTo remove these {role_display}, the group would need to be updated with:")
+                print(
+                    f"\nTo remove these {role_display}, the group would need to be updated with:"
+                )
                 print(f"  Group ID: {group_id}")
                 print(f"  Total members after removal: {len(remaining_members)}")
-                print(f"\nNote: This is a preview only. Run without --only-show to actually remove {role_display}.")
+                print(
+                    f"\nNote: This is a preview only. Run without --only-show to actually remove {role_display}."
+                )
             else:
                 # Actually remove the members
-                print(f"\nUpdating group...")
+                print("\nUpdating group...")
                 try:
                     # Remove only the members that exist
-                    members_to_remove = [uid for uid in user_ids if uid in existing_members]
+                    members_to_remove = [
+                        uid for uid in user_ids if uid in existing_members
+                    ]
                     client.remove_members_from_group(group_id, members_to_remove)
-                    print(f"✓ Successfully removed {remove_count} {role_display} from {group_id}")
+                    print(
+                        f"✓ Successfully removed {remove_count} {role_display} from {group_id}"
+                    )
                     print(f"  Total members now: {len(remaining_members)}")
                 except Exception as e:
                     print(f"Error: Failed to update group: {e}")
@@ -294,7 +320,9 @@ class PcmembersCommand(Command):
         # Get random profiles
         print(f"Finding {num_members} random profiles...")
         names, profile_ids = get_random_profiles(
-            client, num_members, placeholder_prefix=self._get_placeholder_prefix(args.role)
+            client,
+            num_members,
+            placeholder_prefix=self._get_placeholder_prefix(args.role),
         )
 
         # Get the group
@@ -323,7 +351,7 @@ class PcmembersCommand(Command):
                 print(f"  - {name} ({profile_id})")
                 new_count += 1
 
-        print(f"\nSummary:")
+        print("\nSummary:")
         print(f"  New {role_display}: {new_count}")
         print(f"  Already members: {duplicate_count}")
         print(f"  Total: {len(profile_ids)}")
@@ -333,18 +361,26 @@ class PcmembersCommand(Command):
             new_members = list(existing_members.union(set(profile_ids)))
 
             if args.only_show:
-                print(f"\nTo add these {role_display}, the group would need to be updated with:")
+                print(
+                    f"\nTo add these {role_display}, the group would need to be updated with:"
+                )
                 print(f"  Group ID: {group_id}")
                 print(f"  Total members after addition: {len(new_members)}")
-                print(f"\nNote: This is a preview only. Run without --only-show to actually add {role_display}.")
+                print(
+                    f"\nNote: This is a preview only. Run without --only-show to actually add {role_display}."
+                )
             else:
                 # Actually add the members
-                print(f"\nUpdating group...")
+                print("\nUpdating group...")
                 try:
                     # Add only the new members (not duplicates)
-                    new_member_ids = [pid for pid in profile_ids if pid not in existing_members]
+                    new_member_ids = [
+                        pid for pid in profile_ids if pid not in existing_members
+                    ]
                     client.add_members_to_group(group_id, new_member_ids)
-                    print(f"✓ Successfully added {new_count} new {role_display} to {group_id}")
+                    print(
+                        f"✓ Successfully added {new_count} new {role_display} to {group_id}"
+                    )
                     print(f"  Total members now: {len(new_members)}")
                 except Exception as e:
                     print(f"Error: Failed to update group: {e}")
@@ -355,20 +391,53 @@ class PcmembersCommand(Command):
         """
         List all members of the specified role and output their information as JSON or RDF.
         """
-        import sys
 
         group_suffix = self._get_group_suffix(args.role)
         group_id = f"{args.venue_id}/{group_suffix}"
         role_display = self._get_role_display_name(args.role)
 
+        # Get confirmed members from the group
         try:
             group = client.get_group(group_id)
-            members = group.members or []
+            confirmed_members = set(group.members or [])
         except Exception as e:
             print(f"Error: Could not fetch group {group_id}: {e}", file=sys.stderr)
             return
 
-        print(f"Fetching information for {len(members)} {role_display}...", file=sys.stderr)
+        # Get all invited members
+        invited_members = set()
+        try:
+            invited_group_id = f"{group_id}/Invited"
+            invited_group = client.get_group(invited_group_id)
+            invited_members = set(invited_group.members or [])
+        except Exception as e:
+            print(
+                f"Warning: Could not fetch invited group {invited_group_id}: {e}",
+                file=sys.stderr,
+            )
+            # If no invited group exists, assume all confirmed members were invited
+            invited_members = confirmed_members.copy()
+
+        # Get declined members
+        declined_members = set()
+        try:
+            declined_group_id = f"{group_id}/Declined"
+            declined_group = client.get_group(declined_group_id)
+            declined_members = set(declined_group.members or [])
+        except Exception:
+            # Declined group might not exist
+            pass
+
+        # Use all invited members as the complete list
+        all_members = list(invited_members)
+        confirmed_count = len(confirmed_members)
+        declined_count = len(declined_members)
+        pending_count = len(all_members) - confirmed_count - declined_count
+
+        print(
+            f"Fetching information for {len(all_members)} {role_display} ({confirmed_count} accepted, {declined_count} declined, {pending_count} pending)...",
+            file=sys.stderr,
+        )
 
         # First fetch the member data to get profile IDs
         members_data = []
@@ -376,10 +445,17 @@ class PcmembersCommand(Command):
         # Create shared ProfileWithPapers instance for --with-profiles
         profile_with_papers = None
         if args.with_profiles:
-            client_factory = lambda: client
-            profile_with_papers = ProfileWithPapers(client_factory=client_factory)
+            profile_with_papers = ProfileWithPapers()
 
-        for member_id in members:
+        for member_id in all_members:
+            # Determine member status
+            if member_id in confirmed_members:
+                member_status = "accepted"
+            elif member_id in declined_members:
+                member_status = "declined"
+            else:
+                member_status = "pending"
+
             try:
                 # Try to get profile information
                 if member_id.startswith("~") or "@" in member_id:
@@ -388,6 +464,7 @@ class PcmembersCommand(Command):
                         try:
                             profile_with_papers.get_profile(member_id)
                             member_info = profile_with_papers.asJson()
+                            member_info["status"] = member_status
                         except Exception as e:
                             log.error(f"Failed to get profile for {member_id}: {e}")
                             member_info = {
@@ -396,6 +473,7 @@ class PcmembersCommand(Command):
                                 "email": None,
                                 "emails": [],
                                 "homepage": None,
+                                "status": member_status,
                                 "error": str(e),
                             }
                     else:
@@ -403,10 +481,19 @@ class PcmembersCommand(Command):
                         profile = client.get_profile(member_id)
                         member_info = {
                             "id": profile.id,
-                            "name": profile.get_preferred_name() if hasattr(profile, "get_preferred_name") else None,
-                            "email": profile.get_preferred_email() if hasattr(profile, "get_preferred_email") else None,
-                            "emails": profile.content.get("emails", []) if hasattr(profile, "content") else [],
-                            "homepage": profile.content.get("homepage") if hasattr(profile, "content") else None,
+                            "name": profile.get_preferred_name()
+                            if hasattr(profile, "get_preferred_name")
+                            else None,
+                            "email": profile.get_preferred_email()
+                            if hasattr(profile, "get_preferred_email")
+                            else None,
+                            "emails": profile.content.get("emails", [])
+                            if hasattr(profile, "content")
+                            else [],
+                            "homepage": profile.content.get("homepage")
+                            if hasattr(profile, "content")
+                            else None,
+                            "status": member_status,
                         }
                 else:
                     # It's a group or other ID
@@ -416,30 +503,27 @@ class PcmembersCommand(Command):
                         "email": None,
                         "emails": [],
                         "homepage": None,
+                        "status": member_status,
                     }
                 members_data.append(member_info)
             except Exception as e:
                 # If we can't get profile info, just include the ID
-                members_data.append({
-                    "id": member_id,
-                    "name": None,
-                    "email": None,
-                    "emails": [],
-                    "homepage": None,
-                    "error": str(e),
-                })
+                members_data.append(
+                    {
+                        "id": member_id,
+                        "name": None,
+                        "email": None,
+                        "emails": [],
+                        "homepage": None,
+                        "status": member_status,
+                        "error": str(e),
+                    }
+                )
 
         # Generate output based on format
         if args.as_rdf:
             # Generate RDF output
             rdf = Rdf()
-
-            # Build RDF content
-            rdf_lines = []
-
-            # Add prefixes
-            rdf_lines.append(format_rdf_prefixes(rdf.get_prefixes()))
-            rdf_lines.append('')  # Empty line after prefixes
 
             # Get the RDF class for this role
             rdf_class = self._get_rdf_class(args.role)
@@ -449,32 +533,55 @@ class PcmembersCommand(Command):
                 profile_id = member_info.get("id")
                 if profile_id:  # Skip if no ID
                     person_iri = rdf.personIri(profile_id)
-                    if args.with_profiles and not member_info.get("error"):
-                        # Add full profile RDF information using shared instance (only if no error in data collection)
+                    if args.with_profiles:
+                        # Add profile RDF information using shared instance
                         if profile_with_papers is None:
-                            client_factory = lambda: client
-                            profile_with_papers = ProfileWithPapers(client_factory=client_factory)
+                            profile_with_papers = ProfileWithPapers()
                         try:
                             profile_with_papers.get_profile(profile_id)
-                            profile_rdf = profile_with_papers.asRdf()
-                            # Extract just the profile triples (skip prefixes)
-                            profile_lines = profile_rdf.split('\n')
-                            for line in profile_lines:
-                                if line.strip() and not line.startswith('@'):
-                                    rdf_lines.append(line)
+                            profile_with_papers.addToRdf(
+                                rdf, profile_with_papers.asJson(), profile_id
+                            )
                         except Exception as e:
-                            log.error(f"Failed to get profile RDF for {profile_id}: {e}")
-                    # Add role information
-                    rdf_lines.append(f"{person_iri} a {rdf_class} .")
+                            log.error(
+                                f"Failed to get profile RDF for {profile_id}: {e}"
+                            )
+                            profile_with_papers.addToRdf(
+                                rdf, {"id": profile_id, "error": str(e)}, profile_id
+                            )
+                    else:
+                        # No profile requested, just add :dblp_id :novalue
+                        rdf.add_triple(person_iri, ":dblp_id", ":novalue")
 
-            output_content = '\n'.join(rdf_lines)
+                    # Add role and status
+                    rdf.add_triple(person_iri, "a", rdf_class)
+                    rdf.add_triple(
+                        person_iri,
+                        ":status",
+                        rdf.literal(member_info.get("status", "pending")),
+                    )
+
+            output_content = rdf.as_turtle()
         else:
             # Generate JSON output
+            accepted_count = len(
+                [m for m in members_data if m.get("status") == "accepted"]
+            )
+            declined_count = len(
+                [m for m in members_data if m.get("status") == "declined"]
+            )
+            pending_count = len(
+                [m for m in members_data if m.get("status") == "pending"]
+            )
+
             output_data = {
                 "venue_id": args.venue_id,
                 "role": args.role,
                 "group_id": group_id,
-                "count": len(members_data),
+                "total_count": len(members_data),
+                "accepted_count": accepted_count,
+                "declined_count": declined_count,
+                "pending_count": pending_count,
                 "members": members_data,
             }
             output_content = json.dumps(output_data, indent=2)
@@ -484,6 +591,9 @@ class PcmembersCommand(Command):
             with open(args.output, "w") as f:
                 f.write(output_content)
             format_type = "RDF" if args.as_rdf else "JSON"
-            print(f"Members saved to {args.output} in {format_type} format", file=sys.stderr)
+            print(
+                f"Members saved to {args.output} in {format_type} format",
+                file=sys.stderr,
+            )
         else:
             print(output_content)

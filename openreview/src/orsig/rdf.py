@@ -3,28 +3,16 @@ RDF helper functions for OpenReview data export.
 """
 
 import os
-from typing import List, Tuple, Any, Dict
+import re
+from typing import List, Any, Dict
+from collections import defaultdict
 
 
-def get_rdf_base() -> str:
+def get_rdf_default_prefix() -> str:
     """
-    Get the RDF base URL from environment variable or .env file.
+    Get the RDF default prefix URL from environment variable or .env file.
     """
-    return os.environ.get('RDF_BASE', 'http://example.org/')
-
-
-def format_rdf_prefixes(additional_prefixes: List[Tuple[str, str]] = None) -> str:
-    """
-    Format RDF prefix declarations including @base and any additional prefixes.
-    """
-    rdf_base = get_rdf_base()
-    lines = [f'@base <{rdf_base}> .']
-
-    if additional_prefixes:
-        for prefix_name, prefix_uri in additional_prefixes:
-            lines.append(f'@prefix {prefix_name}: <{prefix_uri}> .')
-
-    return '\n'.join(lines)
+    return os.environ.get("RDF_DEFAULT_PREFIX", "http://example.org/")
 
 
 def escape_rdf_literal(value: str) -> str:
@@ -32,37 +20,92 @@ def escape_rdf_literal(value: str) -> str:
     Escape a string value for use in RDF literals.
     """
     # Escape backslashes first, then quotes and newlines
-    value = value.replace('\\', '\\\\')
+    value = value.replace("\\", "\\\\")
     value = value.replace('"', '\\"')
-    value = value.replace('\n', '\\n')
-    value = value.replace('\r', '\\r')
-    value = value.replace('\t', '\\t')
+    value = value.replace("\n", "\\n")
+    value = value.replace("\r", "\\r")
+    value = value.replace("\t", "\\t")
     return value
-
-
-def format_rdf_triple(subject: str, predicate: str, object_value: str, is_literal: bool = True) -> str:
-    """
-    Format an RDF triple.
-    """
-    if is_literal:
-        escaped_value = escape_rdf_literal(object_value)
-        return f'{subject} {predicate} "{escaped_value}" .'
-    else:
-        return f'{subject} {predicate} {object_value} .'
 
 
 class Rdf:
     """
-    Class for generating RDF terms and managing RDF namespaces.
+    RDF utility class for generating IRIs and literals and collecting triples.
     """
 
-    def __init__(self):
+    def __init__(self, prefixes: dict[str, str] | None = None):
+        default_prefix = os.environ.get("RDF_DEFAULT_PREFIX", "http://openreview.net/")
+        self.prefixes = {
+            "": default_prefix,
+            "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+            "xsd": "http://www.w3.org/2001/XMLSchema#",
+            "submission": "https://openreview.net/forum?id=",
+            "person": "https://openreview.net/profile?id=~",
+        }
+        if prefixes:
+            self.prefixes.update(prefixes)
+        self.triples: list[tuple[str, str, str]] = []
+
+    def add_triple(self, subject: str, predicate: str, object: str) -> None:
         """
-        Initialize with the RDF base URL.
+        Add a triple to the collection.
         """
-        self.base = get_rdf_base()
-        self.submission_prefix = f"{self.base}submission/"
-        self.person_prefix = f"{self.base}person/"
+        self.triples.append((subject, predicate, object))
+
+    def as_turtle(self) -> str:
+        """
+        Serialize triples as Turtle format with proper formatting.
+        """
+        lines = []
+
+        # Add prefix declarations
+        for prefix, uri in self.prefixes.items():
+            if prefix == "":
+                lines.append(f"@prefix : <{uri}> .")
+            else:
+                lines.append(f"@prefix {prefix}: <{uri}> .")
+
+        # Empty line after prefixes
+        lines.append("")
+
+        # Group triples by subject
+        if not self.triples:
+            return "\n".join(lines)
+
+        by_subject: dict[str, list[tuple[str, str]]] = defaultdict(list)
+        for s, p, o in self.triples:
+            by_subject[s].append((p, o))
+
+        # Serialize each subject group
+        for subject, pred_objs in by_subject.items():
+            # Group by predicate within each subject
+            by_pred: dict[str, list[str]] = defaultdict(list)
+            for p, o in pred_objs:
+                by_pred[p].append(o)
+
+            # Write the subject and first predicate
+            pred_items = list(by_pred.items())
+            if pred_items:
+                first_pred, first_objs = pred_items[0]
+                # Write first object
+                lines.append(f"{subject} {first_pred} {first_objs[0]}")
+                # Write additional objects for first predicate with comma
+                for obj in first_objs[1:]:
+                    lines[-1] += f", {obj}"
+
+                # Write remaining predicates with semicolon
+                for pred, objs in pred_items[1:]:
+                    lines[-1] += " ;"
+                    # First object of new predicate
+                    lines.append(f"  {pred} {objs[0]}")
+                    # Additional objects with comma
+                    for obj in objs[1:]:
+                        lines[-1] += f", {obj}"
+
+                # End with period
+                lines[-1] += " ."
+
+        return "\n".join(lines)
 
     def submissionIri(self, submission_id: str) -> str:
         """
@@ -76,9 +119,9 @@ class Rdf:
         """
         # Remove special characters and create a clean ID
         # Replace ~ with empty string, spaces with underscores
-        clean_id = person_id.replace('~', '').replace(' ', '_')
+        clean_id = person_id.replace("~", "").replace(" ", "_")
         # For emails, replace @ and . with underscores
-        clean_id = clean_id.replace('@', '_at_').replace('.', '_')
+        clean_id = clean_id.replace("@", "_at_").replace(".", "_")
         return f"person:{clean_id}"
 
     def literal(self, value: str) -> str:
@@ -93,7 +136,7 @@ class Rdf:
         Get a value from a JSON object via a path and return as RDF literal.
         """
         current = obj
-        for key in path.split('.'):
+        for key in path.split("."):
             if isinstance(current, dict) and key in current:
                 current = current.get(key)
             else:
@@ -113,7 +156,7 @@ class Rdf:
         Get a value from a JSON object via a path and return as prefixed IRI.
         """
         current = obj
-        for key in path.split('.'):
+        for key in path.split("."):
             if isinstance(current, dict) and key in current:
                 current = current.get(key)
             else:
@@ -122,14 +165,14 @@ class Rdf:
         # If we got a value, return it as a prefixed IRI
         if current and isinstance(current, str):
             # Use special handling for person IRIs
-            if prefix == 'person':
+            if prefix == "person":
                 # Remove special characters and create a clean ID
-                clean_id = current.replace('~', '').replace(' ', '_')
+                clean_id = current.replace("~", "").replace(" ", "_")
                 # For emails, replace @ and . with underscores
-                clean_id = clean_id.replace('@', '_at_').replace('.', '_')
+                clean_id = clean_id.replace("@", "_at_").replace(".", "_")
             else:
                 # Basic cleaning for other prefixes
-                clean_id = current.replace(' ', '_')
+                clean_id = current.replace(" ", "_")
             return f"{prefix}:{clean_id}"
         elif current is not None and not isinstance(current, (dict, list)):
             # Handle other types (numbers, booleans)
@@ -137,12 +180,14 @@ class Rdf:
         else:
             return ":novalue"
 
-    def urlFromJson(self, obj: Dict[str, Any], path: str, fallback: str) -> str:
+    def urlFromJson(
+        self, obj: Dict[str, Any], path: str, fallback: str = ":novalue"
+    ) -> str:
         """
         Get a URL from a JSON object via a path and return as full IRI with angle brackets.
         """
         current = obj
-        for key in path.split('.'):
+        for key in path.split("."):
             if isinstance(current, dict) and key in current:
                 current = current.get(key)
             else:
@@ -159,7 +204,7 @@ class Rdf:
         Get an array of values from a JSON object via a path.
         """
         current = obj
-        for key in path.split('.'):
+        for key in path.split("."):
             if isinstance(current, dict) and key in current:
                 current = current.get(key)
             else:
@@ -171,12 +216,15 @@ class Rdf:
         else:
             return []
 
-    def get_prefixes(self) -> List[Tuple[str, str]]:
+    def dblpUrlFromBibtex(self, paper: Dict[str, Any]) -> str:
         """
-        Get the list of prefixes used by this Rdf instance.
+        Extract DBLP URL from a paper's _bibtex.value field.
+        Returns the URL as a full IRI with angle brackets, or empty string if not found.
         """
-        return [
-            ('submission', self.submission_prefix),
-            ('person', self.person_prefix),
-            ('rdfs', 'http://www.w3.org/2000/01/rdf-schema#'),
-        ]
+        bibtex = paper.get("content", {}).get("_bibtex", {}).get("value", "")
+        if bibtex:
+            # Parse DBLP key from bibtex entry like @inproceedings{DBLP:conf/emnlp/...,
+            match = re.search(r"@\w+\{DBLP:([^,]+),", bibtex)
+            if match:
+                return f"<https://dblp.org/rec/{match.group(1)}>"
+        return ""

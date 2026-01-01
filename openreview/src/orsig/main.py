@@ -87,7 +87,13 @@ def main() -> None:
     # Parse arguments with argcomplete support.
     argcomplete.autocomplete(parser, always_complete_options="long")
     args = parser.parse_args()
+
     if hasattr(args, "command"):
+        # Set client parameters from command-line arguments (if provided)
+        # The client will be created lazily when first needed
+        from .client import set_client_params
+        set_client_params(args.api_url, args.username, args.password, args.impersonate)
+
         args.command.execute(args)
     else:
         parser.print_help()

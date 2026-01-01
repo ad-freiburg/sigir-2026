@@ -103,7 +103,8 @@ class SubmitCommand(Command):
         """
         Submit papers to OpenReview.
         """
-        client = get_client(args.api_url, args.username, args.password)
+                # Get the singleton client (initialized in main.py)
+        client = get_client()
 
         # Construct the submission invitation ID
         submission_invitation = f"{args.venue_id}/-/Submission"

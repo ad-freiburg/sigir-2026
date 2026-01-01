@@ -10,27 +10,12 @@ import string
 import tempfile
 from typing import Any
 
-import openreview
 from openai import OpenAI
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 
+from .client import get_client
 
-def get_client(baseurl: str, username: str, password: str, impersonate_group: str = None) -> openreview.api.OpenReviewClient:
-    """
-    Initialize and return OpenReview client.
-    """
-    client = openreview.api.OpenReviewClient(
-        baseurl=baseurl,
-        username=username,
-        password=password,
-    )
-
-    # If impersonate_group is provided, impersonate that group
-    if impersonate_group:
-        client.impersonate(impersonate_group)
-
-    return client
 
 
 def format_author_name(author_id: str) -> str:
@@ -154,19 +139,19 @@ def generate_random_paper(
 
 
 def get_random_profiles(
-    client: openreview.api.OpenReviewClient, num_profiles: int, placeholder_prefix: str = "Random User"
+    num_profiles: int, placeholder_prefix: str = "Random User"
 ) -> tuple[list[str], list[str]]:
     """
     Get random profiles by searching with random two-letter strings.
 
     Args:
-        client: OpenReview client
         num_profiles: Number of random profiles to retrieve
         placeholder_prefix: Prefix for placeholder names if not enough profiles found
 
     Returns:
         Tuple of (names, profile_ids)
     """
+    client = get_client()
     names: list[str] = []
     profile_ids: list[str] = []
 
@@ -209,12 +194,12 @@ def get_random_profiles(
 
 
 def get_random_authors(
-    client: openreview.api.OpenReviewClient, num_authors: int
+    num_authors: int
 ) -> tuple[list[str], list[str]]:
     """
     Get random authors by searching with random two-letter strings.
     """
-    return get_random_profiles(client, num_authors, placeholder_prefix="Random Author")
+    return get_random_profiles(num_authors, placeholder_prefix="Random Author")
 
 
 def create_dummy_pdf(title: str, authors: list[str], abstract: str) -> str:

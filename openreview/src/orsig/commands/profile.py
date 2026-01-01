@@ -46,11 +46,9 @@ class ProfileCommand(Command):
         """
         Get complete profile information for the specified user.
         """
-        # Create client factory - client only created if cache miss
-        client_factory = lambda: get_client(args.api_url, args.username, args.password, args.impersonate)
-
+        # Client is already initialized in main.py
         try:
-            profile_with_papers = ProfileWithPapers(client_factory=client_factory)
+            profile_with_papers = ProfileWithPapers()
             profile_with_papers.get_profile(args.profile_id)
 
             if args.as_rdf:

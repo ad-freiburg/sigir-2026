@@ -32,7 +32,8 @@ class InvitationsCommand(Command):
         """
         List all invitations for the venue.
         """
-        client = get_client(args.api_url, args.username, args.password)
+        # Get the singleton client (initialized in main.py)
+        client = get_client()
 
         print(f"Fetching invitations for venue: {args.venue_id}...")
         invitations = client.get_all_invitations(prefix=args.venue_id)
