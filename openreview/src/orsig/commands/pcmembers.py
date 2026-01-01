@@ -457,7 +457,7 @@ class PcmembersCommand(Command):
                             member_info = profile_with_papers.asJson()
                             member_info["status"] = member_status
                         except Exception as e:
-                            log.error(f"Failed to get profile for {member_id}: {e}")
+                            log.warning(f"Failed to get profile for {member_id}: {e}")
                             member_info = {
                                 "id": member_id,
                                 "name": None,
@@ -519,29 +519,14 @@ class PcmembersCommand(Command):
             # Get the RDF class for this role
             rdf_class = self._get_rdf_class(args.role)
 
-            # Add a triple for each member using the profile ID from the data
+            # Add a triple for each member using the already-fetched profile data
             for member_info in members_data:
                 profile_id = member_info.get("id")
                 if profile_id:  # Skip if no ID
                     person_iri = rdf.personIri(profile_id)
                     if args.with_profiles:
-                        # Add profile RDF information using shared instance
-                        if profile_with_papers is None:
-                            profile_with_papers = ProfileWithPapers(
-                                cache_dir=args.cache_dir, recache=args.recache
-                            )
-                        try:
-                            profile_with_papers.get_profile(profile_id)
-                            profile_with_papers.addToRdf(
-                                rdf, profile_with_papers.asJson(), profile_id
-                            )
-                        except Exception as e:
-                            log.error(
-                                f"Failed to get profile RDF for {profile_id}: {e}"
-                            )
-                            profile_with_papers.addToRdf(
-                                rdf, {"id": profile_id, "error": str(e)}, profile_id
-                            )
+                        # Use already-fetched profile data from members_data
+                        profile_with_papers.addToRdf(rdf, member_info, profile_id)
                     else:
                         # No profile requested, just add :dblp_id :novalue
                         rdf.add_triple(person_iri, ":dblp_id", ":novalue")

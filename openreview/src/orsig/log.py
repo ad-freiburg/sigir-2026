@@ -18,11 +18,11 @@ class OrsigLogFormatter(logging.Formatter):
     def format(self, record):
         message = record.getMessage()
         if record.levelno == logging.DEBUG:
-            return colored(f"{message}", "magenta")
+            return colored(message, "magenta", force_color=True)
         elif record.levelno == logging.WARNING:
-            return colored(f"{message}", "yellow")
+            return colored(message, "yellow", force_color=True)
         elif record.levelno in [logging.CRITICAL, logging.ERROR]:
-            return colored(f"{message}", "red")
+            return colored(message, "red", force_color=True)
         else:
             return message
 

@@ -50,6 +50,11 @@ class SubmissionsCommand(Command):
             action="store_true",
             help="Include full profile information for all authors",
         )
+        parser.add_argument(
+            "--recache",
+            action="store_true",
+            help="Fetch fresh profiles from OpenReview and update the cache",
+        )
 
     def execute(self, args: Namespace) -> None:
         """
@@ -74,7 +79,9 @@ class SubmissionsCommand(Command):
 
         # Get profile for each distinct author.
         author_profiles = {}
-        profile_with_papers = ProfileWithPapers(cache_dir=args.cache_dir)
+        profile_with_papers = ProfileWithPapers(
+            cache_dir=args.cache_dir, recache=args.recache
+        )
         if args.with_profiles:
             log.info(
                 f"Fetching profiles for {len(all_author_ids)} distinct authors ..."
@@ -84,7 +91,7 @@ class SubmissionsCommand(Command):
                     profile_with_papers.get_profile(author_id)
                     author_profiles[author_id] = profile_with_papers.asJson()
                 except Exception as e:
-                    log.error(f"Failed to get profile for {author_id}: {e}")
+                    log.warning(f"Failed to get profile for {author_id}: {e}")
                     author_profiles[author_id] = {"id": author_id, "error": str(e)}
 
         if args.as_rdf:

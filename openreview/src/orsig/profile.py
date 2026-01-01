@@ -203,6 +203,16 @@ class ProfileWithPapers:
             fullname_literal = ":novalue"
         rdf.add_triple(person_iri, "rdfs:label", fullname_literal)
 
+        # Add current position and institution from history (first entry)
+        history = profile_data.get("content", {}).get("history", [])
+        current = history[0] if history else {}
+        rdf.add_triple(
+            person_iri, ":position", rdf.literalFromJson(current, "position")
+        )
+        rdf.add_triple(
+            person_iri, ":institution", rdf.literalFromJson(current, "institution.name")
+        )
+
         # Add imported DBLP papers
         papers = profile_data.get("imported_dblp_papers", [])
         for paper in papers:
