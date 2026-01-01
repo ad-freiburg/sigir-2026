@@ -222,7 +222,9 @@ class Rdf:
         Returns the URL as a full IRI with angle brackets, or empty string if not found.
         """
         bibtex = paper.get("content", {}).get("_bibtex", {}).get("value", "")
-        if bibtex:
+        if isinstance(bibtex, dict):
+            bibtex = bibtex.get("value", "")
+        if bibtex and isinstance(bibtex, str):
             # Parse DBLP key from bibtex entry like @inproceedings{DBLP:conf/emnlp/...,
             match = re.search(r"@\w+\{DBLP:([^,]+),", bibtex)
             if match:

@@ -33,8 +33,8 @@ class PcmembersCommand(Command):
         parser.add_argument(
             "--role",
             required=True,
-            choices=["reviewers", "area-chairs", "senior-area-chairs"],
-            help="Role type to manage",
+            choices=["pc", "spc", "ac"],
+            help="Role type: pc (reviewers), spc (area chairs), ac (senior area chairs)",
         )
         parser.add_argument(
             "--add",
@@ -70,11 +70,6 @@ class PcmembersCommand(Command):
             help="Output members as RDF triples instead of JSON",
         )
         parser.add_argument(
-            "--with-profiles",
-            action="store_true",
-            help="Include full profile information for each member",
-        )
-        parser.add_argument(
             "--recache",
             action="store_true",
             help="Fetch fresh profiles from OpenReview and update the cache",
@@ -101,9 +96,9 @@ class PcmembersCommand(Command):
         Map CLI role name to OpenReview group suffix.
         """
         role_mapping = {
-            "reviewers": "Reviewers",
-            "area-chairs": "Area_Chairs",
-            "senior-area-chairs": "Senior_Area_Chairs",
+            "pc": "Reviewers",
+            "spc": "Area_Chairs",
+            "ac": "Senior_Area_Chairs",
         }
         return role_mapping[role]
 
@@ -112,9 +107,9 @@ class PcmembersCommand(Command):
         Get human-readable display name for role.
         """
         display_names = {
-            "reviewers": "reviewers",
-            "area-chairs": "area chairs",
-            "senior-area-chairs": "senior area chairs",
+            "pc": "PC aka Reviewers",
+            "spc": "SPC aka Area Chairs",
+            "ac": "AC aka Senior Area Chairs",
         }
         return display_names[role]
 
@@ -123,9 +118,9 @@ class PcmembersCommand(Command):
         Get placeholder prefix for random profile generation.
         """
         prefixes = {
-            "reviewers": "Random Reviewer",
-            "area-chairs": "Random Area Chair",
-            "senior-area-chairs": "Random Senior Area Chair",
+            "pc": "Random PC",
+            "spc": "Random SPC",
+            "ac": "Random AC",
         }
         return prefixes[role]
 
@@ -134,9 +129,9 @@ class PcmembersCommand(Command):
         Get RDF class name for the role.
         """
         rdf_classes = {
-            "reviewers": ":Reviewer",
-            "area-chairs": ":AreaChair",
-            "senior-area-chairs": ":SeniorAreaChair",
+            "pc": ":PC",
+            "spc": ":SPC",
+            "ac": ":AC",
         }
         return rdf_classes[role]
 
@@ -425,18 +420,15 @@ class PcmembersCommand(Command):
 
         log.info(
             f"Fetching information for {len(all_members)} {role_display} "
-            f"({confirmed_count} accepted, {declined_count} declined, {pending_count} pending)..."
+            f"({confirmed_count} accepted, {declined_count} declined, "
+            f"{pending_count} pending) ..."
         )
 
-        # First fetch the member data to get profile IDs
+        # Fetch profile data for each member
         members_data = []
-
-        # Create shared ProfileWithPapers instance for --with-profiles
-        profile_with_papers = None
-        if args.with_profiles:
-            profile_with_papers = ProfileWithPapers(
-                cache_dir=args.cache_dir, recache=args.recache
-            )
+        profile_with_papers = ProfileWithPapers(
+            cache_dir=args.cache_dir, recache=args.recache
+        )
 
         for member_id in all_members:
             # Determine member status
@@ -447,69 +439,11 @@ class PcmembersCommand(Command):
             else:
                 member_status = "pending"
 
-            try:
-                # Try to get profile information
-                if member_id.startswith("~") or "@" in member_id:
-                    if args.with_profiles:
-                        # Get full profile with papers using shared instance
-                        try:
-                            profile_with_papers.get_profile(member_id)
-                            member_info = profile_with_papers.asJson()
-                            member_info["status"] = member_status
-                        except Exception as e:
-                            log.warning(f"Failed to get profile for {member_id}: {e}")
-                            member_info = {
-                                "id": member_id,
-                                "name": None,
-                                "email": None,
-                                "emails": [],
-                                "homepage": None,
-                                "status": member_status,
-                                "error": str(e),
-                            }
-                    else:
-                        # Get basic profile information
-                        profile = client.get_profile(member_id)
-                        member_info = {
-                            "id": profile.id,
-                            "name": profile.get_preferred_name()
-                            if hasattr(profile, "get_preferred_name")
-                            else None,
-                            "email": profile.get_preferred_email()
-                            if hasattr(profile, "get_preferred_email")
-                            else None,
-                            "emails": profile.content.get("emails", [])
-                            if hasattr(profile, "content")
-                            else [],
-                            "homepage": profile.content.get("homepage")
-                            if hasattr(profile, "content")
-                            else None,
-                            "status": member_status,
-                        }
-                else:
-                    # It's a group or other ID
-                    member_info = {
-                        "id": member_id,
-                        "name": None,
-                        "email": None,
-                        "emails": [],
-                        "homepage": None,
-                        "status": member_status,
-                    }
-                members_data.append(member_info)
-            except Exception as e:
-                # If we can't get profile info, just include the ID
-                members_data.append(
-                    {
-                        "id": member_id,
-                        "name": None,
-                        "email": None,
-                        "emails": [],
-                        "homepage": None,
-                        "status": member_status,
-                        "error": str(e),
-                    }
-                )
+            # Get profile information (defaults to empty profile on failure)
+            profile_with_papers.get_profile(member_id)
+            member_info = profile_with_papers.asJson()
+            member_info["status"] = member_status
+            members_data.append(member_info)
 
         # Generate output based on format
         if args.as_rdf:
@@ -524,20 +458,15 @@ class PcmembersCommand(Command):
                 profile_id = member_info.get("id")
                 if profile_id:  # Skip if no ID
                     person_iri = rdf.personIri(profile_id)
-                    if args.with_profiles:
-                        # Use already-fetched profile data from members_data
-                        profile_with_papers.addToRdf(rdf, member_info, profile_id)
-                    else:
-                        # No profile requested, just add :dblp_id :novalue
-                        rdf.add_triple(person_iri, ":dblp_id", ":novalue")
-
-                    # Add role and status
+                    rdf.add_triple(person_iri, "a", ":Person")
                     rdf.add_triple(person_iri, "a", rdf_class)
                     rdf.add_triple(
                         person_iri,
                         ":status",
                         rdf.literal(member_info.get("status", "pending")),
                     )
+                    # Add profile data
+                    profile_with_papers.addToRdf(rdf, member_info, profile_id)
 
             output_content = rdf.as_turtle()
         else:

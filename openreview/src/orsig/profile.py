@@ -16,6 +16,20 @@ class ProfileWithPapers:
     Class for managing OpenReview profile data with imported DBLP papers.
     """
 
+    @staticmethod
+    def empty_profile(
+        profile_id: str, error: str = "", status: str = ""
+    ) -> Dict[str, Any]:
+        """
+        Create an empty profile dict for profiles that couldn't be loaded.
+        """
+        info: Dict[str, Any] = {"id": profile_id}
+        if error:
+            info["error"] = error
+        if status:
+            info["status"] = status
+        return info
+
     def __init__(
         self,
         cache_profiles: bool = True,
@@ -36,6 +50,7 @@ class ProfileWithPapers:
     def get_profile(self, profile_id: str) -> None:
         """
         Get the profile as well as all imported DBLP papers for a given ID.
+        On failure, sets up a default empty profile (not cached).
         """
         # Clear any cached result from previous calls
         if hasattr(self, "_cached_final_result"):
@@ -44,8 +59,13 @@ class ProfileWithPapers:
         # Get the client (singleton if no args)
         client = get_client()
 
-        # Get the profile using the OpenReview client to get canonical ID
-        self.profile = client.get_profile(profile_id)
+        # Try to get the profile; on failure, use a default empty profile
+        try:
+            self.profile = client.get_profile(profile_id)
+        except Exception as e:
+            log.warning(f"Failed to get profile for {profile_id}: {e}")
+            self._cached_final_result = self.empty_profile(profile_id, str(e))
+            return
 
         # Get the canonical profile ID for caching
         canonical_profile_id = self.profile.id
@@ -156,7 +176,7 @@ class ProfileWithPapers:
     ) -> str:
         """
         Add profile triples to an existing Rdf instance.
-        If profile_data has an error, just adds :dblp_id :novalue.
+        If profile_data has an error, adds core triples with :novalue.
         If person_id is provided, use that for the IRI; otherwise use profile_data's id.
         Returns the person IRI for additional triples.
         """
@@ -166,13 +186,13 @@ class ProfileWithPapers:
 
         person_iri = rdf.personIri(effective_id)
 
-        # If there was an error fetching the profile, just add :dblp_id :novalue
+        # If there was an error fetching the profile, add core triples with :novalue
         if profile_data.get("error"):
+            rdf.add_triple(person_iri, "rdfs:label", ":novalue")
             rdf.add_triple(person_iri, ":dblp_id", ":novalue")
+            rdf.add_triple(person_iri, ":position", ":novalue")
+            rdf.add_triple(person_iri, ":institution", ":novalue")
             return person_iri
-
-        # Add type declaration
-        rdf.add_triple(person_iri, "a", ":Person")
 
         # Add properties
         rdf.add_triple(

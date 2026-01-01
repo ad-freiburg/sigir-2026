@@ -46,11 +46,6 @@ class SubmissionsCommand(Command):
             help="Output submissions as RDF triples instead of JSON",
         )
         parser.add_argument(
-            "--with-profiles",
-            action="store_true",
-            help="Include full profile information for all authors",
-        )
-        parser.add_argument(
             "--recache",
             action="store_true",
             help="Fetch fresh profiles from OpenReview and update the cache",
@@ -62,13 +57,7 @@ class SubmissionsCommand(Command):
         """
         # Get submissions.
         submission_invitation = f"{args.venue_id}/-/Submission"
-        log.info(
-            f"Fetching all submissions from {args.venue_id} "
-            f"using invitation {submission_invitation}..."
-        )
         submissions = get_client().get_all_notes(invitation=submission_invitation)
-
-        log.info(f"Submissions found: {len(submissions)}")
 
         # Get the set of distinct author IDs.
         all_author_ids = set()
@@ -77,22 +66,19 @@ class SubmissionsCommand(Command):
             for author_id in author_ids:
                 all_author_ids.add(author_id)
 
+        log.info(
+            f"Fetching information for {len(submissions)} submissions "
+            f"with {len(all_author_ids)} distinct authors ..."
+        )
+
         # Get profile for each distinct author.
         author_profiles = {}
         profile_with_papers = ProfileWithPapers(
             cache_dir=args.cache_dir, recache=args.recache
         )
-        if args.with_profiles:
-            log.info(
-                f"Fetching profiles for {len(all_author_ids)} distinct authors ..."
-            )
-            for author_id in all_author_ids:
-                try:
-                    profile_with_papers.get_profile(author_id)
-                    author_profiles[author_id] = profile_with_papers.asJson()
-                except Exception as e:
-                    log.warning(f"Failed to get profile for {author_id}: {e}")
-                    author_profiles[author_id] = {"id": author_id, "error": str(e)}
+        for author_id in all_author_ids:
+            profile_with_papers.get_profile(author_id)
+            author_profiles[author_id] = profile_with_papers.asJson()
 
         if args.as_rdf:
             # Add RDF triples for each submission.
@@ -114,14 +100,12 @@ class SubmissionsCommand(Command):
                     rdf.iriFromJson(note.content, "serve_as_reviewer.value", "person"),
                 )
 
-            # Add RDF triple for each author profile.
-            if args.with_profiles:
-                for author_id, profile_data in author_profiles.items():
-                    profile_with_papers.addToRdf(rdf, profile_data, author_id)
-            else:
-                # No profiles requested, just add :dblp_id :novalue for each author
-                for author_id in all_author_ids:
-                    rdf.add_triple(rdf.personIri(author_id), ":dblp_id", ":novalue")
+            # Add RDF triples for each author profile.
+            for author_id in all_author_ids:
+                person_iri = rdf.personIri(author_id)
+                rdf.add_triple(person_iri, "a", ":Person")
+                rdf.add_triple(person_iri, "a", ":Author")
+                profile_with_papers.addToRdf(rdf, author_profiles[author_id], author_id)
 
             output_content = rdf.as_turtle()
         else:
@@ -129,18 +113,10 @@ class SubmissionsCommand(Command):
             submissions_data = []
             for note in submissions:
                 submission_json = note.to_json()
-
-                # Add author profiles if --with-profiles is specified
-                if args.with_profiles:
-                    author_ids = note.content.get("authorids", {}).get("value", [])
-                    authors_with_profiles = []
-                    for author_id in author_ids:
-                        if author_id and author_id in author_profiles:
-                            authors_with_profiles.append(author_profiles[author_id])
-                        else:
-                            authors_with_profiles.append({"id": author_id})
-                    submission_json["authors_profiles"] = authors_with_profiles
-
+                author_ids = note.content.get("authorids", {}).get("value", [])
+                submission_json["authors_profiles"] = [
+                    author_profiles.get(aid, {"id": aid}) for aid in author_ids
+                ]
                 submissions_data.append(submission_json)
 
             output_content = json.dumps(submissions_data, indent=2)
