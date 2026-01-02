@@ -39,7 +39,7 @@ class Rdf:
             "": default_prefix,
             "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
             "xsd": "http://www.w3.org/2001/XMLSchema#",
-            "submission": "https://openreview.net/forum?id=",
+            "paper": "https://openreview.net/forum?id=",
             "person": "https://openreview.net/profile?id=~",
         }
         if prefixes:
@@ -107,11 +107,14 @@ class Rdf:
 
         return "\n".join(lines)
 
-    def submissionIri(self, submission_id: str) -> str:
+    def paperIri(self, paper_id: str) -> str:
         """
-        Create a submission IRI from an OpenReview submission ID.
+        Create a paper IRI from an OpenReview paper/submission ID.
+        Uses full IRI if ID starts with invalid prefix character (e.g., hyphen).
         """
-        return f"submission:{submission_id}"
+        if paper_id and paper_id[0] == "-":
+            return f"<{self.prefixes['paper']}{paper_id}>"
+        return f"paper:{paper_id}"
 
     def personIri(self, person_id: str) -> str:
         """
@@ -218,12 +221,16 @@ class Rdf:
 
     def dblpUrlFromBibtex(self, paper: Dict[str, Any]) -> str:
         """
-        Extract DBLP URL from a paper's _bibtex.value field.
+        Extract DBLP URL from a paper's _bibtex field.
+        Handles both API v1 (string) and API v2 (dict with value key) formats.
         Returns the URL as a full IRI with angle brackets, or empty string if not found.
         """
-        bibtex = paper.get("content", {}).get("_bibtex", {}).get("value", "")
-        if isinstance(bibtex, dict):
-            bibtex = bibtex.get("value", "")
+        bibtex_field = paper.get("content", {}).get("_bibtex", "")
+        # Handle both string and dict formats
+        if isinstance(bibtex_field, dict):
+            bibtex = bibtex_field.get("value", "")
+        else:
+            bibtex = bibtex_field
         if bibtex and isinstance(bibtex, str):
             # Parse DBLP key from bibtex entry like @inproceedings{DBLP:conf/emnlp/...,
             match = re.search(r"@\w+\{DBLP:([^,]+),", bibtex)

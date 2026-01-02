@@ -9,6 +9,7 @@ from argparse import ArgumentParser, Namespace
 from ..command import Command
 from ..client import get_client
 from ..log import log
+from ..qlever import recipients_from_query
 
 
 class MailCommand(Command):
@@ -38,6 +39,11 @@ class MailCommand(Command):
             "--dry-run",
             action="store_true",
             help="Parse and show the email without sending",
+        )
+        parser.add_argument(
+            "--recipients-from-sparql-query",
+            metavar="HASH",
+            help="Replace To: recipients with results from a SPARQL query (short hash)",
         )
 
     def _get_name(self, profile) -> str:
@@ -77,6 +83,21 @@ class MailCommand(Command):
         # Read the file
         with open(args.file, "r") as f:
             content = f.read()
+
+        # Replace To: recipients from SPARQL query if requested
+        if args.recipients_from_sparql_query:
+            if not content.startswith("To:"):
+                log.error(
+                    "Mail file must start with 'To:' when using --recipients-from-sparql-query"
+                )
+                return
+            query_recipients = recipients_from_query(args.recipients_from_sparql_query)
+            new_to_line = "To: " + ", ".join(query_recipients)
+            # Replace the first line (To: ...) with the new recipients
+            content = new_to_line + content[content.index("\n") :]
+            # Write updated content back to file
+            with open(args.file, "w") as f:
+                f.write(content)
 
         # Split headers and body (separated by blank line)
         parts = content.split("\n\n", 1)
@@ -147,6 +168,7 @@ class MailCommand(Command):
         needs_personalization = "{{name}}" in body
 
         # Show what we're sending
+        log.info("")
         log.info(f"From: {headers.get('From')}")
         log.info(f"To: {headers.get('To')}")
         if cc_recipients:
@@ -180,20 +202,22 @@ class MailCommand(Command):
         invitation = f"{args.venue_id}/-/Edit"
 
         # Send the email(s) to To recipients
-        try:
-            if needs_personalization:
-                # Send individual personalized messages
-                for recipient in recipients:
-                    # Get profile to find name
-                    try:
-                        profile = client.get_profile(recipient)
-                        name = self._get_name(profile)
-                    except Exception:
-                        name = ""
+        sent_count = 0
+        failed_count = 0
+        if needs_personalization:
+            # Send individual personalized messages
+            for recipient in recipients:
+                # Get profile to find name
+                try:
+                    profile = client.get_profile(recipient)
+                    name = self._get_name(profile)
+                except Exception:
+                    name = ""
 
-                    # Personalize body
-                    personalized_body = body.replace("{{name}}", name if name else "")
+                # Personalize body
+                personalized_body = body.replace("{{name}}", name if name else "")
 
+                try:
                     client.post_message(
                         subject=headers["Subject"],
                         recipients=[recipient],
@@ -202,8 +226,13 @@ class MailCommand(Command):
                         sender=sender,
                         replyTo=reply_to,
                     )
-            else:
-                # Send single message to all To recipients
+                    sent_count += 1
+                except Exception as e:
+                    log.warning(f"Failed to send to {recipient}: {e}")
+                    failed_count += 1
+        else:
+            # Send single message to all To recipients
+            try:
                 client.post_message(
                     subject=headers["Subject"],
                     recipients=recipients,
@@ -212,10 +241,21 @@ class MailCommand(Command):
                     sender=sender,
                     replyTo=reply_to,
                 )
-            log.info("Email sent successfully")
-        except Exception as e:
-            log.error(f"Failed to send email: {e}")
-            return
+                sent_count = len(recipients)
+            except Exception as e:
+                log.error(f"Failed to send email: {e}")
+                failed_count = len(recipients)
+
+        # Report results
+        def pluralize(n):
+            return "one recipient" if n == 1 else f"{n} recipients"
+
+        if failed_count == 0:
+            log.info(f"Email sent successfully to {pluralize(sent_count)}")
+        else:
+            log.info(
+                f"Email sent to {pluralize(sent_count)}, failed for {pluralize(failed_count)}"
+            )
 
         # Send FYI to Cc recipients
         if cc_recipients:

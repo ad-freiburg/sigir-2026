@@ -84,7 +84,7 @@ class SubmissionsCommand(Command):
             # Add RDF triples for each submission.
             rdf = Rdf()
             for note in submissions:
-                submission_iri = rdf.submissionIri(note.id)
+                submission_iri = rdf.paperIri(note.id)
                 rdf.add_triple(submission_iri, "a", ":Submission")
                 rdf.add_triple(
                     submission_iri,

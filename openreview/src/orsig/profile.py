@@ -8,7 +8,7 @@ from typing import Dict, Any
 
 from .log import log
 from .rdf import Rdf
-from .client import get_client
+from .client import get_client, get_client_v1
 
 
 class ProfileWithPapers:
@@ -80,10 +80,36 @@ class ProfileWithPapers:
                 self._restore_from_cache(cached_data)
                 return
 
-        # Fetch DBLP papers for this profile
-        raw_papers = client.get_notes(
-            invitation="DBLP.org/-/Record", content={"authorids": canonical_profile_id}
-        )
+        # Fetch all papers for this profile from both API v1 and v2.
+        #
+        # NOTE: This is exactly how the the web UI does it in order to show all
+        # publications for a profile.
+        seen_ids = set()
+        raw_papers = []
+
+        def add_papers(papers):
+            for paper in papers:
+                if paper.id not in seen_ids:
+                    seen_ids.add(paper.id)
+                    raw_papers.append(paper)
+
+        # Query API v2 (current API)
+        try:
+            add_papers(
+                client.get_all_notes(content={"authorids": canonical_profile_id})
+            )
+        except Exception:
+            pass
+
+        # Query API v1 (legacy API, contains most DBLP/ORCID imports)
+        try:
+            add_papers(
+                get_client_v1().get_all_notes(
+                    content={"authorids": canonical_profile_id}
+                )
+            )
+        except Exception:
+            pass
 
         # Process papers
         self.papers = []
@@ -138,7 +164,7 @@ class ProfileWithPapers:
         # Pre-compute the final output format to avoid processing on load
         profile_json = self.profile.to_json()
         final_result = profile_json.copy()
-        final_result["imported_dblp_papers"] = self.papers
+        final_result["publications"] = self.papers
 
         # Save to cache file using JSON
         try:
@@ -168,7 +194,7 @@ class ProfileWithPapers:
             raise ValueError("Profile not loaded. Call get_profile() first.")
 
         result = self.profile.to_json()
-        result["imported_dblp_papers"] = self.papers
+        result["publications"] = self.papers
         return result
 
     def addToRdf(
@@ -188,11 +214,18 @@ class ProfileWithPapers:
 
         # If there was an error fetching the profile, add core triples with :novalue
         if profile_data.get("error"):
+            rdf.add_triple(person_iri, ":id", ":novalue")
             rdf.add_triple(person_iri, "rdfs:label", ":novalue")
             rdf.add_triple(person_iri, ":dblp_id", ":novalue")
             rdf.add_triple(person_iri, ":position", ":novalue")
             rdf.add_triple(person_iri, ":institution", ":novalue")
             return person_iri
+
+        # Add profile ID
+        profile_id = profile_data.get("id", "")
+        rdf.add_triple(
+            person_iri, ":id", rdf.literal(profile_id) if profile_id else ":novalue"
+        )
 
         # Add properties
         rdf.add_triple(
@@ -233,12 +266,15 @@ class ProfileWithPapers:
             person_iri, ":institution", rdf.literalFromJson(current, "institution.name")
         )
 
-        # Add imported DBLP papers
-        papers = profile_data.get("imported_dblp_papers", [])
+        # Add publications
+        papers = profile_data.get("publications", [])
         for paper in papers:
+            paper_id = paper.get("id", "")
+            if paper_id:
+                rdf.add_triple(person_iri, ":publication", rdf.paperIri(paper_id))
             dblp_iri = rdf.dblpUrlFromBibtex(paper)
             if dblp_iri:
-                rdf.add_triple(person_iri, ":dblp_pub", dblp_iri)
+                rdf.add_triple(person_iri, ":dblp_publication", dblp_iri)
 
         return person_iri
 
@@ -253,7 +289,7 @@ class ProfileWithPapers:
             if not self.profile:
                 raise ValueError("Profile not loaded. Call get_profile() first.")
             profile_data = self.profile.to_json()
-            profile_data["imported_dblp_papers"] = self.papers
+            profile_data["publications"] = self.papers
 
         # Generate RDF output
         rdf = Rdf()
