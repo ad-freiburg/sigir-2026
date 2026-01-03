@@ -34,7 +34,9 @@ CACHE_DIR=orsig-cache
 MAIL_FROM=Name <sender@openreview.net>
 MAIL_FROM_DIRECT=Name <your_email>
 QLEVER_LINK_API=https://qlever.dev/api/link/
-QLEVER_QUERY_API=hostname:port/
+QLEVER_QUERY_API=https://qlever.dev/api/sigir-2026
+QLEVER_QUERY_API_USERNAME=username
+QLEVER_QUERY_API_PASSWORD=password
 ```
 
 ## RDF System

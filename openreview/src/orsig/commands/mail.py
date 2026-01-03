@@ -259,16 +259,6 @@ class MailCommand(Command):
 
         # Send FYI to Cc recipients
         if cc_recipients:
-            cc_sender_env = os.environ.get("MAIL_FROM_DIRECT")
-            if cc_sender_env:
-                cc_parsed = self._parse_from_header(cc_sender_env)
-                if cc_parsed["fromEmail"].endswith("@openreview.net"):
-                    cc_sender = cc_parsed
-                else:
-                    cc_sender = None
-            else:
-                cc_sender = None
-
             fyi_subject = f"FYI: {headers['Subject']}"
             fyi_body = (
                 f"FYI, the mail below was sent to {num_recipients}: "
@@ -284,7 +274,7 @@ class MailCommand(Command):
                     recipients=cc_recipients,
                     message=fyi_body,
                     invitation=invitation,
-                    sender=cc_sender,
+                    sender=sender,
                 )
                 log.info(f"FYI sent to Cc: {headers.get('Cc')}")
             except Exception as e:
