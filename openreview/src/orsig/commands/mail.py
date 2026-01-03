@@ -5,6 +5,7 @@ Mail command for sending emails via OpenReview.
 import os
 import re
 from argparse import ArgumentParser, Namespace
+from urllib.parse import quote
 
 from ..command import Command
 from ..client import get_client
@@ -84,19 +85,39 @@ class MailCommand(Command):
         with open(args.file, "r") as f:
             content = f.read()
 
+        # Extract and preserve comment lines, check for # Query: comment
+        query_from_file = None
+        content_lines = content.split("\n")
+        comment_lines = []
+        while content_lines and content_lines[0].strip().startswith("#"):
+            line = content_lines.pop(0)
+            comment_lines.append(line)
+            if line.strip().startswith("# Query:"):
+                query_from_file = line.strip()[8:].strip()
+        content = "\n".join(content_lines)
+
+        # Use query from file if no command-line argument was given
+        query_hash_or_url = args.recipients_from_sparql_query or query_from_file
+
         # Replace To: recipients from SPARQL query if requested
-        if args.recipients_from_sparql_query:
+        if query_hash_or_url:
+            if query_from_file and not args.recipients_from_sparql_query:
+                log.info(f"Using query from file: {query_from_file}")
+
             if not content.startswith("To:"):
                 log.error(
-                    "Mail file must start with 'To:' when using --recipients-from-sparql-query"
+                    "Mail file must start with 'To:' (after any # comments) "
+                    "when using a SPARQL query for recipients"
                 )
                 return
-            query_recipients = recipients_from_query(args.recipients_from_sparql_query)
+            query_recipients = recipients_from_query(query_hash_or_url)
             new_to_line = "To: " + ", ".join(query_recipients)
             # Replace the first line (To: ...) with the new recipients
             content = new_to_line + content[content.index("\n") :]
-            # Write updated content back to file
+            # Write updated content back to file, preserving comment lines
             with open(args.file, "w") as f:
+                if comment_lines:
+                    f.write("\n".join(comment_lines) + "\n")
                 f.write(content)
 
         # Split headers and body (separated by blank line)
@@ -260,9 +281,14 @@ class MailCommand(Command):
         # Send FYI to Cc recipients
         if cc_recipients:
             fyi_subject = f"FYI: {headers['Subject']}"
+            subject_encoded = quote(headers["Subject"], safe="")
+            message_log_url = (
+                f"https://openreview.net/messages?subject={subject_encoded}"
+            )
             fyi_body = (
                 f"FYI, the mail below was sent to {num_recipients}: "
-                f"{headers.get('To')}"
+                f"{headers.get('To')}\n\n"
+                f"[Click here to see all messages with that subject in the OpenReview message log]({message_log_url})"
                 f"{self.separator}\n\n"
                 f"{body}"
                 f"{self.separator}"
