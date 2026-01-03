@@ -1,9 +1,11 @@
 """
-Program committee members command for managing reviewers, area chairs, and senior area chairs.
+Recruitment command for managing reviewers, area chairs, and senior area chairs.
 """
 
 import json
 from argparse import ArgumentParser, Namespace
+
+import openreview
 
 from ..command import Command
 from ..client import get_client
@@ -13,28 +15,33 @@ from ..profile import ProfileWithPapers
 from ..log import log
 
 
-class PcmembersCommand(Command):
+class RecruitmentCommand(Command):
     """
-    Manage program committee members (reviewers, area chairs, senior area chairs) for the venue.
+    Manage recruitment of reviewers, area chairs, and senior area chairs for the venue.
     """
 
     @property
     def name(self) -> str:
-        return "pcmembers"
+        return "recruitment"
 
     @property
     def help(self) -> str:
-        return "Manage program committee members for the venue"
+        return "Manage recruitment for the venue"
 
     def add_arguments(self, parser: ArgumentParser) -> None:
         """
-        Add pcmembers command arguments.
+        Add recruitment command arguments.
         """
         parser.add_argument(
             "--role",
             required=True,
             choices=["pc", "spc", "ac"],
             help="Role type: pc (reviewers), spc (area chairs), ac (senior area chairs)",
+        )
+        parser.add_argument(
+            "--dump",
+            choices=["json", "rdf"],
+            help="Dump recruitment data in the specified format",
         )
         parser.add_argument(
             "--add",
@@ -55,6 +62,12 @@ class PcmembersCommand(Command):
             help="Add K random members to the specified role",
         )
         parser.add_argument(
+            "--set-reduced-load",
+            nargs=2,
+            metavar=("PROFILE_ID", "LOAD"),
+            help="Set reduced load for a member (e.g., --set-reduced-load ~John_Doe1 2)",
+        )
+        parser.add_argument(
             "--only-show",
             action="store_true",
             help="Only show what would be added without actually adding",
@@ -65,11 +78,6 @@ class PcmembersCommand(Command):
             default=None,
         )
         parser.add_argument(
-            "--as-rdf",
-            action="store_true",
-            help="Output members as RDF triples instead of JSON",
-        )
-        parser.add_argument(
             "--recache",
             action="store_true",
             help="Fetch fresh profiles from OpenReview and update the cache",
@@ -77,19 +85,25 @@ class PcmembersCommand(Command):
 
     def execute(self, args: Namespace) -> None:
         """
-        Manage program committee members for the venue.
+        Execute recruitment command.
         """
         # Get the singleton client (initialized in main.py)
         client = get_client()
 
-        if args.add:
+        if args.dump:
+            self._dump_members(args, client)
+        elif args.add:
             self._add_specific_members(args, client)
         elif args.remove:
             self._remove_specific_members(args, client)
         elif args.add_random:
             self._add_random_members(args, client)
+        elif args.set_reduced_load:
+            self._set_reduced_load(args, client)
         else:
-            self._list_members(args, client)
+            log.info(
+                "No action specified. Use --dump, --add, --remove, or --set-reduced-load."
+            )
 
     def _get_group_suffix(self, role: str) -> str:
         """
@@ -134,6 +148,94 @@ class PcmembersCommand(Command):
             "ac": ":AC",
         }
         return rdf_classes[role]
+
+    def _get_reduced_loads(self, args: Namespace, client) -> dict[str, int]:
+        """
+        Fetch reduced_load values from recruitment notes.
+        Returns a dict mapping user email/profile ID to their reduced load as integer.
+        """
+        group_suffix = self._get_group_suffix(args.role)
+        recruitment_invitation = f"{args.venue_id}/{group_suffix}/-/Recruitment"
+
+        reduced_loads = {}
+        try:
+            notes = client.get_all_notes(invitation=recruitment_invitation)
+            for note in notes:
+                content = note.content
+                if "reduced_load" in content and content["reduced_load"].get("value"):
+                    user = content.get("user", {}).get("value", "")
+                    load_str = content["reduced_load"]["value"]
+                    if user and load_str:
+                        try:
+                            reduced_loads[user] = int(load_str)
+                        except ValueError:
+                            pass
+        except Exception as e:
+            log.warning(f"Could not fetch recruitment notes: {e}")
+
+        return reduced_loads
+
+    def _set_reduced_load(self, args: Namespace, client) -> None:
+        """
+        Set the reduced load for a member by updating their recruitment note.
+        """
+        profile_id, load_str = args.set_reduced_load
+
+        try:
+            load = int(load_str)
+        except ValueError:
+            log.error(f"Invalid load value: {load_str}. Must be an integer.")
+            return
+
+        group_suffix = self._get_group_suffix(args.role)
+        recruitment_invitation = f"{args.venue_id}/{group_suffix}/-/Recruitment"
+
+        # Resolve profile ID to canonical form and get emails
+        try:
+            profile = client.get_profile(profile_id)
+            canonical_id = profile.id
+            profile_emails = set(profile.content.get("emails", []))
+            log.info(f"Setting reduced load for {canonical_id} to {load}")
+        except Exception as e:
+            log.error(f"Could not find profile {profile_id}: {e}")
+            return
+
+        # Find the recruitment note for this user (by email)
+        try:
+            notes = client.get_all_notes(invitation=recruitment_invitation)
+            recruitment_note = None
+            for note in notes:
+                user_email = note.content.get("user", {}).get("value", "")
+                if user_email in profile_emails:
+                    recruitment_note = note
+                    break
+
+            if not recruitment_note:
+                log.error(
+                    f"No recruitment note found for {canonical_id}. "
+                    "The user may not have responded to recruitment yet."
+                )
+                return
+
+        except Exception as e:
+            log.error(f"Could not fetch recruitment notes: {e}")
+            return
+
+        # Update the recruitment note with the new reduced_load using the meta Edit invitation
+        try:
+            client.post_note_edit(
+                invitation=f"{args.venue_id}/-/Edit",
+                signatures=[args.venue_id],
+                note=openreview.api.Note(
+                    id=recruitment_note.id,
+                    content={
+                        "reduced_load": {"value": str(load)},
+                    },
+                ),
+            )
+            log.info(f"Successfully set reduced load for {canonical_id} to {load}")
+        except Exception as e:
+            log.error(f"Could not update recruitment note: {e}")
 
     def _add_specific_members(self, args: Namespace, client) -> None:
         """
@@ -386,9 +488,9 @@ class PcmembersCommand(Command):
         else:
             log.info(f"\nNo new {role_display} to add (all are already members).")
 
-    def _list_members(self, args: Namespace, client) -> None:
+    def _dump_members(self, args: Namespace, client) -> None:
         """
-        List all members of the specified role and output their information as JSON or RDF.
+        Dump all members of the specified role and output their information as JSON or RDF.
         """
 
         group_suffix = self._get_group_suffix(args.role)
@@ -424,6 +526,11 @@ class PcmembersCommand(Command):
             f"{pending_count} pending) ..."
         )
 
+        # Fetch reduced_load data from recruitment notes (keyed by email)
+        reduced_loads = self._get_reduced_loads(args, client)
+        if reduced_loads:
+            log.info(f"Found {len(reduced_loads)} members with reduced load")
+
         # Fetch profile data for each member
         members_data = []
         profile_with_papers = ProfileWithPapers(
@@ -443,10 +550,18 @@ class PcmembersCommand(Command):
             profile_with_papers.get_profile(member_id)
             member_info = profile_with_papers.asJson()
             member_info["status"] = member_status
+
+            # Check if this member has a reduced_load (match by email)
+            member_emails = member_info.get("content", {}).get("emails", [])
+            for email in member_emails:
+                if email in reduced_loads:
+                    member_info["reduced_load"] = reduced_loads[email]
+                    break
+
             members_data.append(member_info)
 
         # Generate output based on format
-        if args.as_rdf:
+        if args.dump == "rdf":
             # Generate RDF output
             rdf = Rdf()
 
@@ -465,6 +580,13 @@ class PcmembersCommand(Command):
                         ":status",
                         rdf.literal(member_info.get("status", "pending")),
                     )
+                    # Add reduced_load if present
+                    if "reduced_load" in member_info:
+                        rdf.add_triple(
+                            person_iri,
+                            ":reduced_load",
+                            str(member_info["reduced_load"]),
+                        )
                     # Add profile data
                     profile_with_papers.addToRdf(rdf, member_info, profile_id)
 
@@ -497,7 +619,6 @@ class PcmembersCommand(Command):
         if args.output:
             with open(args.output, "w") as f:
                 f.write(output_content)
-            format_type = "RDF" if args.as_rdf else "JSON"
-            log.info(f"Members saved to {args.output} in {format_type} format")
+            log.info(f"Members saved to {args.output} in {args.dump.upper()} format")
         else:
             print(output_content)

@@ -31,6 +31,12 @@ class SubmissionsCommand(Command):
         Add submissions command arguments.
         """
         parser.add_argument(
+            "--dump",
+            choices=["json", "rdf"],
+            required=True,
+            help="Dump submissions in the specified format",
+        )
+        parser.add_argument(
             "--output",
             help="Output file path (default: stdout)",
             default=None,
@@ -39,11 +45,6 @@ class SubmissionsCommand(Command):
             "--verbose",
             action="store_true",
             help="Print detailed information about each submission",
-        )
-        parser.add_argument(
-            "--as-rdf",
-            action="store_true",
-            help="Output submissions as RDF triples instead of JSON",
         )
         parser.add_argument(
             "--recache",
@@ -80,7 +81,7 @@ class SubmissionsCommand(Command):
             profile_with_papers.get_profile(author_id)
             author_profiles[author_id] = profile_with_papers.asJson()
 
-        if args.as_rdf:
+        if args.dump == "rdf":
             # Add RDF triples for each submission.
             rdf = Rdf()
             for note in submissions:
@@ -125,8 +126,9 @@ class SubmissionsCommand(Command):
         if args.output:
             with open(args.output, "w") as f:
                 f.write(output_content)
-            format_type = "RDF" if args.as_rdf else "JSON"
-            log.info(f"Submissions saved to {args.output} in {format_type} format")
+            log.info(
+                f"Submissions saved to {args.output} in {args.dump.upper()} format"
+            )
         else:
             print(output_content)
 
