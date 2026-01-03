@@ -46,14 +46,14 @@ class RecruitmentCommand(Command):
         parser.add_argument(
             "--add",
             nargs="+",
-            metavar="USER_ID",
-            help="Add one or more users by ID (e.g., ~Hannah_Bast1 or email@example.com)",
+            metavar=("GROUP", "USER_ID"),
+            help="Add users to a group: --add {accepted,invited,declined} USER_ID [USER_ID ...]",
         )
         parser.add_argument(
             "--remove",
             nargs="+",
-            metavar="USER_ID",
-            help="Remove one or more users by ID (e.g., ~Hannah_Bast1 or email@example.com)",
+            metavar=("GROUP", "USER_ID"),
+            help="Remove users from a group: --remove {accepted,invited,declined} USER_ID [USER_ID ...]",
         )
         parser.add_argument(
             "--add-random",
@@ -93,9 +93,27 @@ class RecruitmentCommand(Command):
         if args.dump:
             self._dump_members(args, client)
         elif args.add:
-            self._add_specific_members(args, client)
+            if len(args.add) < 2:
+                log.error("--add requires GROUP and at least one USER_ID")
+                return
+            to_group = args.add[0]
+            if to_group not in ("accepted", "invited", "declined"):
+                log.error(
+                    f"Invalid group '{to_group}'. Must be accepted, invited, or declined."
+                )
+                return
+            self._add_specific_members(args, client, to_group, args.add[1:])
         elif args.remove:
-            self._remove_specific_members(args, client)
+            if len(args.remove) < 2:
+                log.error("--remove requires GROUP and at least one USER_ID")
+                return
+            from_group = args.remove[0]
+            if from_group not in ("accepted", "invited", "declined"):
+                log.error(
+                    f"Invalid group '{from_group}'. Must be accepted, invited, or declined."
+                )
+                return
+            self._remove_specific_members(args, client, from_group, args.remove[1:])
         elif args.add_random:
             self._add_random_members(args, client)
         elif args.set_reduced_load:
@@ -237,17 +255,23 @@ class RecruitmentCommand(Command):
         except Exception as e:
             log.error(f"Could not update recruitment note: {e}")
 
-    def _add_specific_members(self, args: Namespace, client) -> None:
+    def _add_specific_members(
+        self, args: Namespace, client, to_group: str, user_ids: list[str]
+    ) -> None:
         """
         Add specific members by ID to the specified role group.
         """
-        user_ids = args.add
         role_display = self._get_role_display_name(args.role)
-        log.info(f"Adding {len(user_ids)} {role_display} to {args.venue_id}...")
+        log.info(f"Adding {len(user_ids)} to {to_group} {role_display}...")
 
-        # Get the group
+        # Get the group based on to_group
         group_suffix = self._get_group_suffix(args.role)
-        group_id = f"{args.venue_id}/{group_suffix}"
+        if to_group == "accepted":
+            group_id = f"{args.venue_id}/{group_suffix}"
+        elif to_group == "invited":
+            group_id = f"{args.venue_id}/{group_suffix}/Invited"
+        else:  # declined
+            group_id = f"{args.venue_id}/{group_suffix}/Declined"
 
         try:
             group = client.get_group(group_id)
@@ -324,17 +348,23 @@ class RecruitmentCommand(Command):
         else:
             log.info(f"\nNo new {role_display} to add (all are already members).")
 
-    def _remove_specific_members(self, args: Namespace, client) -> None:
+    def _remove_specific_members(
+        self, args: Namespace, client, from_group: str, user_ids: list[str]
+    ) -> None:
         """
         Remove specific members by ID from the specified role group.
         """
-        user_ids = args.remove
         role_display = self._get_role_display_name(args.role)
-        log.info(f"Removing {len(user_ids)} {role_display} from {args.venue_id}...")
+        log.info(f"Removing {len(user_ids)} from {from_group} {role_display}...")
 
-        # Get the group
+        # Get the group based on from_group
         group_suffix = self._get_group_suffix(args.role)
-        group_id = f"{args.venue_id}/{group_suffix}"
+        if from_group == "accepted":
+            group_id = f"{args.venue_id}/{group_suffix}"
+        elif from_group == "invited":
+            group_id = f"{args.venue_id}/{group_suffix}/Invited"
+        else:  # declined
+            group_id = f"{args.venue_id}/{group_suffix}/Declined"
 
         try:
             group = client.get_group(group_id)
@@ -528,8 +558,6 @@ class RecruitmentCommand(Command):
 
         # Fetch reduced_load data from recruitment notes (keyed by email)
         reduced_loads = self._get_reduced_loads(args, client)
-        if reduced_loads:
-            log.info(f"Found {len(reduced_loads)} members with reduced load")
 
         # Fetch profile data for each member
         members_data = []
@@ -574,7 +602,7 @@ class RecruitmentCommand(Command):
                 if profile_id:  # Skip if no ID
                     person_iri = rdf.personIri(profile_id)
                     rdf.add_triple(person_iri, "a", ":Person")
-                    rdf.add_triple(person_iri, "a", rdf_class)
+                    rdf.add_triple(person_iri, ":role", rdf_class)
                     rdf.add_triple(
                         person_iri,
                         ":status",
