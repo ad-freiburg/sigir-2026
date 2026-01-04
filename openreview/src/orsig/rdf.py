@@ -4,6 +4,7 @@ RDF helper functions for OpenReview data export.
 
 import os
 import re
+from datetime import datetime, timezone
 from typing import List, Any, Dict
 from collections import defaultdict
 
@@ -218,6 +219,16 @@ class Rdf:
             return current
         else:
             return []
+
+    def dateTimeFromTimestamp(self, timestamp_ms: int | None) -> str:
+        """
+        Convert milliseconds timestamp to xsd:dateTime literal.
+        Returns :novalue if timestamp is None or falsy.
+        """
+        if not timestamp_ms:
+            return ":novalue"
+        dt = datetime.fromtimestamp(timestamp_ms / 1000, tz=timezone.utc)
+        return f'"{dt.strftime("%Y-%m-%dT%H:%M:%SZ")}"^^xsd:dateTime'
 
     def dblpUrlFromBibtex(self, paper: Dict[str, Any]) -> str:
         """

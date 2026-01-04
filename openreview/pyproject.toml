@@ -7,8 +7,10 @@ dependencies = [
     "argcomplete",
     "numpy",
     "openai",
+    "pdf2image",
     "reportlab",
     "python-dotenv",
+    "termcolor",
 ]
 
 [project.scripts]
