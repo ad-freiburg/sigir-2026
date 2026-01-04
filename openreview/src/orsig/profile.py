@@ -46,15 +46,113 @@ class ProfileWithPapers:
         self.cache_profiles = cache_profiles
         self.cache_dir = str(Path(cache_dir) / "profiles")
         self.recache = recache
+        # Track which profiles need updating (set by check_profiles_for_updates)
+        self._profiles_needing_update: set[str] = set()
+        self._batch_check_done = False
+        # Map from input IDs (emails, aliases) to canonical profile IDs
+        self._id_to_canonical: Dict[str, str] = {}
+
+    def check_profiles_for_updates(self, member_ids: list[str]) -> set[str]:
+        """
+        Batch check which profiles have changed since they were cached.
+        Uses batch API calls to fetch current tmdates for all profiles.
+        Handles both profile IDs (~...) and email addresses.
+        Logs a message for each profile that has changed.
+        Returns set of canonical profile IDs that need updating.
+        """
+        if not member_ids:
+            return set()
+
+        # Separate profile IDs and emails
+        profile_ids = [mid for mid in member_ids if mid.startswith("~")]
+        email_ids = [mid for mid in member_ids if "@" in mid]
+
+        client = get_client()
+        all_profiles = []
+
+        # Batch fetch profiles by ID
+        if profile_ids:
+            try:
+                profiles_by_id = client.search_profiles(ids=profile_ids)
+                for profile in profiles_by_id:
+                    all_profiles.append(profile)
+                    # Store input ID → canonical ID mapping (may differ)
+                    self._id_to_canonical[profile.id] = profile.id
+            except Exception as e:
+                log.warning(f"Failed to batch check profile IDs: {e}")
+                self._profiles_needing_update = set(profile_ids)
+                self._batch_check_done = True
+                return self._profiles_needing_update
+
+        # Batch fetch profiles by email
+        if email_ids:
+            try:
+                email_results = client.search_profiles(emails=email_ids)
+                # email_results is a dict: email -> list of Profile objects
+                for email, profiles in email_results.items():
+                    if profiles:
+                        profile = profiles[0]  # Take first match
+                        all_profiles.append(profile)
+                        # Store email → canonical ID mapping
+                        self._id_to_canonical[email] = profile.id
+            except Exception as e:
+                log.warning(f"Failed to batch check emails: {e}")
+                # Continue with what we have
+
+        # Load cached tmdates using canonical IDs from API response
+        cached_tmdates: Dict[str, int] = {}
+        for profile in all_profiles:
+            canonical_id = profile.id
+            cached = self._load_from_cache(canonical_id)
+            if cached:
+                cached_tmdates[canonical_id] = cached.get("tmdate", 0)
+
+        # Compare tmdates and identify changes
+        self._profiles_needing_update = set()
+        for profile in all_profiles:
+            canonical_id = profile.id
+            current_tmdate = profile.tmdate
+            cached_tmdate = cached_tmdates.get(canonical_id, 0)
+
+            if canonical_id not in cached_tmdates:
+                # New profile, not in cache
+                log.info(f"New profile: {canonical_id}")
+                self._profiles_needing_update.add(canonical_id)
+            elif current_tmdate != cached_tmdate:
+                # Profile has changed
+                log.info(f"Changed profile: {canonical_id}")
+                self._profiles_needing_update.add(canonical_id)
+
+        self._batch_check_done = True
+
+        # Log summary
+        if self._profiles_needing_update:
+            log.info(f"Profiles to update: {len(self._profiles_needing_update)}")
+        else:
+            log.info("No profile changes detected")
+
+        return self._profiles_needing_update
 
     def get_profile(self, profile_id: str) -> None:
         """
         Get the profile as well as all imported DBLP papers for a given ID.
         On failure, sets up a default empty profile (not cached).
+
+        If check_profiles_for_updates() was called first, uses that info to
+        skip fetching for unchanged profiles.
         """
         # Clear any cached result from previous calls
         if hasattr(self, "_cached_final_result"):
             del self._cached_final_result
+
+        # If batch check was done, resolve canonical ID and check if update needed
+        if self._batch_check_done and not self.recache:
+            canonical_id = self._id_to_canonical.get(profile_id)
+            if canonical_id and canonical_id not in self._profiles_needing_update:
+                cached_data = self._load_from_cache(canonical_id)
+                if cached_data:
+                    self._restore_from_cache(cached_data)
+                    return
 
         # Get the client (singleton if no args)
         client = get_client()
@@ -70,8 +168,20 @@ class ProfileWithPapers:
         # Get the canonical profile ID for caching
         canonical_profile_id = self.profile.id
 
+        # If batch check was done and canonical ID doesn't need update, use cache
+        if (
+            self._batch_check_done
+            and not self.recache
+            and canonical_profile_id not in self._profiles_needing_update
+        ):
+            cached_data = self._load_from_cache(canonical_profile_id)
+            if cached_data:
+                self._restore_from_cache(cached_data)
+                return
+
         # Check cache using canonical ID (skip if recache is True)
-        if self.cache_profiles and not self.recache:
+        # This is the fallback when no batch check was done
+        if self.cache_profiles and not self.recache and not self._batch_check_done:
             cached_data = self._load_from_cache(canonical_profile_id)
             if cached_data:
                 log.debug(

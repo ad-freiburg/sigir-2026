@@ -8,6 +8,8 @@ import sys
 
 import openreview
 
+from .log import log
+
 # Redirect openreview/urllib3 messages to stderr (they default to stdout)
 _stderr_handler = logging.StreamHandler(sys.stderr)
 _stderr_handler.setFormatter(logging.Formatter("%(message)s"))
@@ -20,6 +22,26 @@ for _logger_name in ("openreview", "urllib3"):
 # Global client instances (singletons)
 _client_instance = None
 _client_v1_instance = None
+
+
+def _handle_openreview_exception(e: openreview.OpenReviewException) -> None:
+    """
+    Handle OpenReview API exceptions with user-friendly error messages.
+    """
+    # Extract error details from exception args
+    error_info = e.args[0] if e.args else {}
+    error_name = error_info.get("name", "Error")
+    error_message = error_info.get("message", str(e))
+
+    if error_name == "RateLimitError":
+        log.error(f"Rate limit exceeded: {error_message}")
+    elif error_name == "ForbiddenError":
+        log.error(f"Access denied: {error_message}")
+    elif error_name == "NotFoundError":
+        log.error(f"Not found: {error_message}")
+    else:
+        log.error(f"OpenReview API error: {error_message}")
+    sys.exit(1)
 
 
 def get_client() -> openreview.api.OpenReviewClient:
@@ -35,17 +57,20 @@ def get_client() -> openreview.api.OpenReviewClient:
     global _client_instance
 
     if _client_instance is None:
-        # Create client from environment variables
-        _client_instance = openreview.api.OpenReviewClient(
-            baseurl=os.environ.get("OPENREVIEW_API_URL"),
-            username=os.environ.get("OPENREVIEW_USERNAME"),
-            password=os.environ.get("OPENREVIEW_PASSWORD"),
-        )
+        try:
+            # Create client from environment variables
+            _client_instance = openreview.api.OpenReviewClient(
+                baseurl=os.environ.get("OPENREVIEW_API_URL"),
+                username=os.environ.get("OPENREVIEW_USERNAME"),
+                password=os.environ.get("OPENREVIEW_PASSWORD"),
+            )
 
-        # Apply impersonation from environment if set
-        impersonate = os.environ.get("OPENREVIEW_IMPERSONATE_GROUP")
-        if impersonate:
-            _client_instance.impersonate(impersonate)
+            # Apply impersonation from environment if set
+            impersonate = os.environ.get("OPENREVIEW_IMPERSONATE_GROUP")
+            if impersonate:
+                _client_instance.impersonate(impersonate)
+        except openreview.OpenReviewException as e:
+            _handle_openreview_exception(e)
 
     return _client_instance
 
@@ -62,11 +87,14 @@ def get_client_v1() -> openreview.Client:
     global _client_v1_instance
 
     if _client_v1_instance is None:
-        _client_v1_instance = openreview.Client(
-            baseurl="https://api.openreview.net",
-            username=os.environ.get("OPENREVIEW_USERNAME"),
-            password=os.environ.get("OPENREVIEW_PASSWORD"),
-        )
+        try:
+            _client_v1_instance = openreview.Client(
+                baseurl="https://api.openreview.net",
+                username=os.environ.get("OPENREVIEW_USERNAME"),
+                password=os.environ.get("OPENREVIEW_PASSWORD"),
+            )
+        except openreview.OpenReviewException as e:
+            _handle_openreview_exception(e)
 
     return _client_v1_instance
 

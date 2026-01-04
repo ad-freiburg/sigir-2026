@@ -565,6 +565,10 @@ class RecruitmentCommand(Command):
             cache_dir=args.cache_dir, recache=args.recache
         )
 
+        # Batch check which profiles have changed
+        if not args.recache:
+            profile_with_papers.check_profiles_for_updates(all_members)
+
         for member_id in all_members:
             # Determine member status
             if member_id in confirmed_members:

@@ -61,6 +61,9 @@ QLEVER_QUERY_API_PASSWORD=password
 ## Code Style
 Each .py file should be formatted according to `/home/bast/.local/bin/ruff format FILE && /home/bast/.local/bin/ruff check --fix FILE`
 
+## Logging
+Use `from .log import log` and then `log.info()`, `log.warning()`, `log.error()` for all output messages. Do not use `print()` for logging.
+
 ## Common Tasks
 - `orsig profile ~Hannah_Bast1 --as-rdf`: Get profile with RDF output
 - `orsig pcmembers reviewers --with-profiles`: Get reviewers with profile data

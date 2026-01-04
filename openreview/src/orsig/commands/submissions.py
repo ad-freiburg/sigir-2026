@@ -200,6 +200,11 @@ class SubmissionsCommand(Command):
         profile_with_papers = ProfileWithPapers(
             cache_dir=args.cache_dir, recache=args.recache
         )
+
+        # Batch check which profiles have changed
+        if not args.recache:
+            profile_with_papers.check_profiles_for_updates(list(all_author_ids))
+
         for author_id in all_author_ids:
             profile_with_papers.get_profile(author_id)
             author_profiles[author_id] = profile_with_papers.asJson()
