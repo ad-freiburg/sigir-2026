@@ -49,7 +49,7 @@ QLEVER_QUERY_API_PASSWORD=password
 - Prefixes: `paper:` for papers/submissions, `person:` for profiles
 - `paperIri()` handles IDs starting with `-` by using full IRI form
 - Person triples: `:id`, `:state`, `:role`, `:status`, `:gender`, `:dblp_id`, `:orcid`, `:email`, `:position`, `:institution`, `:publication`, `:dblp_publication`, `:num_publications`
-- Submission triples: `:title`, `:abstract`, `:author`, `:authors`, `:num_authors`, `:has_pdf`, `:created_on`, `:last_modified_on`, AI review fields
+- Submission triples: `:status` (active/deleted/withdrawn/desk_rejected), `:title`, `:abstract`, `:author`, `:authors`, `:num_authors`, `:has_pdf`, `:created_on`, `:last_modified_on`, AI review fields
 
 ## Mail Command
 - Sends emails via OpenReview API from a file with headers and body
@@ -104,12 +104,30 @@ The `update` command syncs the cache with OpenReview:
 
 The options are NOT hierarchical (except `profiles` < `profiles-with-publications`). DBLP publication scanning only runs during incremental updates.
 
+The update command fetches all submission types: active (`Submission`), withdrawn (`Withdrawn_Submission`), and desk-rejected (`Desk_Rejected_Submission`). It uses `trash=True` to include soft-deleted submissions.
+
+Submission `:status` is derived from:
+- `ddate` field present → "deleted" (soft delete, greyed out in UI)
+- `Withdrawn_Submission` invitation → "withdrawn"
+- `Desk_Rejected_Submission` invitation → "desk_rejected"
+- Otherwise → "active"
+
 ## Common Workflow
 1. `orsig update` - Sync cache with OpenReview (incremental)
 2. `orsig update --recache all` - Force full cache refresh
 3. `orsig dump --output data.rdf` - Output all cached data as RDF
 4. `orsig submissions` - Show summary of cached submissions
 5. `orsig recruitment --role pc --add invited user@example.com` - Add to PC
+
+## Recruitment Command
+- `orsig recruitment --search USER` - Search by profile ID or email, shows group memberships and recruitment notes (queries live API, not cache)
+- `orsig recruitment --role pc --add invited USER` - Add user to PC Invited group
+- `orsig recruitment --role pc --remove invited USER` - Remove user from PC Invited group
+- `orsig recruitment --role pc --set-reduced-load ~User1 2` - Set reduced load (requires existing recruitment note)
+
+Roles: `pc` (Reviewers), `spc` (Area Chairs), `ac` (Senior Area Chairs)
+
+**Note:** `--set-reduced-load` only works for users who responded to recruitment via OpenReview. Users added directly to groups have no recruitment note and cannot have reduced_load set via API.
 
 ## Other Commands
 - `orsig profile ~Hannah_Bast1 --as-rdf`: Get single profile with RDF output

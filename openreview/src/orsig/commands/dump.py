@@ -119,20 +119,40 @@ class DumpCommand(Command):
             all_members = confirmed | invited | declined
             all_member_ids.update(all_members)
 
-            # Add triples for each member
+            # First pass: resolve all member IDs to canonical profile IDs
+            # and collect all identifiers (emails) for each person
+            canonical_profiles: dict[str, dict] = {}  # canonical_id -> member_info
+            id_to_canonical: dict[str, str] = {}  # any identifier -> canonical_id
+
             for member_id in all_members:
-                if member_id in confirmed:
+                profile_with_papers.get_profile(member_id)
+                member_info = profile_with_papers.asJson()
+                canonical_id = member_info.get("id", member_id)
+
+                # Map this identifier to canonical ID
+                id_to_canonical[member_id] = canonical_id
+
+                # Store profile info (may overwrite, but same profile)
+                canonical_profiles[canonical_id] = member_info
+
+            # Second pass: determine status for each canonical profile
+            # A person is confirmed/declined if ANY of their identifiers are
+            for canonical_id, member_info in canonical_profiles.items():
+                # Get all identifiers for this person (profile ID + emails)
+                person_identifiers = {canonical_id}
+                person_identifiers.update(
+                    member_info.get("content", {}).get("emails", [])
+                )
+
+                # Determine status: confirmed > declined > pending
+                if person_identifiers & confirmed:
                     status = "accepted"
-                elif member_id in declined:
+                elif person_identifiers & declined:
                     status = "declined"
                 else:
                     status = "pending"
 
-                profile_with_papers.get_profile(member_id)
-                member_info = profile_with_papers.asJson()
-
-                profile_id = member_info.get("id", member_id)
-                person_iri = rdf.personIri(profile_id)
+                person_iri = rdf.personIri(canonical_id)
 
                 rdf.add_triple(person_iri, "a", ":Person")
                 rdf.add_triple(person_iri, ":role", rdf_class)
@@ -148,7 +168,7 @@ class DumpCommand(Command):
                         break
 
                 # Add profile data
-                profile_with_papers.addToRdf(rdf, member_info, profile_id)
+                profile_with_papers.addToRdf(rdf, member_info, canonical_id)
 
         return all_member_ids
 
@@ -171,7 +191,27 @@ class DumpCommand(Command):
 
             rdf.add_triple(submission_iri, "a", ":Submission")
 
-            title_literal = rdf.literalFromJson(content, "title.value")
+            # Derive status from ddate and invitations
+            # ddate = deletion date (soft delete, shown as greyed out in UI)
+            invitations = submission.get("invitations", [])
+            if submission.get("ddate"):
+                status = "deleted"
+                title_prefix = "[D] "
+            elif any("Withdrawn_Submission" in inv for inv in invitations):
+                status = "withdrawn"
+                title_prefix = "[W] "
+            elif any("Desk_Rejected_Submission" in inv for inv in invitations):
+                status = "desk_rejected"
+                title_prefix = "[R] "
+            else:
+                status = "active"
+                title_prefix = ""
+            rdf.add_triple(submission_iri, ":status", rdf.literal(status))
+
+            title_value = content.get("title", {}).get("value", "")
+            title_literal = (
+                rdf.literal(title_prefix + title_value) if title_value else ":novalue"
+            )
             rdf.add_triple(submission_iri, ":title", title_literal)
             rdf.add_triple(submission_iri, "rdfs:label", title_literal)
 

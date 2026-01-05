@@ -31,7 +31,6 @@ class RecruitmentCommand(Command):
         """
         parser.add_argument(
             "--role",
-            required=True,
             choices=["pc", "spc", "ac"],
             help="Role type: pc (reviewers), spc (area chairs), ac (senior area chairs)",
         )
@@ -64,6 +63,11 @@ class RecruitmentCommand(Command):
             action="store_true",
             help="Only show what would be added without actually adding",
         )
+        parser.add_argument(
+            "--search",
+            metavar="USER",
+            help="Search for a profile ID or email and show all group memberships",
+        )
 
     def execute(self, args: Namespace) -> None:
         """
@@ -71,6 +75,15 @@ class RecruitmentCommand(Command):
         """
         # Get the singleton client (initialized in main.py)
         client = get_client()
+
+        if args.search:
+            self._search_user(args, client)
+            return
+
+        # All other actions require --role
+        if not args.role:
+            log.error("--role is required for this action")
+            return
 
         if args.add:
             if len(args.add) < 2:
@@ -102,6 +115,83 @@ class RecruitmentCommand(Command):
             log.info(
                 "No action specified. Use --add, --remove, --add-random, or --set-reduced-load."
             )
+
+    def _search_user(self, args: Namespace, client) -> None:
+        """
+        Search for a user and show all their group memberships and recruitment status.
+        Uses optimized API calls: 1 for profile, 1 for all groups, 3 for recruitment notes.
+        """
+        user_id = args.search
+
+        # Resolve to canonical profile ID and get all emails (1 API call)
+        try:
+            profile = client.get_profile(user_id)
+            canonical_id = profile.id
+            profile_emails = set(profile.content.get("emails", []))
+            names = profile.content.get("names", [])
+            fullname = names[0].get("fullname", "") if names else ""
+            log.info(f"Profile: {fullname} ({canonical_id})")
+            log.info(f"Emails: {', '.join(profile_emails)}")
+        except Exception as e:
+            log.error(f"Could not find profile for '{user_id}': {e}")
+            return
+
+        # Get all groups the user is a member of
+        log.info("")
+        log.info("Group memberships:")
+
+        user_groups = []
+        # Query by profile ID and each email (some groups use emails as member IDs)
+        for member_id in [canonical_id] + list(profile_emails):
+            try:
+                user_groups.extend(
+                    client.get_groups(member=member_id, prefix=args.venue_id)
+                )
+            except Exception:
+                pass  # No groups found for this identifier
+
+        # Deduplicate by group ID
+        seen_ids = set()
+        unique_groups = []
+        for g in user_groups:
+            if g.id not in seen_ids:
+                seen_ids.add(g.id)
+                unique_groups.append(g)
+
+        if unique_groups:
+            for group in unique_groups:
+                log.info(group.id)
+        else:
+            log.info("(none)")
+
+        # Check for recruitment notes (3 API calls, filter locally)
+        log.info("")
+        log.info("Recruitment notes:")
+        found_notes = False
+
+        for role in ["pc", "spc", "ac"]:
+            group_suffix = self._get_group_suffix(role)
+            invitation = f"{args.venue_id}/{group_suffix}/-/Recruitment"
+
+            try:
+                notes = client.get_all_notes(invitation=invitation)
+                for note in notes:
+                    user_email = note.content.get("user", {}).get("value", "")
+                    if user_email in profile_emails:
+                        found_notes = True
+                        response = note.content.get("response", {}).get("value", "N/A")
+                        reduced_load = note.content.get("reduced_load", {}).get(
+                            "value", ""
+                        )
+                        msg = f"{invitation}: response={response}"
+                        if reduced_load:
+                            msg += f", reduced_load={reduced_load}"
+                        log.info(msg)
+            except Exception:
+                pass
+
+        if not found_notes:
+            log.info("(none)")
 
     def _get_group_suffix(self, role: str) -> str:
         """

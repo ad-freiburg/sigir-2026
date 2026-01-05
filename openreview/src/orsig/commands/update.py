@@ -101,52 +101,37 @@ class UpdateCommand(Command):
     ) -> tuple[list[str], int, int]:
         """
         Update submissions cache with new/modified submissions.
+        Includes active, withdrawn, and desk-rejected submissions.
         Returns (new_author_ids, new_count, modified_count).
         """
-        submission_invitation = f"{args.venue_id}/-/Submission"
+        # All submission types to track
+        submission_types = [
+            ("Submission", "New submission"),
+            ("Withdrawn_Submission", "Withdrawn submission"),
+            ("Desk_Rejected_Submission", "Desk-rejected submission"),
+        ]
         submissions_cache_dir = Path(args.cache_dir) / "submissions"
 
         new_author_ids = []
         new_count = 0
         modified_count = 0
 
-        # Get new submissions (created after last update)
-        try:
-            new_submissions = list(
-                client.get_all_notes(
-                    invitation=submission_invitation, mintcdate=last_update
+        for suffix, label in submission_types:
+            invitation = f"{args.venue_id}/-/{suffix}"
+
+            # Get new submissions (created after last update)
+            try:
+                new_submissions = list(
+                    client.get_all_notes(invitation=invitation, mintcdate=last_update)
                 )
-            )
-        except Exception as e:
-            log.warning(f"Failed to fetch new submissions: {e}")
-            new_submissions = []
+            except Exception as e:
+                log.warning(f"Failed to fetch new {suffix}: {e}")
+                new_submissions = []
 
-        for submission in new_submissions:
-            new_count += 1
-            author_ids = submission.content.get("authorids", {}).get("value", [])
-            new_author_ids.extend(author_ids)
-
-            if not dry_run:
-                submissions_cache_dir.mkdir(parents=True, exist_ok=True)
-                cache_path = submissions_cache_dir / f"{submission.id}.json"
-                with open(cache_path, "w") as f:
-                    json.dump(submission.to_json(), f, indent=2)
-
-            log.info(f"New submission: {submission.id}")
-
-        # Get modified submissions (sort by tmdate, stop when older than last_update)
-        try:
-            all_submissions = client.get_notes(
-                invitation=submission_invitation, sort="tmdate:desc", limit=100
-            )
-            for submission in all_submissions:
-                if submission.tmdate < last_update:
-                    break
-                # Skip if it's a new submission (already processed)
-                if submission.tcdate >= last_update:
-                    continue
-
-                modified_count += 1
+            for submission in new_submissions:
+                new_count += 1
+                author_ids = submission.content.get("authorids", {}).get("value", [])
+                new_author_ids.extend(author_ids)
 
                 if not dry_run:
                     submissions_cache_dir.mkdir(parents=True, exist_ok=True)
@@ -154,10 +139,33 @@ class UpdateCommand(Command):
                     with open(cache_path, "w") as f:
                         json.dump(submission.to_json(), f, indent=2)
 
-                log.info(f"Modified submission: {submission.id}")
+                log.info(f"{label}: {submission.id}")
 
-        except Exception as e:
-            log.warning(f"Failed to check modified submissions: {e}")
+            # Get modified submissions (sort by tmdate, stop when older than last_update)
+            # Use trash=True to include deleted submissions (have ddate set)
+            try:
+                all_submissions = client.get_notes(
+                    invitation=invitation, sort="tmdate:desc", limit=100, trash=True
+                )
+                for submission in all_submissions:
+                    if submission.tmdate < last_update:
+                        break
+                    # Skip if it's a new submission (already processed)
+                    if submission.tcdate >= last_update:
+                        continue
+
+                    modified_count += 1
+
+                    if not dry_run:
+                        submissions_cache_dir.mkdir(parents=True, exist_ok=True)
+                        cache_path = submissions_cache_dir / f"{submission.id}.json"
+                        with open(cache_path, "w") as f:
+                            json.dump(submission.to_json(), f, indent=2)
+
+                    log.info(f"Modified {suffix.lower()}: {submission.id}")
+
+            except Exception as e:
+                log.warning(f"Failed to check modified {suffix}: {e}")
 
         return new_author_ids, new_count, modified_count
 
