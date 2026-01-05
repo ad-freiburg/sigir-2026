@@ -198,10 +198,28 @@ class RecruitmentCommand(Command):
                     break
 
             if not recruitment_note:
-                log.error(
-                    f"No recruitment note found for {canonical_id}. "
-                    "The user may not have responded to recruitment yet."
-                )
+                # Check if user is actually in the confirmed group
+                try:
+                    group = client.get_group(f"{args.venue_id}/{group_suffix}")
+                    is_member = canonical_id in (group.members or [])
+                except Exception:
+                    is_member = False
+
+                if is_member:
+                    log.error(
+                        f"No recruitment note found for {canonical_id}. "
+                        "The user was added directly to the group without "
+                        "going through recruitment."
+                    )
+                    log.info(
+                        "To set reduced load, send them a recruitment email via "
+                        "OpenReview UI first, then use this command after they respond."
+                    )
+                else:
+                    log.error(
+                        f"No recruitment note found for {canonical_id}. "
+                        "The user may not have responded to recruitment yet."
+                    )
                 return
 
         except Exception as e:
