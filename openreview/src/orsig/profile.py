@@ -35,22 +35,45 @@ class ProfileWithPapers:
         cache_profiles: bool = True,
         cache_dir: str = "orsig-cache",
         recache: bool = False,
+        cache_only: bool = False,
+        skip_publications: bool = False,
     ):
         """
         Initialize ProfileWithPapers with caching options.
         The cache_dir is the top-level cache directory; profiles are stored in cache_dir/profiles.
         If recache is True, skip reading from cache but still write fresh data to cache.
+        If cache_only is True, never make API calls - return empty profile if not in cache.
+        If skip_publications is True, only fetch profile metadata (not publications).
         """
         self.profile = None
         self.papers = []
         self.cache_profiles = cache_profiles
         self.cache_dir = str(Path(cache_dir) / "profiles")
         self.recache = recache
+        self.cache_only = cache_only
+        self.skip_publications = skip_publications
         # Track which profiles need updating (set by check_profiles_for_updates)
         self._profiles_needing_update: set[str] = set()
         self._batch_check_done = False
         # Map from input IDs (emails, aliases) to canonical profile IDs
         self._id_to_canonical: Dict[str, str] = {}
+        # Load ID mapping from cache if in cache-only mode
+        if cache_only:
+            self._load_id_mapping()
+
+    def _load_id_mapping(self) -> None:
+        """Load ID mapping from cache file (for cache-only mode)."""
+        mapping_path = Path(self.cache_dir) / "_id_mapping.json"
+        if mapping_path.exists():
+            try:
+                with open(mapping_path) as f:
+                    self._id_to_canonical = json.load(f)
+            except Exception:
+                pass
+
+    def get_id_mapping(self) -> Dict[str, str]:
+        """Return the current ID mapping (for saving to cache)."""
+        return self._id_to_canonical.copy()
 
     def check_profiles_for_updates(self, member_ids: list[str]) -> set[str]:
         """
@@ -140,10 +163,26 @@ class ProfileWithPapers:
 
         If check_profiles_for_updates() was called first, uses that info to
         skip fetching for unchanged profiles.
+
+        If cache_only is True, only reads from cache - no API calls.
         """
         # Clear any cached result from previous calls
         if hasattr(self, "_cached_final_result"):
             del self._cached_final_result
+
+        # Cache-only mode: try cache, return empty profile if not found
+        if self.cache_only:
+            # Resolve to canonical ID if we have a mapping
+            canonical_id = self._id_to_canonical.get(profile_id, profile_id)
+            cached_data = self._load_from_cache(canonical_id)
+            if cached_data:
+                self._restore_from_cache(cached_data)
+                return
+            # Profile not in cache - return empty profile
+            self._cached_final_result = self.empty_profile(
+                profile_id, status="not in cache"
+            )
+            return
 
         # If batch check was done, resolve canonical ID and check if update needed
         if self._batch_check_done and not self.recache:
@@ -190,41 +229,47 @@ class ProfileWithPapers:
                 self._restore_from_cache(cached_data)
                 return
 
-        # Fetch all papers for this profile from both API v1 and v2.
-        #
-        # NOTE: This is exactly how the the web UI does it in order to show all
-        # publications for a profile.
-        seen_ids = set()
-        raw_papers = []
+        # Fetch publications (unless skip_publications is True)
+        if self.skip_publications:
+            # Keep existing publications from cache if available
+            cached_data = self._load_from_cache(canonical_profile_id)
+            self.papers = cached_data.get("publications", []) if cached_data else []
+        else:
+            # Fetch all papers for this profile from both API v1 and v2.
+            #
+            # NOTE: This is exactly how the web UI does it in order to show all
+            # publications for a profile.
+            seen_ids = set()
+            raw_papers = []
 
-        def add_papers(papers):
-            for paper in papers:
-                if paper.id not in seen_ids:
-                    seen_ids.add(paper.id)
-                    raw_papers.append(paper)
+            def add_papers(papers):
+                for paper in papers:
+                    if paper.id not in seen_ids:
+                        seen_ids.add(paper.id)
+                        raw_papers.append(paper)
 
-        # Query API v2 (current API)
-        try:
-            add_papers(
-                client.get_all_notes(content={"authorids": canonical_profile_id})
-            )
-        except Exception:
-            pass
-
-        # Query API v1 (legacy API, contains most DBLP/ORCID imports)
-        try:
-            add_papers(
-                get_client_v1().get_all_notes(
-                    content={"authorids": canonical_profile_id}
+            # Query API v2 (current API)
+            try:
+                add_papers(
+                    client.get_all_notes(content={"authorids": canonical_profile_id})
                 )
-            )
-        except Exception:
-            pass
+            except Exception:
+                pass
 
-        # Process papers
-        self.papers = []
-        for paper in raw_papers:
-            self.papers.append(paper.to_json())
+            # Query API v1 (legacy API, contains most DBLP/ORCID imports)
+            try:
+                add_papers(
+                    get_client_v1().get_all_notes(
+                        content={"authorids": canonical_profile_id}
+                    )
+                )
+            except Exception:
+                pass
+
+            # Process papers
+            self.papers = []
+            for paper in raw_papers:
+                self.papers.append(paper.to_json())
 
         # Save to cache if caching is enabled (use canonical profile ID to avoid duplicates)
         if self.cache_profiles:
@@ -275,6 +320,12 @@ class ProfileWithPapers:
         profile_json = self.profile.to_json()
         final_result = profile_json.copy()
         final_result["publications"] = self.papers
+
+        # Include active/state fields (not in to_json() but useful for filtering)
+        if hasattr(self.profile, "active"):
+            final_result["active"] = self.profile.active
+        if hasattr(self.profile, "state"):
+            final_result["state"] = self.profile.state
 
         # Save to cache file using JSON
         try:
@@ -337,6 +388,12 @@ class ProfileWithPapers:
             person_iri, ":id", rdf.literal(profile_id) if profile_id else ":novalue"
         )
 
+        # Add profile state (Active Institutional, Needs Moderation, etc.)
+        state = profile_data.get("state", "")
+        rdf.add_triple(
+            person_iri, ":state", rdf.literal(state) if state else ":novalue"
+        )
+
         # Add properties
         rdf.add_triple(
             person_iri, ":gender", rdf.literalFromJson(profile_data, "content.gender")
@@ -379,12 +436,11 @@ class ProfileWithPapers:
         # Add publications
         papers = profile_data.get("publications", [])
         for paper in papers:
-            paper_id = paper.get("id", "")
-            if paper_id:
-                rdf.add_triple(person_iri, ":publication", rdf.paperIri(paper_id))
+            rdf.add_triple(person_iri, ":publication", rdf.paperIri(paper["id"]))
             dblp_iri = rdf.dblpUrlFromBibtex(paper)
             if dblp_iri:
                 rdf.add_triple(person_iri, ":dblp_publication", dblp_iri)
+        rdf.add_triple(person_iri, ":num_publications", str(len(papers)))
 
         return person_iri
 

@@ -2,7 +2,6 @@
 Recruitment command for managing reviewers, area chairs, and senior area chairs.
 """
 
-import json
 from argparse import ArgumentParser, Namespace
 
 import openreview
@@ -10,8 +9,6 @@ import openreview
 from ..command import Command
 from ..client import get_client
 from ..utils import get_random_profiles
-from ..rdf import Rdf
-from ..profile import ProfileWithPapers
 from ..log import log
 
 
@@ -37,11 +34,6 @@ class RecruitmentCommand(Command):
             required=True,
             choices=["pc", "spc", "ac"],
             help="Role type: pc (reviewers), spc (area chairs), ac (senior area chairs)",
-        )
-        parser.add_argument(
-            "--dump",
-            choices=["json", "rdf"],
-            help="Dump recruitment data in the specified format",
         )
         parser.add_argument(
             "--add",
@@ -72,16 +64,6 @@ class RecruitmentCommand(Command):
             action="store_true",
             help="Only show what would be added without actually adding",
         )
-        parser.add_argument(
-            "--output",
-            help="Output file path (default: stdout)",
-            default=None,
-        )
-        parser.add_argument(
-            "--recache",
-            action="store_true",
-            help="Fetch fresh profiles from OpenReview and update the cache",
-        )
 
     def execute(self, args: Namespace) -> None:
         """
@@ -90,9 +72,7 @@ class RecruitmentCommand(Command):
         # Get the singleton client (initialized in main.py)
         client = get_client()
 
-        if args.dump:
-            self._dump_members(args, client)
-        elif args.add:
+        if args.add:
             if len(args.add) < 2:
                 log.error("--add requires GROUP and at least one USER_ID")
                 return
@@ -120,7 +100,7 @@ class RecruitmentCommand(Command):
             self._set_reduced_load(args, client)
         else:
             log.info(
-                "No action specified. Use --dump, --add, --remove, or --set-reduced-load."
+                "No action specified. Use --add, --remove, --add-random, or --set-reduced-load."
             )
 
     def _get_group_suffix(self, role: str) -> str:
@@ -155,17 +135,6 @@ class RecruitmentCommand(Command):
             "ac": "Random AC",
         }
         return prefixes[role]
-
-    def _get_rdf_class(self, role: str) -> str:
-        """
-        Get RDF class name for the role.
-        """
-        rdf_classes = {
-            "pc": ":PC",
-            "spc": ":SPC",
-            "ac": ":AC",
-        }
-        return rdf_classes[role]
 
     def _get_reduced_loads(self, args: Namespace, client) -> dict[str, int]:
         """
@@ -517,140 +486,3 @@ class RecruitmentCommand(Command):
                     log.error(f" Failed to update group: {e}")
         else:
             log.info(f"\nNo new {role_display} to add (all are already members).")
-
-    def _dump_members(self, args: Namespace, client) -> None:
-        """
-        Dump all members of the specified role and output their information as JSON or RDF.
-        """
-
-        group_suffix = self._get_group_suffix(args.role)
-        group_id = f"{args.venue_id}/{group_suffix}"
-        role_display = self._get_role_display_name(args.role)
-
-        # Get all related groups in one call (main, `/Invited`, `/Declined`)
-        try:
-            groups = client.get_groups(prefix=group_id)
-        except Exception as e:
-            log.error(f"Could not fetch groups with prefix {group_id}: {e}")
-            return
-
-        # Determine which members are confirmed, invited, or declined.
-        confirmed_members = set()
-        invited_members = set()
-        declined_members = set()
-        for group in groups:
-            if group.id == group_id:
-                confirmed_members = set(group.members or [])
-            elif group.id == f"{group_id}/Invited":
-                invited_members = set(group.members or [])
-            elif group.id == f"{group_id}/Declined":
-                declined_members = set(group.members or [])
-        all_members = list(confirmed_members | invited_members | declined_members)
-        confirmed_count = len(confirmed_members)
-        declined_count = len(declined_members)
-        pending_count = len(all_members) - confirmed_count - declined_count
-
-        log.info(
-            f"Fetching information for {len(all_members)} {role_display} "
-            f"({confirmed_count} accepted, {declined_count} declined, "
-            f"{pending_count} pending) ..."
-        )
-
-        # Fetch reduced_load data from recruitment notes (keyed by email)
-        reduced_loads = self._get_reduced_loads(args, client)
-
-        # Fetch profile data for each member
-        members_data = []
-        profile_with_papers = ProfileWithPapers(
-            cache_dir=args.cache_dir, recache=args.recache
-        )
-
-        # Batch check which profiles have changed
-        if not args.recache:
-            profile_with_papers.check_profiles_for_updates(all_members)
-
-        for member_id in all_members:
-            # Determine member status
-            if member_id in confirmed_members:
-                member_status = "accepted"
-            elif member_id in declined_members:
-                member_status = "declined"
-            else:
-                member_status = "pending"
-
-            # Get profile information (defaults to empty profile on failure)
-            profile_with_papers.get_profile(member_id)
-            member_info = profile_with_papers.asJson()
-            member_info["status"] = member_status
-
-            # Check if this member has a reduced_load (match by email)
-            member_emails = member_info.get("content", {}).get("emails", [])
-            for email in member_emails:
-                if email in reduced_loads:
-                    member_info["reduced_load"] = reduced_loads[email]
-                    break
-
-            members_data.append(member_info)
-
-        # Generate output based on format
-        if args.dump == "rdf":
-            # Generate RDF output
-            rdf = Rdf()
-
-            # Get the RDF class for this role
-            rdf_class = self._get_rdf_class(args.role)
-
-            # Add a triple for each member using the already-fetched profile data
-            for member_info in members_data:
-                profile_id = member_info.get("id")
-                if profile_id:  # Skip if no ID
-                    person_iri = rdf.personIri(profile_id)
-                    rdf.add_triple(person_iri, "a", ":Person")
-                    rdf.add_triple(person_iri, ":role", rdf_class)
-                    rdf.add_triple(
-                        person_iri,
-                        ":status",
-                        rdf.literal(member_info.get("status", "pending")),
-                    )
-                    # Add reduced_load if present
-                    if "reduced_load" in member_info:
-                        rdf.add_triple(
-                            person_iri,
-                            ":reduced_load",
-                            str(member_info["reduced_load"]),
-                        )
-                    # Add profile data
-                    profile_with_papers.addToRdf(rdf, member_info, profile_id)
-
-            output_content = rdf.as_turtle()
-        else:
-            # Generate JSON output
-            accepted_count = len(
-                [m for m in members_data if m.get("status") == "accepted"]
-            )
-            declined_count = len(
-                [m for m in members_data if m.get("status") == "declined"]
-            )
-            pending_count = len(
-                [m for m in members_data if m.get("status") == "pending"]
-            )
-
-            output_data = {
-                "venue_id": args.venue_id,
-                "role": args.role,
-                "group_id": group_id,
-                "total_count": len(members_data),
-                "accepted_count": accepted_count,
-                "declined_count": declined_count,
-                "pending_count": pending_count,
-                "members": members_data,
-            }
-            output_content = json.dumps(output_data, indent=2)
-
-        # Output to file or stdout
-        if args.output:
-            with open(args.output, "w") as f:
-                f.write(output_content)
-            log.info(f"Members saved to {args.output} in {args.dump.upper()} format")
-        else:
-            print(output_content)
