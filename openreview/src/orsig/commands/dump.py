@@ -120,28 +120,36 @@ class DumpCommand(Command):
             all_member_ids.update(all_members)
 
             # First pass: resolve all member IDs to canonical profile IDs
-            # and collect all identifiers (emails) for each person
+            # and collect all identifiers for each person
             canonical_profiles: dict[str, dict] = {}  # canonical_id -> member_info
-            id_to_canonical: dict[str, str] = {}  # any identifier -> canonical_id
+            canonical_to_original: dict[
+                str, set
+            ] = {}  # canonical_id -> set of original IDs
 
             for member_id in all_members:
                 profile_with_papers.get_profile(member_id)
                 member_info = profile_with_papers.asJson()
                 canonical_id = member_info.get("id", member_id)
 
-                # Map this identifier to canonical ID
-                id_to_canonical[member_id] = canonical_id
-
                 # Store profile info (may overwrite, but same profile)
                 canonical_profiles[canonical_id] = member_info
+
+                # Track all original member IDs that resolved to this canonical ID
+                if canonical_id not in canonical_to_original:
+                    canonical_to_original[canonical_id] = set()
+                canonical_to_original[canonical_id].add(member_id)
 
             # Second pass: determine status for each canonical profile
             # A person is confirmed/declined if ANY of their identifiers are
             for canonical_id, member_info in canonical_profiles.items():
-                # Get all identifiers for this person (profile ID + emails)
+                # Get all identifiers for this person:
+                # canonical ID + emails + all original IDs that resolved here
                 person_identifiers = {canonical_id}
                 person_identifiers.update(
                     member_info.get("content", {}).get("emails", [])
+                )
+                person_identifiers.update(
+                    canonical_to_original.get(canonical_id, set())
                 )
 
                 # Determine status: confirmed > declined > pending
@@ -226,14 +234,20 @@ class DumpCommand(Command):
                 rdf.add_triple(submission_iri, ":author", rdf.personIri(author_id))
                 all_author_ids.add(author_id)
 
-            # Add comma-separated author IDs and count
+            # Add comma-separated author IDs and names
             author_ids_clean = [aid.lstrip("~") for aid in author_ids]
             rdf.add_triple(
                 submission_iri,
-                ":authors",
+                ":author_ids",
                 rdf.literal(", ".join(author_ids_clean))
                 if author_ids_clean
                 else ":novalue",
+            )
+            author_names = rdf.valuesFromJson(content, "authors.value")
+            rdf.add_triple(
+                submission_iri,
+                ":author_names",
+                rdf.literal(", ".join(author_names)) if author_names else ":novalue",
             )
             rdf.add_triple(submission_iri, ":num_authors", str(len(author_ids)))
 

@@ -97,10 +97,29 @@ class ProfileWithPapers:
         if profile_ids:
             try:
                 profiles_by_id = client.search_profiles(ids=profile_ids)
+                returned_ids = set()
                 for profile in profiles_by_id:
                     all_profiles.append(profile)
-                    # Store input ID → canonical ID mapping (may differ)
+                    returned_ids.add(profile.id)
+                    # Store canonical ID → canonical ID mapping
                     self._id_to_canonical[profile.id] = profile.id
+
+                # Check for input IDs that didn't match a returned canonical ID
+                # These might be aliases/merged profiles
+                for input_id in profile_ids:
+                    if (
+                        input_id not in returned_ids
+                        and input_id not in self._id_to_canonical
+                    ):
+                        # Fetch individually to resolve the alias
+                        try:
+                            profile = client.get_profile(input_id)
+                            self._id_to_canonical[input_id] = profile.id
+                            if profile.id not in returned_ids:
+                                all_profiles.append(profile)
+                                returned_ids.add(profile.id)
+                        except Exception:
+                            pass  # Profile doesn't exist
             except Exception as e:
                 log.warning(f"Failed to batch check profile IDs: {e}")
                 self._profiles_needing_update = set(profile_ids)
@@ -206,6 +225,11 @@ class ProfileWithPapers:
 
         # Get the canonical profile ID for caching
         canonical_profile_id = self.profile.id
+
+        # Update ID mapping (handles merged profiles where input ID differs from canonical)
+        self._id_to_canonical[profile_id] = canonical_profile_id
+        if profile_id != canonical_profile_id:
+            log.debug(f"Profile {profile_id} resolved to {canonical_profile_id}")
 
         # If batch check was done and canonical ID doesn't need update, use cache
         if (

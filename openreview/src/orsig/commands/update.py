@@ -120,9 +120,12 @@ class UpdateCommand(Command):
             invitation = f"{args.venue_id}/-/{suffix}"
 
             # Get new submissions (created after last update)
+            # Use trash=True to include deleted submissions (have ddate set)
             try:
                 new_submissions = list(
-                    client.get_all_notes(invitation=invitation, mintcdate=last_update)
+                    client.get_all_notes(
+                        invitation=invitation, mintcdate=last_update, trash=True
+                    )
                 )
             except Exception as e:
                 log.warning(f"Failed to fetch new {suffix}: {e}")
