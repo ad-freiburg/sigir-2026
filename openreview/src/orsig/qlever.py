@@ -70,12 +70,39 @@ def _convert_email_profile_to_email(profile_id: str) -> str:
     return f"{local_part}@{domain}"
 
 
-def recipients_from_query(hash_or_url: str) -> list[str]:
+def _extract_value(cell: dict) -> str:
     """
-    Get OpenReview profile IDs from a SPARQL query result. Finds the first
-    column where all values are profile IRIs, extracts the profile IDs, and
-    returns them as a list. Accepts a short hash or full URL.
-    Converts email-as-profile IDs to actual email addresses.
+    Extract a display value from a SPARQL result cell.
+    For URIs, extracts the last path component or fragment.
+    For literals, unescapes common escape sequences and returns the value.
+    """
+    cell_type = cell.get("type", "")
+    value = cell.get("value", "")
+
+    if cell_type == "uri":
+        # Extract last component from URI
+        # e.g., "https://openreview.net/profile?id=~User1" -> "~User1"
+        # e.g., "http://example.org/foo#bar" -> "bar"
+        if "?id=" in value:
+            return value.split("?id=")[-1]
+        elif "#" in value:
+            return value.split("#")[-1]
+        elif "/" in value:
+            return value.rstrip("/").split("/")[-1]
+        return value
+    else:
+        return value
+
+
+def query_results_by_recipient(hash_or_url: str) -> tuple[list[str], dict[str, dict]]:
+    """
+    Execute a SPARQL query and return results keyed by recipient.
+
+    Returns:
+        (recipients, data_by_recipient) where:
+        - recipients: list of profile IDs/emails (from first column with profile IRIs)
+        - data_by_recipient: dict mapping each recipient to {variable: value, ...}
+          for all other variables in that row
     """
     short_hash = hash_or_url.rstrip("/").split("/")[-1]
     query = get_sparql_query(short_hash)
@@ -89,8 +116,8 @@ def recipients_from_query(hash_or_url: str) -> list[str]:
     profile_prefix = "https://openreview.net/profile?id="
 
     # Find first column where all values are profile IRIs
+    recipient_var = None
     for var in variables:
-        profile_ids = []
         all_match = True
         for row in bindings:
             cell = row.get(var, {})
@@ -101,11 +128,41 @@ def recipients_from_query(hash_or_url: str) -> list[str]:
             if not value.startswith(profile_prefix):
                 all_match = False
                 break
-            profile_id = value[len(profile_prefix) :]
-            # Convert email-as-profile to actual email
-            profile_ids.append(_convert_email_profile_to_email(profile_id))
+        if all_match:
+            recipient_var = var
+            break
 
-        if all_match and profile_ids:
-            return profile_ids
+    if not recipient_var:
+        raise ValueError("No column found with profile IRIs")
 
-    raise ValueError("No column found with profile IRIs")
+    # Build recipients list and data mapping
+    recipients = []
+    data_by_recipient: dict[str, dict] = {}
+
+    for row in bindings:
+        # Extract recipient ID
+        recipient_cell = row.get(recipient_var, {})
+        profile_id = recipient_cell.get("value", "")[len(profile_prefix) :]
+        recipient = _convert_email_profile_to_email(profile_id)
+        recipients.append(recipient)
+
+        # Extract all other variables for this recipient
+        row_data = {}
+        for var in variables:
+            if var != recipient_var:
+                cell = row.get(var, {})
+                row_data[var] = _extract_value(cell)
+        data_by_recipient[recipient] = row_data
+
+    return recipients, data_by_recipient
+
+
+def recipients_from_query(hash_or_url: str) -> list[str]:
+    """
+    Get OpenReview profile IDs from a SPARQL query result. Finds the first
+    column where all values are profile IRIs, extracts the profile IDs, and
+    returns them as a list. Accepts a short hash or full URL.
+    Converts email-as-profile IDs to actual email addresses.
+    """
+    recipients, _ = query_results_by_recipient(hash_or_url)
+    return recipients

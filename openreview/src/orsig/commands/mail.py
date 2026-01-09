@@ -10,7 +10,7 @@ from urllib.parse import quote
 from ..command import Command
 from ..client import get_client
 from ..log import log
-from ..qlever import recipients_from_query
+from ..qlever import query_results_by_recipient
 
 
 class MailCommand(Command):
@@ -40,6 +40,11 @@ class MailCommand(Command):
             "--dry-run",
             action="store_true",
             help="Parse and show the email without sending",
+        )
+        parser.add_argument(
+            "--test-run",
+            metavar="PROFILE",
+            help="Send all emails to PROFILE instead of actual recipients (for testing)",
         )
         parser.add_argument(
             "--recipients-from-sparql-query",
@@ -100,6 +105,7 @@ class MailCommand(Command):
         query_hash_or_url = args.recipients_from_sparql_query or query_from_file
 
         # Replace To: recipients from SPARQL query if requested
+        query_data_by_recipient: dict[str, dict] = {}
         if query_hash_or_url:
             if query_from_file and not args.recipients_from_sparql_query:
                 log.info(f"Using query from file: {query_from_file}")
@@ -110,7 +116,9 @@ class MailCommand(Command):
                     "when using a SPARQL query for recipients"
                 )
                 return
-            query_recipients = recipients_from_query(query_hash_or_url)
+            query_recipients, query_data_by_recipient = query_results_by_recipient(
+                query_hash_or_url
+            )
             new_to_line = "To: " + ", ".join(query_recipients)
             # Replace the first line (To: ...) with the new recipients
             content = new_to_line + content[content.index("\n") :]
@@ -165,11 +173,17 @@ class MailCommand(Command):
             sender = None  # Let OpenReview use default
 
         # Parse recipients (To and Cc) - extract email/profile ID from "Name <email>" format
-        recipients = []
+        original_recipients = []
         for r in headers.get("To", "").split(","):
             r = r.strip()
             parsed = self._parse_from_header(r)
-            recipients.append(parsed["fromEmail"] if "<" in r else r)
+            original_recipients.append(parsed["fromEmail"] if "<" in r else r)
+
+        # For test-run, redirect all emails to the test profile
+        if args.test_run:
+            recipients = [args.test_run] * len(original_recipients)
+        else:
+            recipients = original_recipients
 
         cc_recipients = []
         if "Cc" in headers:
@@ -186,12 +200,20 @@ class MailCommand(Command):
             reply_to = headers["From"]
 
         # Check if personalization is needed
-        needs_personalization = "{{name}}" in body
+        # Find all {{variable}} placeholders in the body
+        placeholder_pattern = re.compile(r"\{\{(\w+)\}\}")
+        placeholders = set(placeholder_pattern.findall(body))
+        needs_personalization = bool(placeholders)
 
         # Show what we're sending
         log.info("")
         log.info(f"From: {headers.get('From')}")
-        log.info(f"To: {headers.get('To')}")
+        to_display = (
+            f"{args.test_run} (TEST-RUN, original: {headers.get('To')})"
+            if args.test_run
+            else headers.get("To")
+        )
+        log.info(f"To: {to_display}")
         if cc_recipients:
             log.info(f"Cc: {headers.get('Cc')}")
         if reply_to != headers["From"]:
@@ -199,21 +221,21 @@ class MailCommand(Command):
         log.info(f"Subject: {headers.get('Subject')}")
         log.info(f"\n{body}")
 
-        n = len(recipients)
+        n = len(original_recipients)
         num_recipients = "one recipient" if n == 1 else f"{n} recipients"
 
         if args.dry_run:
             log.warning(
                 f"Dry run: without --dry-run, email would be sent to {num_recipients}: "
-                f"{headers.get('To')}"
+                f"{to_display}"
             )
             return
 
         # Confirm before sending
         try:
             input(
-                f"\n\033[94mPress CTRL+C to abort, RETURN to send email to {num_recipients}: "
-                f"{headers.get('To')} \033[0m"
+                f"\n\033[94mPress CTRL+C to abort, RETURN to send email to "
+                f"{num_recipients}: {to_display} \033[0m"
             )
         except KeyboardInterrupt:
             log.warning("\nAborted")
@@ -227,21 +249,36 @@ class MailCommand(Command):
         failed_count = 0
         if needs_personalization:
             # Send individual personalized messages
-            for recipient in recipients:
-                # Get profile to find name
-                try:
-                    profile = client.get_profile(recipient)
-                    name = self._get_name(profile)
-                except Exception:
-                    name = ""
+            # Use original_recipients for data lookup, recipients for actual sending
+            for i, original_recipient in enumerate(original_recipients):
+                send_to = recipients[i]
 
-                # Personalize body
-                personalized_body = body.replace("{{name}}", name if name else "")
+                # Start with original body
+                personalized_body = body
+
+                # Substitute {{name}} from profile if present
+                if "name" in placeholders:
+                    try:
+                        profile = client.get_profile(original_recipient)
+                        name = self._get_name(profile)
+                    except Exception:
+                        name = ""
+                    personalized_body = personalized_body.replace(
+                        "{{name}}", name if name else ""
+                    )
+
+                # Substitute query variables if available
+                if original_recipient in query_data_by_recipient:
+                    row_data = query_data_by_recipient[original_recipient]
+                    for var, value in row_data.items():
+                        personalized_body = personalized_body.replace(
+                            "{{" + var + "}}", value if value else ""
+                        )
 
                 try:
                     client.post_message(
                         subject=headers["Subject"],
-                        recipients=[recipient],
+                        recipients=[send_to],
                         message=personalized_body + self.separator,
                         invitation=invitation,
                         sender=sender,
@@ -249,7 +286,7 @@ class MailCommand(Command):
                     )
                     sent_count += 1
                 except Exception as e:
-                    log.warning(f"Failed to send to {recipient}: {e}")
+                    log.warning(f"Failed to send to {send_to}: {e}")
                     failed_count += 1
         else:
             # Send single message to all To recipients
