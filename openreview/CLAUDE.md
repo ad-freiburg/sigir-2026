@@ -1,4 +1,4 @@
-# OpenReview CLI Tool (orsig) for SIGIR 2026
+# OpenReview CLI Tool (ortler) for SIGIR 2026
 
 ## Project Structure
 - CLI tool for OpenReview API with commands: `update`, `dump`, `profile`, `submissions`, `recruitment`, `mail`
@@ -6,12 +6,12 @@
 - Uses singleton client pattern for API authentication (both v1 and v2 APIs)
 
 ## Key Files
-- `src/orsig/main.py`: CLI entry point with argparse
-- `src/orsig/client.py`: Singleton OpenReview client management (v1 and v2 APIs)
-- `src/orsig/profile.py`: ProfileWithPapers class with caching and RDF export
-- `src/orsig/rdf.py`: Rdf class for triple collection and Turtle serialization
-- `src/orsig/qlever.py`: QLever SPARQL query functions
-- `src/orsig/commands/`: Individual command implementations
+- `src/ortler/main.py`: CLI entry point with argparse
+- `src/ortler/client.py`: Singleton OpenReview client management (v1 and v2 APIs)
+- `src/ortler/profile.py`: ProfileWithPapers class with caching and RDF export
+- `src/ortler/rdf.py`: Rdf class for triple collection and Turtle serialization
+- `src/ortler/qlever.py`: QLever SPARQL query functions
+- `src/ortler/commands/`: Individual command implementations
   - `update.py`: Incremental cache sync with OpenReview
   - `dump.py`: Output all cached data as RDF
   - `recruitment.py`: Manage PC/SPC/AC membership
@@ -34,7 +34,7 @@ OPENREVIEW_PASSWORD=your_password
 OPENREVIEW_VENUE_ID=ACM.org/SIGIR/2026/Conference
 OPENREVIEW_IMPERSONATE_GROUP=venue_organizer_group
 RDF_DEFAULT_PREFIX=http://openreview.net/
-CACHE_DIR=orsig-cache
+CACHE_DIR=ortler-cache
 MAIL_FROM=Name <sender@openreview.net>
 MAIL_FROM_DIRECT=Name <your_email>
 QLEVER_LINK_API=https://qlever.dev/api/link/
@@ -96,11 +96,11 @@ The `state` field is saved to cache and output as `:state` triple in RDF.
 
 ## Update Command and --recache Options
 The `update` command syncs the cache with OpenReview:
-- `orsig update` - Incremental update (only changed data since last update)
-- `orsig update --recache submissions` - Re-fetch all submissions
-- `orsig update --recache profiles` - Re-fetch profile metadata only (1 API call per profile)
-- `orsig update --recache profiles-with-publications` - Re-fetch profiles + publications (3 API calls per profile)
-- `orsig update --recache all` - Re-fetch submissions + profiles-with-publications
+- `ortler update` - Incremental update (only changed data since last update)
+- `ortler update --recache submissions` - Re-fetch all submissions
+- `ortler update --recache profiles` - Re-fetch profile metadata only (1 API call per profile)
+- `ortler update --recache profiles-with-publications` - Re-fetch profiles + publications (3 API calls per profile)
+- `ortler update --recache all` - Re-fetch submissions + profiles-with-publications
 
 The options are NOT hierarchical (except `profiles` < `profiles-with-publications`). DBLP publication scanning only runs during incremental updates.
 
@@ -113,26 +113,26 @@ Submission `:status` is derived from:
 - Otherwise → "active"
 
 ## Common Workflow
-1. `orsig update` - Sync cache with OpenReview (incremental)
-2. `orsig update --recache all` - Force full cache refresh
-3. `orsig dump --output data.rdf` - Output all cached data as RDF
-4. `orsig submissions` - Show summary of cached submissions
-5. `orsig recruitment --role pc --add invited user@example.com` - Add to PC
+1. `ortler update` - Sync cache with OpenReview (incremental)
+2. `ortler update --recache all` - Force full cache refresh
+3. `ortler dump --output data.rdf` - Output all cached data as RDF
+4. `ortler submissions` - Show summary of cached submissions
+5. `ortler recruitment --role pc --add invited user@example.com` - Add to PC
 
 ## Recruitment Command
-- `orsig recruitment --search USER` - Search by profile ID or email, shows group memberships and recruitment notes (queries live API, not cache)
-- `orsig recruitment --role pc --add invited USER` - Add user to PC Invited group
-- `orsig recruitment --role pc --remove invited USER` - Remove user from PC Invited group
-- `orsig recruitment --role pc --set-reduced-load ~User1 2` - Set reduced load (requires existing recruitment note)
+- `ortler recruitment --search USER` - Search by profile ID or email, shows group memberships and recruitment notes (queries live API, not cache)
+- `ortler recruitment --role pc --add invited USER` - Add user to PC Invited group
+- `ortler recruitment --role pc --remove invited USER` - Remove user from PC Invited group
+- `ortler recruitment --role pc --set-reduced-load ~User1 2` - Set reduced load (requires existing recruitment note)
 
 Roles: `pc` (Reviewers), `spc` (Area Chairs), `ac` (Senior Area Chairs)
 
 **Note:** `--set-reduced-load` only works for users who responded to recruitment via OpenReview. Users added directly to groups have no recruitment note and cannot have reduced_load set via API.
 
 ## Other Commands
-- `orsig profile ~Hannah_Bast1 --as-rdf`: Get single profile with RDF output
-- `orsig mail message.txt --dry-run`: Preview email without sending
-- `orsig mail message.txt --recipients-from-sparql-query HASH`: Send to SPARQL results
+- `ortler profile ~Hannah_Bast1 --as-rdf`: Get single profile with RDF output
+- `ortler mail message.txt --dry-run`: Preview email without sending
+- `ortler mail message.txt --recipients-from-sparql-query HASH`: Send to SPARQL results
 
 ## Rate Limiting
 OpenReview API has rate limits (3 requests per time window). Use cache-based workflow to minimize API calls. If rate limited, wait ~30 seconds.

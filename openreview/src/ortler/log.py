@@ -1,5 +1,5 @@
 """
-Logging module for orsig.
+Logging module for ortler.
 """
 
 from __future__ import annotations
@@ -10,7 +10,7 @@ from contextlib import contextmanager
 from termcolor import colored
 
 
-class OrsigLogFormatter(logging.Formatter):
+class OrtlerLogFormatter(logging.Formatter):
     """
     Custom formatter for logging.
     """
@@ -28,10 +28,10 @@ class OrsigLogFormatter(logging.Formatter):
 
 
 # Custom logger.
-log = logging.getLogger("orsig")
+log = logging.getLogger("ortler")
 log.setLevel(logging.INFO)
 handler = logging.StreamHandler()
-handler.setFormatter(OrsigLogFormatter())
+handler.setFormatter(OrtlerLogFormatter())
 log.addHandler(handler)
 log_levels = {
     "DEBUG": logging.DEBUG,

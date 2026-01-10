@@ -41,12 +41,12 @@ class SubmissionsCommand(Command):
     def execute(self, args: Namespace) -> None:
         """
         Show summary of cached submissions.
-        Use 'orsig dump' to output full data as RDF.
+        Use 'ortler dump' to output full data as RDF.
         """
         # Load submissions from cache
         submissions_cache_dir = self._get_cache_dir(args.cache_dir)
         if not submissions_cache_dir.exists():
-            log.error("No cached submissions. Run 'orsig update' first.")
+            log.error("No cached submissions. Run 'ortler update' first.")
             return
 
         submissions_data = []
@@ -58,7 +58,7 @@ class SubmissionsCommand(Command):
                 pass
 
         if not submissions_data:
-            log.error("No cached submissions. Run 'orsig update' first.")
+            log.error("No cached submissions. Run 'ortler update' first.")
             return
 
         # Get the set of distinct author IDs

@@ -33,7 +33,7 @@ class ProfileWithPapers:
     def __init__(
         self,
         cache_profiles: bool = True,
-        cache_dir: str = "orsig-cache",
+        cache_dir: str = "ortler-cache",
         recache: bool = False,
         cache_only: bool = False,
         skip_publications: bool = False,

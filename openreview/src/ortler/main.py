@@ -33,7 +33,7 @@ def discover_commands() -> list[Command]:
 
     # Find all subclasses of `Command` in the `commands` package.
     for _, module_name, _ in pkgutil.iter_modules([str(commands_path)]):
-        module = importlib.import_module(f".commands.{module_name}", package="orsig")
+        module = importlib.import_module(f".commands.{module_name}", package="ortler")
         for attr_name in dir(module):
             attr = getattr(module, attr_name)
             if (
@@ -76,8 +76,8 @@ def main() -> None:
     )
     parser.add_argument(
         "--cache-dir",
-        default=os.environ.get("CACHE_DIR", "orsig-cache"),
-        help="Cache directory (default: $CACHE_DIR or 'orsig-cache')",
+        default=os.environ.get("CACHE_DIR", "ortler-cache"),
+        help="Cache directory (default: $CACHE_DIR or 'ortler-cache')",
     )
 
     # Add subparser for each command (the arguments are in the respective

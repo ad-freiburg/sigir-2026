@@ -325,7 +325,7 @@ class DumpCommand(Command):
         submissions = self._load_submissions(args.cache_dir)
 
         if not all_groups and not submissions:
-            log.error("No cached data. Run 'orsig update' first.")
+            log.error("No cached data. Run 'ortler update' first.")
             return
 
         # Initialize profile loader (cache-only mode)

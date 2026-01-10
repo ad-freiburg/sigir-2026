@@ -1,5 +1,5 @@
 [project]
-name = "openreview-client"
+name = "ortler"
 version = "0.1.2"
 requires-python = ">=3.10"
 dependencies = [
@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 [project.scripts]
-orsig = "orsig.main:main"
+ortler = "ortler.main:main"
 
 [build-system]
 requires = ["setuptools>=61.0"]
