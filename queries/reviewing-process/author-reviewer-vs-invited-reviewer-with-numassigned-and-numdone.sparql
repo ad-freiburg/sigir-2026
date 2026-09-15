@@ -1,0 +1,13 @@
+# Author reviewer vs. invited reviewer, with #assigned and #done
+PREFIX or: <http://openreview.net/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT ?pc ?name ?email ?assigned ?done ?red_load ?invited_or_not WHERE {
+  ?pc or:role or:PC .
+  ?pc rdfs:label ?name .
+  ?pc or:email ?email .
+  OPTIONAL { ?pc or:reduced_load ?red_load }
+  OPTIONAL { SELECT ?pc (COUNT(*) AS ?assigned) WHERE { [] or:status "submitted"; or:assigned ?pc } GROUP BY ?pc }
+  OPTIONAL { SELECT ?pc (COUNT(*) AS ?done) WHERE { [] or:status "submitted"; or:assigned ?pc; or:has_review [ or:reviewer ?pc ] } GROUP BY ?pc } 
+  BIND (IF(EXISTS { ?pc or:role_invited or:PC }, "invited reviewer", "author reviewer") AS ?invited_or_not) 
+}
+ORDER BY ASC(?red_load) ASC(?assigned) DESC(?done)

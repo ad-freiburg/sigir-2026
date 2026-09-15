@@ -1,0 +1,20 @@
+# Query: ../queries/mails/2026-02-21_spc_missing_reviews.sparql
+To: (recipients computed by the query above)
+Subject: [SIGIR 2026] Chasing after missing reviews
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{firstname_or_fullname}},
+
+The deadline for the reviews for the SIGIR 2026 full papers track passed three days ago (February 17, 2026, AoE), and we have been busy chasing after missing reviews. We have made good progress: only around 500 (of over 5000) reviews are still missing, and only around 50 of the 1282 submissions have fewer than three reviews. Note that we overprovisioned: we requested four reviews per submission, but require only three to proceed. We also have capacity for at least 500 emergency reviews.
+
+[You]({{spc}}) can help us chase after the missing reviews. Here is a list of the missing reviews for submissions for which you are the SPC in charge. It includes the number, title, and link for each submission, as well as the name, profile link, and email of the respective reviewer.
+
+{{missing}}
+
+NOTE: We already requested emergency reviews for some of the submissions with fewer than three reviews. You will see those listed in your "Area Chairs Console" in OpenReview, but they are deliberately **not** included in the list above (those emergency reviewers need some time to complete their reviews).
+
+A few hints: Try to find a good balance between being polite, understanding, and persistent, with a shift towards the latter the more overdue a review is. Briefly explain that you are the Senior Program Committee (SPC) member in charge of the respective submission. You can include us (program-chairs@sigir2026.org) on the cc, but you don't have to. If you have any questions, please don't hesitate to contact us.
+
+Hannah Bast, Marc Najork, and Min Zhang
+SIGIR 2026 Program Chairs, Full Papers Track

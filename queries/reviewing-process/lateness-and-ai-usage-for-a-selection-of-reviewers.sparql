@@ -1,0 +1,11 @@
+# Lateness and AI usage for a selection of reviewers
+PREFIX pangram: <https://pangram.com/rdf/schema#>
+PREFIX or: <http://openreview.net/>
+PREFIX person: <https://openreview.net/profile?id=~>
+SELECT ?pc ?submission ?title ?ass_date ?rev_date ?ai ?inv_or_aut WHERE {  
+  ?review ^or:has_review ?submission ; or:reviewer ?pc ; or:cdatetime ?rev_date ; pangram:prediction_short ?ai .
+  ?submission or:assignment [ or:assigned ?pc; or:date ?ass_date ]; or:title ?title .
+  BIND (IF(EXISTS { ?pc or:role_invited or:PC }, "invited", "author") AS ?inv_or_aut) 
+  VALUES ?pc { person:Redacted_Name1 person:Redacted_Name2 person:Redacted_Name3 }
+}
+ORDER BY ?pc ?rev_date

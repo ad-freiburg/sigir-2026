@@ -1,0 +1,16 @@
+# Satisfaction with paper assignment (survey)
+#defaultView:BarChart
+PREFIX or: <http://openreview.net/>
+SELECT ?assignment_quality (COUNT(?person) AS ?num_reviewers) WHERE {
+  ?person or:task_paper_assignment_quality ?choice .
+  BIND(IF(STRSTARTS(?choice, "All"), "All",
+       IF(STRSTARTS(?choice, "Most"), "Most",
+       IF(STRSTARTS(?choice, "Some"), "Some",
+       IF(STRSTARTS(?choice, "Few"), "Few", "None")))) AS ?assignment_quality)
+  BIND(IF(STRSTARTS(?choice, "All"), 1,
+       IF(STRSTARTS(?choice, "Most"), 2,
+       IF(STRSTARTS(?choice, "Some"), 3,
+       IF(STRSTARTS(?choice, "Few"), 4, 5)))) AS ?order)
+}
+GROUP BY ?assignment_quality ?order
+ORDER BY ?order

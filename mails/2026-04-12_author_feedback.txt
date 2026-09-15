@@ -1,0 +1,19 @@
+# Query: ../queries/mails/2026-04-12_author_feedback.sparql
+To: (recipients computed by the query above)
+From: Hannah Bast <sigir2026-pc-chairs@openreview.net>
+Subject: [SIGIR 2026] Your feedback please
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{firstname_or_fullname}},
+
+We would love to hear your feedback on the review process and the reviews you received. Here is a list of your submissions. A click on the title will take you to the submission page, where you should now find the following buttons: **Author Feedback to Review Process** (below the decision), **Author Feedback to Metareview** (below the meta-review), and **Author Feedback to Review** (below each individual review). For each of these, you can provide a 1-5 rating and an optional comment. Any one author can provide feedback, and you can revise your feedback as often as you like until the feedback deadline of April 29 AoE time. Your feedback will be anonymous. **Please read the brief instructions for each form: they explain which aspects we are interested in.**
+
+{{submissions}}
+
+A brief word on the whole process from our perspective: We recruited 1211 reviewers, 194 senior program committee members (called Area Chairs in OpenReview), and 46 area chairs (called Senior Area Chairs in OpenReview) to review the 1271 valid submissions we received. We closely monitored the quality of the reviews and the discussions and found the typical bell curve, with very engaging PC members, unresponsive ones, and everything in between. Wherever we found issues, we tried to address them, but there is only so much we could do in the limited time and for these many submissions and people. We are aware that some reviews are shallow, some discussions did not happen as they should have, and some decisions may be questionable. All the more reason for us to ask you for your feedback, so that we can learn from it and improve the process in the future.
+
+Thank you for submitting to the SIGIR 2026 Full Papers Track and for taking the time to provide feedback. It is extremely valuable for us.
+
+Hannah Bast, Marc Najork, Min Zhang  
+Program Chairs of the SIGIR 2026 Full Papers Track  

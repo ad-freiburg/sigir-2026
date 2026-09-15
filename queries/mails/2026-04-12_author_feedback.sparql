@@ -1,0 +1,15 @@
+# Query for mail ../../mails/2026-04-12_author_feedback.txt
+PREFIX or: <http://openreview.net/>
+PREFIX person: <https://openreview.net/profile?id=~>
+PREFIX pangram: <https://pangram.com/rdf/schema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT ?author ?firstname_or_fullname ?count ?submissions WHERE {
+  { SELECT ?author (GROUP_CONCAT(?row; SEPARATOR="\n") AS ?submissions) (COUNT(?row) AS ?count) WHERE {
+    SELECT ?author ?number ?row WHERE {
+	  ?submission a or:Submission; or:status "submitted"; or:number ?number; or:title ?title; or:author ?author .
+      BIND (CONCAT(STR(?number), " [", ?title, "](", STR(?submission), ")") AS ?row)
+	} INTERNAL SORT BY ?author ?number
+  } GROUP BY ?author }
+  ?author or:firstname_or_fullname ?firstname_or_fullname .
+}
+ORDER BY ?author

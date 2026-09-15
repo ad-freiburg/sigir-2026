@@ -1,0 +1,26 @@
+# Author vs invited reviewers: timeliness over time
+#defaultView:LineChart
+PREFIX or: <http://openreview.net/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT (STRDT(CONCAT(STR(?day), "T00:00:00Z"), xsd:dateTime) AS ?date) (ROUND(?cum / ?total * 1000) / 10 AS ?cum_percentage) ?group WHERE {
+  {
+    SELECT ?group ?day (SUM(IF(?cdate <= ?day, 1, 0)) AS ?cum) WHERE {
+      { SELECT DISTINCT ?day WHERE {
+          { ?rr rdf:type or:Review ; or:cdate ?day . }
+          UNION { VALUES ?day { "2026-01-19"^^xsd:date "2026-03-05"^^xsd:date } }
+          FILTER(?day >= "2026-01-19"^^xsd:date && ?day <= "2026-03-05"^^xsd:date)
+      } }
+      ?submission or:status "submitted" ; or:has_review ?review .
+      ?review or:reviewer ?pc ; or:cdate ?cdate .
+      BIND(IF(EXISTS { ?pc or:role_invited or:PC }, "invited reviewers", "author reviewers") AS ?group)
+    } GROUP BY ?group ?day
+  }
+  {
+    SELECT ?group (COUNT(?review2) AS ?total) WHERE {
+      ?submission2 or:status "submitted" ; or:has_review ?review2 . ?review2 or:reviewer ?pc2 .
+      BIND(IF(EXISTS { ?pc2 or:role_invited or:PC }, "invited reviewers", "author reviewers") AS ?group)
+    } GROUP BY ?group
+  }
+}
+ORDER BY ?group ?day

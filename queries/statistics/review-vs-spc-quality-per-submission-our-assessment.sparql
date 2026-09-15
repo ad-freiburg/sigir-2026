@@ -1,0 +1,17 @@
+# Review vs SPC quality per submission (our assessment)
+#Review vs SPC quality per submission (our assessment)
+PREFIX or: <http://openreview.net/>
+SELECT ?score ?percentage ?what WHERE {
+  {
+    { SELECT ?s (COUNT(*) AS ?cnt) WHERE { ?r or:quality_evaluation_quality_score ?s } GROUP BY ?s }
+    { SELECT (COUNT(*) AS ?tot) WHERE { ?r2 or:quality_evaluation_quality_score ?s2 } }
+    BIND("reviews" AS ?what)
+  } UNION {
+    { SELECT ?s (COUNT(*) AS ?cnt) WHERE { ?p or:spc_rating_strict ?s } GROUP BY ?s }
+    { SELECT (COUNT(*) AS ?tot) WHERE { ?p2 or:spc_rating_strict ?s3 } }
+    BIND("SPC work per submission" AS ?what)
+  }
+  BIND(STR(?s) AS ?score)
+  BIND(ROUND(1000 * ?cnt / ?tot) / 10 AS ?percentage)
+}
+ORDER BY ?score ?what

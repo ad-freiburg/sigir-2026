@@ -1,0 +1,15 @@
+# Query for mail ../../mails/2026-01-15_authors_import_your_publications.txt
+PREFIX or: <http://openreview.net/>
+PREFIX dblp: <https://dblp.org/rdf/schema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT ?author ?author_name ?position ?dblp_id ?imported_pubs ?dblp_pubs WHERE {
+  { SELECT DISTINCT ?author WHERE { ?submission or:status "submitted" . ?submission or:author ?author } }
+  ?author or:dblp_id ?dblp_id .
+  ?author rdfs:label ?author_name .
+  ?author or:position ?position .
+  MINUS { ?author or:role [] } 
+  OPTIONAL { ?author or:num_publications ?imported_pubs }
+  OPTIONAL { ?dblp_id dblp:num_publications ?dblp_pubs }
+  FILTER (?imported_pubs < 0.9 * ?dblp_pubs && ?dblp_pubs >= 10)
+}
+ORDER BY DESC(?imported_pubs)

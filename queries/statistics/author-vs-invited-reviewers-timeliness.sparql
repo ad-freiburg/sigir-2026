@@ -1,0 +1,24 @@
+# Author vs invited reviewers: timeliness
+#defaultView:BarChart
+PREFIX or: <http://openreview.net/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT ?group (ROUND(?count / ?total * 1000) / 10 AS ?percentage) ?timeliness WHERE {
+  {
+    SELECT ?group ?timeliness (COUNT(?review) AS ?count) WHERE {
+      ?submission or:status "submitted" ; or:has_review ?review .
+      ?review or:reviewer ?pc ; or:cdate ?d .
+      BIND(IF(EXISTS { ?pc or:role_invited or:PC }, "invited reviewers", "author reviewers") AS ?group)
+      BIND(IF(?d <= "2026-02-17"^^xsd:date, "on time",
+           IF(?d <= "2026-02-24"^^xsd:date, "up to one week late", "very late")) AS ?timeliness)
+    } GROUP BY ?group ?timeliness
+  }
+  {
+    SELECT ?group (COUNT(?review2) AS ?total) WHERE {
+      ?submission2 or:status "submitted" ; or:has_review ?review2 .
+      ?review2 or:reviewer ?pc2 ; or:cdate ?d2 .
+      BIND(IF(EXISTS { ?pc2 or:role_invited or:PC }, "invited reviewers", "author reviewers") AS ?group)
+    } GROUP BY ?group
+  }
+  BIND(IF(?timeliness = "on time", 1, IF(?timeliness = "up to one week late", 2, 3)) AS ?t_order)
+}
+ORDER BY ?group ?t_order

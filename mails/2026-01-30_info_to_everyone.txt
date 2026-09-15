@@ -1,0 +1,21 @@
+# Query: (none, recipients were listed explicitly)
+To: (list of recipients removed)
+Subject: [SIGIR 2026] Slack channel #sigir2026-full-papers-track
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear everyone involved in the SIGIR 2026 Full-Papers Track (authors and reviewers),
+
+We wanted to inform you that we have created a dedicated Slack channel for the SIGIR 2026 Full-Papers Track. The name of the channel is [#sigir2026-full-papers-track](https://acmsigir.slack.com/archives/C0A48CQNALX).
+
+The channel is intended for purely informal communication. All official communications will continue to happen via OpenReview and email. There is no obligation whatsoever to join or participate in the Slack channel.
+
+You need an account
+: #sigir2026-full-papers-track
+
+
+
+
+
+Hannah Bast, Marc Najork, and Min Zhang
+SIGIR 2026 Program Chairs, Full Papers Track

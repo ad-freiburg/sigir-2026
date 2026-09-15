@@ -1,0 +1,12 @@
+# Missing reviews, per SPC
+PREFIX or: <http://openreview.net/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX person: <https://openreview.net/profile?id=~>
+SELECT ?spc ?submission ?num ?pc ?email ?invited WHERE {
+  ?spc or:role or:SPC .
+  ?pc or:role or:PC ; or:email ?email .
+  ?submission or:status "submitted" ; or:assigned ?spc ; or:assigned ?pc ; or:number ?num .
+  MINUS { ?submission or:has_review [ or:reviewer ?pc ] }
+  BIND (IF(EXISTS { ?pc or:role_invited or:PC }, "yes", "no") AS ?invited)
+}
+ORDER BY ?spc ?num

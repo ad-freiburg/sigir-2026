@@ -1,0 +1,11 @@
+# Co-author only in OR or in DBLP, for Marc Min Hannah
+PREFIX or: <http://openreview.net/>
+PREFIX person: <https://openreview.net/profile?id=~>
+PREFIX dblp: <https://dblp.org/rdf/schema#>
+SELECT ?author ?coauthor_only_dblp ?coauthor_only_or WHERE {
+  VALUES ?author { person:Hannah_Bast1 person:Marc_Najork1 person:Min_Zhang15 }
+  { ?author or:has_coauthor ?coauthor_only_or MINUS { ?author or:dblp_id/dblp:has_coauthor ?coauthor_only_or . } }
+  UNION
+  { ?author or:dblp_id/dblp:has_coauthor ?coauthor_only_dblp MINUS { ?author or:has_coauthor ?coauthor_only_dblp . } }
+}
+ORDER BY ?author ?coauthor_only_or ?coauthor_only_dblp

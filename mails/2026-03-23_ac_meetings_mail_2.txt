@@ -1,0 +1,31 @@
+# Query: ../queries/mails/2026-03-23_ac_meetings_mail_2.sparql
+To: (recipients computed by the query above)
+From: Hannah Bast <sigir2026-pc-chairs@openreview.net>
+Subject: [SIGIR 2026] Please fill out your Decision forms
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{firstname}},
+
+Please fill out your "Decision" forms. We want to look at the comments ahead of our meeting.
+
+See the last email we sent 
+
+
+The AC meetings will start soon. Please double-check your slot in this [sheet](https://docs.google.com/spreadsheets/d/1jzIy1ocwUWBessjPxYdjw-DABs8eE5uZxeKS_z-i1Yc). You should have also received a calendar invitation.
+
+The basis for our discussion will be a table with all your submissions, similar to the one you have been receiving by mail, but with your decisions and comments added, and with some more information. Since this information is changing as you enter more information, we created a webpage for you that automatically updates every five minutes with the latest information from OpenReview:
+
+{{webpage}}
+
+Three more remarks:
+
+**1. Please fill out the "Decision" form for each of your submissions, if you haven't done so already. We want to look at your comments ahead of the meeting, so the sooner you fill these out, the better.**
+
+2\. You currently recommend accept for {{accept}} out of the {{all}} submissions assigned to you; that is an **acceptance rate of {{rate}}%** for your batch. The typical acceptance rate for SIGIR is around 20%. We have now also added the original review scores to the table; watch out for submissions where the current scores deviate significantly from the original scores.
+
+3\. Over the course of the next week, you can still discuss with the SPCs and reviewers. Watch out for submissions with inconclusive review scores, with little or no discussion, or with generic or otherwise uninformative meta-reviews. As an additional hint, we have now also added our own ratings of the SPCs to the table.
+
+We are looking forward to the meeting with you!
+
+Hannah, Min, and Marc

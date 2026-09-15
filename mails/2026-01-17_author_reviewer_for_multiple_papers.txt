@@ -1,0 +1,18 @@
+# Query: ../queries/mails/2026-01-17_author_reviewer_for_multiple_papers.sparql
+To: (recipients computed by the query above)
+Subject: [SIGIR 2026] Nominated as reviewer for multiple submissions
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{name}},
+
+You were nominated to serve as reviewer for multiple submissions, namely:
+
+{{papers}}
+
+This violates a requirement stated in the [Call for Papers](https://sigir2026.org/en-AU/pages/submissions/full-papers-track): "In the case of authors submitting multiple papers, we ask for a DIFFERENT author to be nominated for each submission."
+
+Please resolve this immediately, and let us know when you have done so.
+
+Hannah Bast, Marc Najork, and Min Zhang
+SIGIR 2026 Program Chairs, Full Papers Track

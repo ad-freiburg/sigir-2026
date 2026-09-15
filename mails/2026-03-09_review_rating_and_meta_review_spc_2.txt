@@ -1,0 +1,43 @@
+# Query: ../queries/mails/2026-03-09_review_rating_and_meta_review_spc_2.sparql
+To: (recipients computed by the query above)
+Subject: [SIGIR 2026] Rating the reviews and submitting meta-reviews
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{firstname_or_fullname}},
+
+The deadline for submitting your meta-reviews and review ratings is just a litte more than one day away (March 10 AoE).
+
+If you need input from reviewers a
+
+
+As a reminder, here are the instructions we sent on March 1:
+
+
+We have now deployed the forms for rating the reviews and for submitting your
+meta-reviews.
+
+**Rating the reviews**: At the bottom of each review, to the right, you should
+now see a button labeled "Rating". You can rate each review on a scale from 1
+to 5, and there is also a text box for any optional comments you may have. The
+rating will **not** be visible to the reviewers or to the authors. They will
+eventually be made visible to the Senior Area Chairs assigned to the paper.
+
+**Submitting meta-reviews**: At the top of the page for each paper, below the
+panel with the title, abstract, etc., you should now see a button labeled "Meta
+Review" on the right. Please carefully read the instructions. In particular, a
+meta-review should **not** just summarize or average the reviews, but it should
+separate the wheat from the chaff. Like the reviews, the meta-reviews will
+eventually be made visible to the authors.
+
+Both ratings and meta-reviews can be edited as often as you like until the
+deadline, which is March 10 AoE.
+
+Thank you very much for this. Your work as an SPC / Area Chair is absolutely
+crucial for the quality and fairness of the review process. In particular, we
+rely on you to identify and rectify any issues with the reviews.
+
+As always, please do not hesitate to reach out to us if you have any questions.
+
+Hannah Bast, Marc Najork, and Min Zhang
+SIGIR 2026 Program Chairs, Full Papers Track

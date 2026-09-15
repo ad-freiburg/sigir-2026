@@ -1,0 +1,22 @@
+# Query: ../queries/mails/2026-02-12_pc_reminder_2.sparql
+To: (recipients computed by the query above)
+Subject: [SIGIR 2026] Please start with your first review TODAY
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{firstname_or_fullname}},
+
+The deadline for your reviews for the SIGIR 2026 full-papers track is only two days away (February 17, 2026, AoE).
+
+We have not received any reviews from you yet, and we want to make sure that you have enough time to complete your reviews before the deadline.
+
+Please start with your first review TODAY.
+
+As a first step, click on one of the papers assigned to you and start reading it:
+
+{{papers}}
+
+Thank you for your effort.
+
+Hannah Bast, Marc Najork, and Min Zhang
+SIGIR 2026 Program Chairs, Full Papers Track

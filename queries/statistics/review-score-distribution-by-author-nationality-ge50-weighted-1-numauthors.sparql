@@ -1,0 +1,25 @@
+# Review score distribution by author nationality (≥50, weighted 1/#authors)
+#defaultView:BarChart
+PREFIX or: <http://openreview.net/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+SELECT ?country (ROUND(?wcount / ?total * 1000) / 10 AS ?percentage) ?score WHERE {
+  {
+    SELECT ?country ?rating (SUM(1/?na) AS ?wcount) WHERE {
+      ?submission or:status "submitted" ; or:num_authors ?na ; or:has_review ?review ; or:author ?author .
+      ?review or:rating ?rating .
+      ?author or:country ?country .
+      FILTER(?country != <http://openreview.net/novalue>)
+    } GROUP BY ?country ?rating
+  }
+  {
+    SELECT ?country (SUM(1/?na2) AS ?total) (SUM(IF(?rating2 < 0, 1/?na2, 0)) AS ?neg) WHERE {
+      ?submission2 or:status "submitted" ; or:num_authors ?na2 ; or:has_review ?review2 ; or:author ?author2 .
+      ?review2 or:rating ?rating2 .
+      ?author2 or:country ?country .
+      FILTER(?country != <http://openreview.net/novalue>)
+    } GROUP BY ?country HAVING(?total >= 50)
+  }
+  BIND(?neg / ?total AS ?neg_frac)
+  BIND(IF(?rating > 0, CONCAT("+", STR(?rating)), STR(?rating)) AS ?score)
+}
+ORDER BY ?neg_frac ?rating

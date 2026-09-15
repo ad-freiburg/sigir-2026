@@ -1,0 +1,16 @@
+# Query: ../queries/mails/2026-02-21_spc_no_missing_reviews.sparql
+To: (recipients computed by the query above)
+Subject: [SIGIR 2026] Chasing after missing reviews
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{firstname_or_fullname}},
+
+The deadline for the reviews for the SIGIR 2026 full papers track passed three days ago (February 17, 2026, AoE), and we have been busy chasing after missing reviews. We have made good progress: only around 500 (of over 5000) reviews are still missing, and only around 50 of the 1282 submissions have fewer than three reviews. Note that we overprovisioned: we requested four reviews per submission, but require only three to proceed. We also have capacity for at least 500 emergency reviews.
+
+[You]({{spc}}) are among the lucky ones: all reviews for all the submissions for which you are the SPC in charge are in.
+
+We are optimistic that we will reach our target of at least three reviews for each submission within the next two days. Then we will start with the discussion phase; there will be a separate email for that. Until then, feel free to have a look at the reviews already, or just relax and enjoy the weekend.
+
+Hannah Bast, Marc Najork, and Min Zhang
+SIGIR 2026 Program Chairs, Full Papers Track

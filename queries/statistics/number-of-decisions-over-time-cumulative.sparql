@@ -1,0 +1,20 @@
+# Number of decisions over time (cumulative)
+#defaultView:BarChart
+PREFIX or: <http://openreview.net/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT (STR(?day) AS ?date) ?num_decisions WHERE {
+  {
+    SELECT ?day (SUM(?cdate <= ?day) AS ?num_decisions) WHERE {
+      {
+        SELECT DISTINCT ?day WHERE {
+          { ?d rdf:type or:Decision ; or:cdate ?day . }
+          UNION { VALUES ?day { "2026-03-17"^^xsd:date "2026-03-28"^^xsd:date } }
+          FILTER(?day >= "2026-03-17"^^xsd:date && ?day <= "2026-03-28"^^xsd:date)
+        }
+      }
+      ?decision rdf:type or:Decision ; or:cdate ?cdate .
+    } GROUP BY ?day
+  }
+}
+ORDER BY ?day

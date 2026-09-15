@@ -1,0 +1,31 @@
+# AI help in submissions, reviews, meta-reviews (Pangram)
+#defaultView:BarChart
+PREFIX or: <http://openreview.net/>
+PREFIX pg: <https://pangram.com/rdf/schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+SELECT ?type (ROUND(1000 * ?count / ?total) / 10 AS ?percentage) ?category WHERE {
+  {
+    SELECT ?type ?category (COUNT(?x) AS ?count) WHERE {
+      {
+        { ?x rdf:type or:Submission ; or:status "submitted" . BIND("Submissions" AS ?type) }
+        UNION { ?x rdf:type or:Review . BIND("Reviews" AS ?type) }
+        UNION { ?x rdf:type or:Metareview . ?sub or:has_metareview ?x . ?sub or:status "submitted" . BIND("Metareviews" AS ?type) }
+      }
+      ?x pg:prediction_short ?ps .
+      BIND(IF(?ps = "Human", "Human", IF(?ps = "Mixed", "AI-assisted", "AI-written")) AS ?category)
+    } GROUP BY ?type ?category
+  }
+  {
+    SELECT ?type (COUNT(?y) AS ?total) WHERE {
+      {
+        { ?y rdf:type or:Submission ; or:status "submitted" . BIND("Submissions" AS ?type) }
+        UNION { ?y rdf:type or:Review . BIND("Reviews" AS ?type) }
+        UNION { ?y rdf:type or:Metareview . ?sub2 or:has_metareview ?y . ?sub2 or:status "submitted" . BIND("Metareviews" AS ?type) }
+      }
+      ?y pg:prediction_short ?ps2 .
+    } GROUP BY ?type
+  }
+  BIND(IF(?type = "Submissions", 1, IF(?type = "Reviews", 2, 3)) AS ?type_order)
+  BIND(IF(?category = "Human", 1, IF(?category = "AI-assisted", 2, 3)) AS ?cat_order)
+}
+ORDER BY ?type_order ?cat_order

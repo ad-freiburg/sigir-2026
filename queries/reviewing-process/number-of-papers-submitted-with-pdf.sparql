@@ -1,0 +1,9 @@
+# Number of papers "submitted" with PDF
+PREFIX or: <http://openreview.net/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+SELECT ?has_pdf (COUNT(*) as ?count) ?all (CONCAT(STR(ROUND(100 * ?count / ?all)), "%") AS ?perc) WHERE {
+  { SELECT (COUNT(*) AS ?all) WHERE { [] rdf:type or:Submission ; or:status "submitted" } }
+  [] rdf:type or:Submission ; or:status "submitted"; or:has_pdf ?has_pdf .
+}
+GROUP BY ?has_pdf ?all
+ORDER BY DESC(?count)

@@ -1,0 +1,16 @@
+# Co-author only in OR or in DBLP, for Marc Min Hannah (counts)
+PREFIX or: <http://openreview.net/>
+PREFIX person: <https://openreview.net/profile?id=~>
+PREFIX dblp: <https://dblp.org/rdf/schema#>
+SELECT ?author ?coa_only_dblp ?coa_only_or WHERE {
+  VALUES ?author { person:Hannah_Bast1 person:Marc_Najork1 person:Min_Zhang15 }
+  { SELECT ?author (COUNT(?coauthor_only_or) AS ?coa_only_or) WHERE {
+    ?author or:has_coauthor ?coauthor_only_or
+    MINUS { ?author or:dblp_id/dblp:has_coauthor ?coauthor_only_or }
+  } GROUP BY ?author }
+  { SELECT ?author (COUNT(?coauthor_only_dblp) AS ?coa_only_dblp) WHERE {
+    ?author or:dblp_id/dblp:has_coauthor ?coauthor_only_dblp
+    MINUS { ?author or:has_coauthor ?coauthor_only_dblp }
+  } GROUP BY ?author }
+}
+ORDER BY ?author

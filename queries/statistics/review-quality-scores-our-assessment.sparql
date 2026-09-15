@@ -1,0 +1,8 @@
+# Review quality scores (our assessment)
+#Review quality scores (our assessment)
+PREFIX or: <http://openreview.net/>
+SELECT ?score (COUNT(?review) AS ?num_reviews) WHERE {
+  ?review or:quality_evaluation_quality_score ?score .
+}
+GROUP BY ?score
+ORDER BY ?score

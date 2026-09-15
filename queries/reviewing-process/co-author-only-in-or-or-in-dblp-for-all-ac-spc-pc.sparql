@@ -1,0 +1,23 @@
+# Co-author only in OR or in DBLP, for all AC SPC PC
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX or: <http://openreview.net/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX dblp: <https://dblp.org/rdf/schema#>
+SELECT ?person ?dblp_id ?role ?pubs_or ?pubs_dblp ?coa_only_or ?coa_only_dblp WHERE { 
+  VALUES ?role { or:AC or:SPC or:PC }
+  ?person or:role ?role .
+  ?person or:dblp_id ?dblp_id .
+  ?person or:status "accepted" . 
+  ?person rdfs:label ?label .
+  ?person or:num_publications ?pubs_or .
+  OPTIONAL { ?dblp_id dblp:num_publications ?pubs_dblp . }
+  OPTIONAL { SELECT ?person (COUNT(?coauthor_only_or) AS ?coa_only_or) WHERE {
+    ?person or:has_coauthor ?coauthor_only_or
+    MINUS { ?person or:dblp_id/dblp:has_coauthor ?coauthor_only_or }
+  } GROUP BY ?person }
+  OPTIONAL { SELECT ?person (COUNT(?coauthor_only_dblp) AS ?coa_only_dblp) WHERE {
+    ?person or:dblp_id/dblp:has_coauthor ?coauthor_only_dblp
+    MINUS { ?author or:has_coauthor ?coauthor_only_dblp }
+  } GROUP BY ?person }
+}
+ORDER BY DESC(?coa_only_dblp)

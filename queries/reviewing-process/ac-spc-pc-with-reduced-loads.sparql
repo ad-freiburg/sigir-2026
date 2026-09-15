@@ -1,0 +1,10 @@
+# AC, SPC, PC with reduced loads
+PREFIX or: <http://openreview.net/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT ?person ?label ?role ?status ?reduced_load WHERE {
+  ?person or:role ?role .
+  ?person rdfs:label ?label .
+  ?person or:status ?status .
+  ?person or:reduced_load ?reduced_load .
+}

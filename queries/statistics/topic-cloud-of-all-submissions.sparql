@@ -1,0 +1,24 @@
+# Topic cloud of all submissions
+#defaultView:BubbleChart
+PREFIX or: <http://openreview.net/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+SELECT ?label ?count WHERE {
+  {
+    SELECT ?topic (COUNT(?submission) AS ?count) WHERE {
+      ?submission rdf:type or:Submission ; or:topic_coarse ?topic .
+      FILTER(?topic != "Other")
+    } GROUP BY ?topic
+  }
+  {
+    SELECT (COUNT(?s2) AS ?total) WHERE {
+      ?s2 rdf:type or:Submission ; or:topic_coarse ?t2 .
+      FILTER(?t2 != "Other")
+    }
+  }
+  BIND(?count / ?total * 100 AS ?pct)
+  BIND(ROUND(?count / ?total * 1000) AS ?p10)
+  BIND(FLOOR(?p10 / 10) AS ?whole)
+  BIND(?p10 - 10 * ?whole AS ?frac)
+  BIND(IF(?pct < 1, STR(?topic), CONCAT(STR(?topic), "\n", STR(?whole), ".", STR(?frac), "%")) AS ?label)
+}
+ORDER BY DESC(?count)

@@ -1,0 +1,22 @@
+# Query for mail ../../mails/2026-03-07_discussion_phase_spc_4b.txt
+PREFIX or: <http://openreview.net/>
+PREFIX person: <https://openreview.net/profile?id=~>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT  ?spc ?firstname_or_fullname (COUNT(?submission) AS ?count) (GROUP_CONCAT(?paper; SEPARATOR="\n") AS ?missing) WHERE {
+  { SELECT ?spc ?firstname_or_fullname ?submission (GROUP_CONCAT(?reviewer; SEPARATOR="\n") AS ?reviewers) WHERE {
+    ?spc or:role or:SPC; or:firstname_or_fullname ?firstname_or_fullname .
+    ?pc or:role or:PC; rdfs:label ?name; or:email ?email .
+    OPTIONAL { SELECT ?pc (COUNT(*) AS ?assigned) WHERE { [] or:status "submitted"; or:assigned ?pc } GROUP BY ?pc }
+    MINUS { VALUES ?spc { person:Hannah_Bast2 person:Marc_Najork2 person:Min_Zhang32 } }
+    MINUS { VALUES ?pc { person:Hannah_Bast2 person:Marc_Najork2 person:Min_Zhang32 } }
+    ?submission a or:Submission; or:status "submitted"; or:assigned ?spc; or:assigned ?pc .
+	BIND(CONCAT("Reviewer: ", "[", ?name, "](", STR(?pc), "), Email: [", ?email, "](mailto:", ENCODE_FOR_URI(CONCAT("\"", ?name, "\" <", ?email, ">")), ")") AS ?reviewer)
+    BIND (EXISTS { ?submission or:has_comment ?comment . ?comment or:author ?spc } AS ?spc_active)
+    BIND (EXISTS { ?submission or:has_comment ?comment . ?comment or:author ?pc } AS ?pc_active)
+    FILTER (?spc_active = true && ?pc_active = false)
+  } GROUP BY ?spc ?firstname_or_fullname ?submission }
+  ?submission or:number ?num; or:title ?title .
+  BIND (CONCAT(STR(?num), "   [", ?title, "](", STR(?submission), ")\n", ?reviewers) AS ?paper) 
+}
+GROUP BY ?spc ?firstname_or_fullname
+ORDER BY DESC(?count)

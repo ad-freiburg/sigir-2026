@@ -1,0 +1,18 @@
+# Query: ../queries/mails/2026-01-23_no_dblp_certify_imported_publications_single_author.sparql
+To: (recipients computed by the query above)
+Subject: [SIGIR 2026] Complete the "DBLP and Imported Publications" task in OpenReview, FINAL CALL
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{author_name}},
+
+This is the FINAL CALL regarding the "DBLP and Imported Publications" task in OpenReview. Here are the detailed instructions again. Please read them carefully and follow them. It looks like you have only few prior publications (or none at all), so this should not take much time.
+
+Please log into OpenReview, click on "Tasks" in the top right corner (to the left of your name), click on the small triangle to the left of "ACM SIGIR 2026 Conference", and then click on "DBLP and Imported Publications". A form will appear. Please fill out this form truthfully (and take the corresponding actions), then click on "Submit". If you make a mistake, you can edit the form and submit it again.
+
+Link to your OpenReview profile: {{author}}
+
+Please do this IMMEDIATELY, you risk desk rejection of your submission otherwise.
+
+Hannah Bast, Marc Najork, and Min Zhang
+SIGIR 2026 Program Chairs, Full Papers Track

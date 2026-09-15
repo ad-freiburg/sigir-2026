@@ -1,0 +1,20 @@
+# Query: ../queries/mails/2026-03-16_ac_meetings.sparql
+To: (recipients computed by the query above)
+From: Marc Najork <sigir2026-pc-chairs@openreview.net>
+Subject: [SIGIR 2026] Meeting with the PC chairs, SIGN UP PLEASE
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{firstname_or_fullname}},
+
+Please sign up for a 20-minute time slot to discuss a subset of the {{count}} submissions that were assigned to [you]({{ac}}). Some of these submissions will have been flagged for discussions by you, others by us.  
+
+Please enter your name into one (and only one) of the yellow cells in the [signup sheet](https://docs.google.com/spreadsheets/d/1jzIy1ocwUWBessjPxYdjw-DABs8eE5uZxeKS_z-i1Yc/), and please do not overwrite the names in cells that have already been populated. 
+
+The right half of the sheet contains one column for each available day (where "day" is a calendar day in the UTC time zone), and the yellow portions of each column are the available time slots on that day.  The left half of the sheet is intended to make it easier to schedule across the time zones of the committee members.  Each column shows the local equivalent of the time in the UTC column.  Please be mindful that in some cases, the day in your local time zone may be one day earlier or one day later than the UTC day.
+
+Please do this by Wednesday March 18 EoD AoE.  We will be sending out personalized calendar invitations with a video conferencing link starting Thursday.
+
+Thank you!
+
+Hannah, Min and Marc

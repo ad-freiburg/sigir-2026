@@ -1,0 +1,24 @@
+# Query: ../queries/mails/2026-02-12_pc_reminder_1b.sparql
+To: (recipients computed by the query above)
+Subject: [SIGIR 2026] Please start with your second review TODAY
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{firstname_or_fullname}},
+
+The deadline for your reviews for the SIGIR 2026 full-papers track is approaching (February 17, 2026, AoE).
+
+We noticed that you have already completed one review; thank you for that!
+
+We wanted to encourage you to start with your second review today (doing all the remaining reviews shortly before the deadline is stressful).
+
+For your convenience, here is the list of papers assigned to you:
+
+{{papers}}
+
+If you celebrate Chinese New Year (春節) next week, we wish you a wonderful time with your family and friends! Please finish your reviews before that.
+
+Thank you for helping us with this; we could not do it without you.
+
+Hannah Bast, Marc Najork, and Min Zhang
+SIGIR 2026 Program Chairs, Full Papers Track

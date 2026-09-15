@@ -1,0 +1,25 @@
+# Query for mail ../../mails/2026-03-08_status_quo_ac_1.txt
+PREFIX or: <http://openreview.net/>
+PREFIX person: <https://openreview.net/profile?id=~>
+PREFIX pangram: <https://pangram.com/rdf/schema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT ?ac ?firstname_or_fullname ?count ?table WHERE {
+  { SELECT ?ac (GROUP_CONCAT(?row; SEPARATOR="\n") AS ?rows) (COUNT(?row) AS ?count) WHERE {
+    SELECT ?ac ?number ?row WHERE {
+	  ?ac or:role or:AC . MINUS { VALUES ?ac { person:Hannah_Bast2 person:Marc_Najork2 person:Min_Zhang32 } }
+	  ?spc or:role or:SPC; rdfs:label ?spc_name; or:email ?spc_email . MINUS { VALUES ?spc { person:Hannah_Bast2 person:Marc_Najork2 person:Min_Zhang32 } }
+      ?submission a or:Submission; or:status "submitted"; or:assigned ?ac; or:assigned ?spc; or:number ?number; or:title ?title .
+	  BIND (IF(STRLEN(?title) > 30, CONCAT(SUBSTR(?title, 1, 27), "..."), ?title) AS ?title_abbrv) 
+      OPTIONAL { SELECT ?submission (GROUP_CONCAT(STR(?score); SEPARATOR=", ") AS ?scores) WHERE { SELECT ?submission ?pc ?score WHERE { ?submission or:has_review ?review; or:assigned ?ac . ?ac or:role or:AC . ?review or:reviewer ?pc; or:rating ?score . ?pc or:role or:PC } INTERNAL SORT BY ?submission ?pc } GROUP BY ?submission }
+	  OPTIONAL { SELECT ?submission (GROUP_CONCAT(COALESCE(STR(?rating),"-"); SEPARATOR=", ") AS ?ratings) WHERE { SELECT ?submission ?pc ?rating WHERE { ?submission or:has_review ?review; or:assigned ?ac . ?ac or:role or:AC . ?review or:reviewer ?pc . OPTIONAL { ?review or:rating_value ?rating } ?pc or:role or:PC } INTERNAL SORT BY ?submission ?pc } GROUP BY ?submission }
+      OPTIONAL { SELECT ?submission (CONCAT("len = ", STR(SUM(STRLEN(?text)))) AS ?reviews) WHERE { ?submission or:has_review ?review; or:assigned ?ac . ?ac or:role or:AC . ?review pangram:text ?text } GROUP BY ?submission }
+      OPTIONAL { SELECT ?submission (CONCAT("n = ", STR(COUNT(?comment)), ", len = ", STR(SUM(STRLEN(?text)))) AS ?comments) WHERE { ?submission or:has_comment ?comment; or:assigned ?ac . ?ac or:role or:AC . ?comment or:text ?text } GROUP BY ?submission }
+      OPTIONAL { SELECT ?submission (CONCAT("len = ", STR(SUM(STRLEN(?text)))) AS ?metareviews) WHERE { ?submission or:has_metareview ?metareview; or:assigned ?ac . ?ac or:role or:AC . ?metareview or:text ?text } GROUP BY ?submission }
+	  BIND(CONCAT("[", ?spc_name, "](mailto:", ?spc_email, ")") AS ?spc_contact)
+      BIND (CONCAT("| ", STR(?number), " | [", ?title_abbrv, "](", STR(?submission), ") | ", ?scores, " | | ", ?ratings, " | | ", COALESCE(?reviews, "none"), " | | ", COALESCE(?comments, "none"), " | | ", COALESCE(?metareviews, "none"), " | ", ?spc_contact) AS ?row)
+	} INTERNAL SORT BY ?ac ?number
+  } GROUP BY ?ac }
+  BIND (CONCAT("| Number | Title | Scores | | Ratings | | Reviews | | Comments | | Metareview | SPC |", "\n", "|:----- |:----- |:------- |-|:------- |-|:------- |-|:-------- |-|:--------- |:--- |", "\n", ?rows) AS ?table)
+  ?ac or:firstname_or_fullname ?firstname_or_fullname .
+}
+ORDER BY ?ac

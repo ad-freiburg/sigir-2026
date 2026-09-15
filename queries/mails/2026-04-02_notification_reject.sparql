@@ -1,0 +1,8 @@
+# Query for mail ../../mails/2026-04-02_notification_reject.txt
+PREFIX or: <http://openreview.net/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT ?author ?full_name ?number ?submission ?title WHERE {
+  ?submission or:status "submitted"; or:number ?number; or:title ?title; or:has_decision [ or:decision "Reject" ] .
+  ?submission or:author ?author .
+  ?author rdfs:label ?full_name .
+}

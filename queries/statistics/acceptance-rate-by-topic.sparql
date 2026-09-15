@@ -1,0 +1,13 @@
+# Acceptance rate by topic
+#Acceptance rate by topic (reviewed papers)
+PREFIX or: <http://openreview.net/>
+SELECT ?topic (ROUND(1000 * COALESCE(?na, 0) / ?ns) / 10 AS ?acceptance_rate) WHERE {
+  { SELECT ?t (COUNT(?s) AS ?ns) WHERE {
+      ?s or:status "submitted" ; or:topic_coarse ?t . FILTER(?t != "Other")
+  } GROUP BY ?t }
+  OPTIONAL { SELECT ?t (COUNT(?sa) AS ?na) WHERE {
+      ?sa or:status "submitted" ; or:topic_coarse ?t ; or:has_decision [ or:decision "Accept" ] .
+  } GROUP BY ?t }
+  BIND(CONCAT(?t, " (", STR(?ns), ")") AS ?topic)
+}
+ORDER BY DESC(?acceptance_rate)

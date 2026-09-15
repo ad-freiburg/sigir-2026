@@ -1,0 +1,14 @@
+# Query for mail ../../mails/2026-01-23_no_dblp_certify_imported_publications_all_again.txt
+PREFIX or: <http://openreview.net/>
+PREFIX dblp: <https://dblp.org/rdf/schema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT ?author ?author_name ?position ?or_pubs WHERE {
+  { SELECT DISTINCT ?author WHERE { ?submission or:status "submitted" . ?submission or:author ?author } }
+  ?author or:dblp_id or:novalue .
+  ?author rdfs:label ?author_name .
+  ?author or:position ?position .
+  MINUS { ?author or:role [] } 
+  ?author or:num_publications ?or_pubs .
+  MINUS { ?author or:task_dblp_status [] }
+}
+ORDER BY DESC(?or_pubs)

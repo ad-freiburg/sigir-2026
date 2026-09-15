@@ -1,0 +1,15 @@
+# Query for mail ../../mails/2026-02-21_emergency_reviewers_3.txt
+PREFIX or: <http://openreview.net/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT ?pc ?firstname_or_fullname ?ass ?done ?number ?submission ?title ?date ?inv_or_aut WHERE {
+  ?pc or:role or:PC .
+  ?pc or:firstname_or_fullname ?firstname_or_fullname .
+  ?submission or:assignment [ or:assigned ?pc; or:date ?date ] FILTER (?date >= "2026-02-22T14:00:00Z"^^xsd:dateTime)
+  ?submission or:title ?title .
+  ?submission or:number ?number .
+  BIND (IF(EXISTS { ?pc or:role_invited or:PC }, "invited", "author") AS ?inv_or_aut) 
+  OPTIONAL { SELECT ?pc (COUNT(*) AS ?ass) WHERE { [] or:status "submitted"; or:assigned ?pc } GROUP BY ?pc }
+  OPTIONAL { SELECT ?pc (COUNT(*) AS ?done) WHERE { [] or:status "submitted"; or:assigned ?pc; or:has_review [ or:reviewer ?pc ] } GROUP BY ?pc } 
+  FILTER (?done < ?ass)
+}
+ORDER BY ?date

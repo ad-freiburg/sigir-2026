@@ -1,0 +1,22 @@
+# Query: ../queries/mails/2026-03-19_ac_decisions_1.sparql
+To: (recipients computed by the query above)
+From: Hannah Bast <sigir2026-pc-chairs@openreview.net>
+Subject: [SIGIR 2026] Fill out the DECISION form for each of your submissions please
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{firstname_or_fullname}},
+
+For each of the {{count}} submissions that were assigned to [you]({{ac}}), you should now find a button "Decision" on the OpenReview page for that submission (below the abstract, to the right).
+
+Please fill out the respective form for each submission over the next few days. For each submission, you have to give a recommendation (accept, reject, discuss), a short comment, and a 1-5 rating of the performance of the SPC in handling that submission. Please read the short instructions on the form.
+
+At the very latest, all forms should be filled out before you meet with us in the week of March 23 - 27. Before the meeting, we will send you a link to a (dynamically up-to-date) table with all the decisions and comments that you have entered, which will be the basis of our 20-minute discussion with you.
+
+And here once more is the table with the current status of your submissions. Please particularly check for submissions with inconclusive review scores but little discussion, or when the recommendation of the meta-review contrasts with the scores. Discuss with the respective SPC (or even with the reviewers) as you see fit.
+
+And please consider accepting more submissions. The current acceptance rate according to the meta-reviews is still only 12%, and 4% of the meta-reviews are undecided. We see no reason why we should be stricter with acceptances than in previous years, where the acceptance rate always was around 20%.
+
+{{table}}
+
+Hannah, Min, and Marc

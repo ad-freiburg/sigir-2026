@@ -1,0 +1,23 @@
+To: (list of recipients removed)
+Subject: [SIGIR 2026] Please create your OpenReview profile
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear SPC Member,
+
+Happy new year + thank you again for agreeing to serve as SPC for the SIGIR 2026 Full Papers Track.
+
+We noticed that you haven't yet created your OpenReview profile, please do so as soon as possible.
+
+And don't forget to add your DBLP link to your profile, which can be done as follows:
+
+1. Log in to your OpenReview account and go to your profile page (click on your name in the top right corner and select "Profile")
+2. Click on "Edit Profile" (towards the top)
+3. Click on "Personal Links"
+4. In the "DBLP URL" field, enter your DBLP link (of the form https://dblp.org/pid/... without .html in the end)
+5. Click on "Add DBLP Papers to Profile" (right next to the "DBLP URL" field)
+
+Let us know if you encounter any issues.
+
+Hannah, Marc, and Min
+SIGIR 2026 Program Chairs (Full Papers Track)

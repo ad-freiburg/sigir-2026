@@ -1,0 +1,12 @@
+# SPC quality scores (our assessment)
+#SPC quality scores (our assessment)
+PREFIX or: <http://openreview.net/>
+SELECT ?score (COALESCE(?n, 0) AS ?num_spcs) WHERE {
+  VALUES ?score { 1 2 3 4 5 }
+  OPTIONAL {
+    SELECT ?score (COUNT(?spc) AS ?n) WHERE {
+      ?spc or:overall_rating_value ?score .
+    } GROUP BY ?score
+  }
+}
+ORDER BY ?score

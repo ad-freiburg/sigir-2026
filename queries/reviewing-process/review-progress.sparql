@@ -1,0 +1,15 @@
+# Review progress
+PREFIX or: <http://openreview.net/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT ?date ?done_at (SUM(?cdate <= ?date) AS ?done_until) (?total - ?done_until AS ?missing) ?total WHERE {
+  { SELECT (?cdate AS ?date) (COUNT(?review) as ?done_at) WHERE {
+    ?review rdf:type or:Review .
+    ?review or:cdate ?cdate .
+  } GROUP BY ?cdate }
+  ?review rdf:type or:Review .
+  ?review or:cdate ?cdate
+  { SELECT (COUNT(*) * 4 AS ?total) WHERE { ?submission rdf:type or:Submission . ?submission or:status "submitted" } }
+}
+GROUP BY ?date ?done_at ?total
+ORDER BY DESC(?date)

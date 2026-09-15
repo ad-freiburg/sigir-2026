@@ -1,0 +1,12 @@
+# SPC rating vs. our quality evaluation (scatter, per review)
+#defaultView:ScatterChart
+PREFIX or: <http://openreview.net/>
+# Per-review correlation as a bubble grid: x = SPC rating, y = our quality
+# evaluation, bubble size = number of reviews in that (integer) cell.
+SELECT ?spc_rating ?our_quality (COUNT(?r) AS ?num_reviews) WHERE {
+  ?r or:rating_value ?rv ; or:quality_evaluation_quality_score ?q .
+  BIND(STR(?rv) AS ?spc_rating)
+  BIND(STR(?q) AS ?our_quality)
+}
+GROUP BY ?spc_rating ?our_quality ?rv ?q
+ORDER BY ?rv ?q

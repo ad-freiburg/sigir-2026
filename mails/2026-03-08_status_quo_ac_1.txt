@@ -1,0 +1,40 @@
+# Query: ../queries/mails/2026-03-08_status_quo_ac_1.sparql
+To: (recipients computed by the query above)
+Subject: [SIGIR 2026] Your work as (Senior) Area Chair begins, IMPORTANT
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{firstname_or_fullname}},
+
+We are about to enter the **third** phase of the review process, which critically involves you as an Area Chair (called Senior Area Chair in OpenReview).
+
+The first phase was getting all the reviews in. At this point, all submissions received three reviews, and 94% of them received four or more reviews. The second phase is the discussion phase, which started on February 22 and is scheduled to end on March 10 AoE. At this point, only about 15% of the meta-reviews are in, and many discussions have not yet concluded and some have not even started. We have already sent multiple reminders to both the SPCs (called Area Chairs in OpenReview) and the PCs (called Reviewers in OpenReview).
+
+The goal of the third phase is a clear recommendation for each submission (accept or reject) based on its reviews, discussion, and meta-review. Also, each review has been rated by the responsible SPC, and you will have the opportunity to rate the meta-reviews as well (there will be a separate email about that). Towards the end of the process, between March 17 and March 27, we will meet with each of you to discuss problematic cases and to finalize recommendations.
+
+We sent the SPCs guidelines on how to conduct the discussions and how to write their meta-reviews, and a checklist of [lazy reasons to reject a paper](https://docs.google.com/document/d/1I4eTHDaMQ2-khs5MEv_1BjEcvhsPWAIcZvTFzE124II/view#heading=h.f5czy5vvku9i). You can find the instructions from the meta-review form below [1]. In a nutshell, the job of the SPCs is to review the reviewers and to separate the wheat from the chaff, which requires reading and understanding the submissions well enough. Importantly, a meta-review should **not** just summarize or average the reviews. Like the reviews, the meta-reviews will eventually be made visible to the authors. 
+
+For the next week, your most important task is to help us ensure that there is a solid information basis for each submission. This includes ensuring that the reviews are of sufficient quality, that the discussion phase is progressing, and that all meta-reviews are submitted. You are welcome to participate in the discussions of the submissions assigned to you (please use the "Official Comment" button, these comments will be visible to the PCs and SPCs, but **not** to the authors). For a considerable fraction of the submissions you will have to chase after the responsible SPC (and maybe even PCs) to do their job. This is best done via private email; in the "Senior Area Chairs Console" there is a link "Copy Email" for each SPC and for each PC assigned to a submission assigned to you.
+
+[You]({{ac}}) have been assigned {{count}} submissions. Monitoring progress for these many submissions is not trivial. To help you with this task, we have compiled the following table. It contains all the submissions assigned to you, along with the scores from the reviews (2 = accept, 1 = weak accept, 0 = borderline, -1 = weak reject, -2 = reject), the SPC ratings of the reviews (5 = very helpful, ..., 1 = not helpful at all), the total length (measured in number of characters) of the reviews, the number and total lengths of the comments, the length of the meta-review, and the SPC assigned to the submission (clicking on the name should open your email client). Of course, these are all just rough proxies, but maybe useful for prioritizing your efforts.
+ 
+{{table}}
+
+We will periodically send you an updated version of this table. Please let us know if you have suggestions for additional information that would be helpful for you. And please do reach out to us any time if you have questions.
+
+Thank you very much for your help in this critical phase of the review process!
+
+Hannah Bast, Marc Najork, and Min Zhang
+SIGIR 2026 Program Chairs, Full Papers Track
+
+----------
+
+**[1] Instructions at the top of the form for the meta-reviews:**
+
+The meta-review is key for the review process and serves two purposes: it helps the program chairs to arrive at an accept/reject decision, and it explains that accept/reject decision to the authors. Please make sure that your meta-review is informative to both audiences. Specifically:                                                                                                                               
+1. Your meta-review should not merely summarize the reviews, but "separate the wheat from the chaff". That is, you should carefully weigh the different arguments, which entails discarding arguments that lack evidence or are unconvincing.
+2. If there is substantial disagreement between the reviewers, your meta-review should explain how input from the reviewers factored into the decision. Also factor in your own understanding of the paper, but please be aware of your own biases.
+3. Provide actionable feedback for the camera-ready submission or resubmission of the paper. If such feedback is provided in the reviews, you don't have to copy it to your meta-review, but you can refer to it with a short summary.
+4. If parts of the explanation are sensitive and should not be provided to the authors, please enter it in the "confidential remarks" section instead.
+
+Again, high-quality meta-reviews are crucial for the whole review process. Thank you!

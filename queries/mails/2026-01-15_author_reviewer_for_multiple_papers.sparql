@@ -1,0 +1,15 @@
+# Query for mail ../../mails/2026-01-15_author_reviewer_for_multiple_papers.txt
+PREFIX or: <http://openreview.net/>
+PREFIX person: <https://openreview.net/profile?id=~>
+SELECT ?author_reviewer ?email (COUNT(?paper) AS ?count) (SUM(?num_authors) AS ?num_a) (GROUP_CONCAT(?paper; SEPARATOR="\n") AS ?papers) {
+  ?submission or:status "submitted" .  
+  ?submission or:author_reviewer ?author_reviewer .
+  ?author_reviewer or:email ?email .
+  ?submission or:title ?title .
+  ?submission or:author_names ?authors .
+  ?submission or:num_authors ?num_authors .
+  BIND (CONCAT("[", ?title, "](", STR(?submission), ") ", ?authors) AS ?paper) 
+}
+GROUP BY ?author_reviewer ?email
+HAVING (?count > 1 && SUM(?num_authors) > ?count)
+ORDER BY DESC(?count)

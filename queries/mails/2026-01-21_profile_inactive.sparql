@@ -1,0 +1,12 @@
+# Query for mail ../../mails/2026-01-21_profile_inactive.txt
+PREFIX or: <http://openreview.net/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT ?author ?author_name ?email ?submission ?title WHERE {
+  ?author rdf:type or:Author .
+  ?author rdfs:label ?author_name .
+  ?author or:state "Inactive" .
+  ?submission or:author ?author .
+  ?submission or:title ?title .
+  ?author or:email ?email .
+}

@@ -1,0 +1,26 @@
+# Countries of rejected papers (weighted by 1/#authors)
+#defaultView:BubbleChart
+PREFIX or: <http://openreview.net/>
+SELECT ?label ?weighted_count WHERE {
+  { SELECT ?country (SUM(1 / ?num_authors) AS ?wc) WHERE {
+    ?submission or:status "submitted" .
+    ?submission or:has_decision [ or:decision "Reject" ] .
+    ?submission or:num_authors ?num_authors .
+    ?submission or:author/or:country ?country .
+    FILTER(?country != <http://openreview.net/novalue>)
+  } GROUP BY ?country }
+  { SELECT (SUM(1 / ?num_authors2) AS ?total) WHERE {
+    ?submission2 or:status "submitted" .
+    ?submission2 or:has_decision [ or:decision "Reject" ] .
+    ?submission2 or:num_authors ?num_authors2 .
+    ?submission2 or:author/or:country ?country2 .
+    FILTER(?country2 != <http://openreview.net/novalue>)
+  } }
+  BIND(ROUND(?wc * 100) / 100 AS ?weighted_count)
+  BIND(?wc / ?total * 100 AS ?pct)
+  BIND(ROUND(?wc / ?total * 1000) AS ?p10)
+  BIND(FLOOR(?p10 / 10) AS ?whole)
+  BIND(?p10 - 10 * ?whole AS ?frac)
+  BIND(IF(?pct < 1, STR(?country), CONCAT(STR(?country), "\n", STR(?whole), ".", STR(?frac), "%")) AS ?label)
+}
+ORDER BY DESC(?weighted_count)

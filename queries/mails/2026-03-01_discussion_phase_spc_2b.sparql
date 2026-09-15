@@ -1,0 +1,14 @@
+# Query for mail ../../mails/2026-03-01_discussion_phase_spc_2b.txt
+PREFIX or: <http://openreview.net/>
+PREFIX person: <https://openreview.net/profile?id=~>
+SELECT ?spc ?firstname_or_fullname (SUM(?active = true) AS ?started) (SUM(?active = false) AS ?not_started) (GROUP_CONCAT(?paper; SEPARATOR="\n") AS ?missing) WHERE {
+  ?spc or:role or:SPC; or:firstname_or_fullname ?firstname_or_fullname .
+  MINUS { VALUES ?spc { person:Hannah_Bast2 person:Marc_Najork2 person:Min_Zhang32 } }
+  ?submission a or:Submission; or:assigned ?spc; or:status "submitted"; or:number ?number; or:title ?title .
+  BIND (EXISTS { ?submission or:has_comment ?comment . ?comment or:author ?spc . ?spc or:role or:SPC } AS ?active)
+  BIND (IF(?active, "started", "NOT YET STARTED") AS ?status)
+  BIND (CONCAT(STR(?number), "   [", ?title, "](", STR(?submission), ")   ", ?status) AS ?paper)
+}
+GROUP BY ?spc ?firstname_or_fullname
+HAVING(?started > 0 && ?not_started > 0)
+ORDER BY DESC(?not_started)

@@ -1,0 +1,23 @@
+# Review-quality ratings by reviewer country (rated; ≥50)
+#defaultView:BarChart
+PREFIX or: <http://openreview.net/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+SELECT ?country (ROUND(?count / ?total * 1000) / 10 AS ?percentage) ?rating WHERE {
+  {
+    SELECT ?country ?rv (COUNT(?review) AS ?count) WHERE {
+      ?review rdf:type or:Review ; or:rating_value ?rv ; or:reviewer ?reviewer .
+      ?reviewer or:country ?country .
+      FILTER(?country != <http://openreview.net/novalue>)
+    } GROUP BY ?country ?rv
+  }
+  {
+    SELECT ?country (COUNT(?review2) AS ?total) (SUM(IF(?rv2 <= 2, 1, 0)) AS ?poor) WHERE {
+      ?review2 rdf:type or:Review ; or:rating_value ?rv2 ; or:reviewer ?rev2 .
+      ?rev2 or:country ?country .
+      FILTER(?country != <http://openreview.net/novalue>)
+    } GROUP BY ?country HAVING(?total >= 50)
+  }
+  BIND(?poor / ?total AS ?poor_frac)
+  BIND(STR(?rv) AS ?rating)
+}
+ORDER BY DESC(?poor_frac) ?rv

@@ -1,0 +1,15 @@
+# Number of submissions with 0, 1, 2, 3, 4 reviews
+PREFIX or: <http://openreview.net/>
+SELECT ?num_reviews ?count (ROUND(1000 * ?count / ?all) / 10 AS ?perc) WHERE { 
+  VALUES ?num_reviews { 0 1 2 3 4 5 }
+  OPTIONAL { SELECT ?num_reviews (COUNT(?num_reviews) AS ?count) WHERE {
+    { SELECT ?submission (COUNT(?review) as ?num_reviews) WHERE {
+      ?submission or:status "submitted" MINUS { ?submission or:number 1732 }
+      OPTIONAL { ?submission or:has_review ?review }
+    } GROUP BY ?submission }
+  } GROUP BY ?num_reviews }  
+  { SELECT (COUNT(*) as ?all) WHERE {
+    ?submission or:status "submitted" MINUS { ?submission or:number 1732 }
+  } }
+}
+ORDER BY ?num_reviews

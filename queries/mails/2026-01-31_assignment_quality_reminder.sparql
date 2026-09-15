@@ -1,0 +1,11 @@
+# Query for mail ../../mails/2026-01-31_assignment_quality_reminder.txt
+PREFIX or: <http://openreview.net/>
+PREFIX person: <https://openreview.net/profile?id=~>
+SELECT ?person ?firstname_or_fullname ?role_str WHERE {
+  ?person or:role ?role .
+  ?person or:firstname_or_fullname ?firstname_or_fullname .
+  MINUS { ?person or:task_paper_assignment_quality [] }
+  MINUS { VALUES ?person { person:Hannah_Bast2 person:Min_Zhang32 person:Marc_Najork2 } }
+  VALUES ?role { or:AC or:SPC }
+  BIND (IF(?role = or:AC, "Senior Area Chair", "Area Chair") AS ?role_str)
+}

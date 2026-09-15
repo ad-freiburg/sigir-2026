@@ -1,0 +1,21 @@
+# Author reviewers nominated for more than one paper
+PREFIX or: <http://openreview.net/>
+PREFIX person: <https://openreview.net/profile?id=~>
+SELECT ?submission ?title ?authors ?dblp_ids ?author_reviewer_bits ?author_reviewer ?email WHERE {
+  ?submission or:status "submitted" .  
+  ?submission or:author_reviewer ?author_reviewer .
+  ?submission or:title ?title .
+  ?author_reviewer or:email ?email .
+  { SELECT ?author_reviewer WHERE {
+    ?submission or:status "submitted" .  
+    ?submission or:author_reviewer ?author_reviewer .
+    ?submission or:num_authors ?num_authors .
+  } GROUP BY ?author_reviewer HAVING (COUNT(?submission) > 1 && (SUM(?num_authors) >= COUNT(?submission))) }
+  { SELECT ?submission (GROUP_CONCAT(SUBSTR(STR(?author), 36)) AS ?authors) (GROUP_CONCAT(SUBSTR(STR(?dblp_id), 23)) AS ?dblp_ids) (GROUP_CONCAT(?is_author_reviewer) AS ?author_reviewer_bits) WHERE {
+    ?submission or:title ?title .
+    ?submission or:author ?author .
+    ?author or:dblp_id ?dblp_id .
+	BIND (IF(EXISTS { ?submission or:author_reviewer ?author }, "1", "0") AS ?is_author_reviewer)
+  } GROUP BY ?submission }
+}
+ORDER BY ?author_reviewer

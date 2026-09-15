@@ -1,0 +1,18 @@
+# Query: ../queries/mails/2026-03-09_status_quo_ac_2.sparql
+To: (recipients computed by the query above)
+Subject: [SIGIR 2026] Updated table of your assigned submissions
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{firstname_or_fullname}},
+
+Here is an updated table of the {{count}} submissions assigned to [you]({{ac}}). Compared to the table we sent you yesterday, we fixed a small bug, removed the column with the total length of the reviews (most reviews are written with the help of AI, so text length is not even a proxy for quality anymore), added a column "Confidences" with the self-declared reviewer confidences (5 = very confident, ..., 1 = not confident at all), and added a letter to the "Metareview" column which says whether the SPC recommends accept (A) or reject (R), or whether they are undecided (U). We asked SPCs to use the option "undecided" very sparingly.
+
+As a reminder, column "Review Scores" shows the scores from the reviews (2 = accept, 1 = weak accept, 0 = borderline, -1 = weak reject, -2 = reject), column "SPC Ratings" shows how the respective SPC rated these reviews (5 = very helpful, ..., 1 = not helpful at all), and column "Official Comments" shows the total number of comments for this submission and their total length, measured in number of characters. The last column shows the SPC assigned to the submission; clicking on the name should open your email client.
+ 
+{{table}}
+
+As always, please do reach out to us any time if you have questions.
+
+Hannah Bast, Marc Najork, and Min Zhang
+SIGIR 2026 Program Chairs, Full Papers Track

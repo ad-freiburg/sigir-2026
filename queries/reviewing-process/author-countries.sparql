@@ -1,0 +1,9 @@
+# Author countries
+PREFIX or: <http://openreview.net/>
+SELECT ?country (COUNT(?country) as ?count) (CONCAT(STR(ROUND(100 * ?count / ?all)), "%") AS ?perc) WHERE {
+  { SELECT (COUNT(*) AS ?all) WHERE { ?submission or:author ?author } }
+  ?submission or:author ?author .
+  ?author or:country ?country .
+}
+GROUP BY ?country ?all
+ORDER BY DESC(?count)

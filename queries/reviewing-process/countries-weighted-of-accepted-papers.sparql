@@ -1,0 +1,11 @@
+# Countries (weighted) of accepted papers
+PREFIX or: <http://openreview.net/>
+SELECT ?country (ROUND(100 * ?weighted_count_) / 100 AS ?weighted_count) (CONCAT(STR(ROUND(100 * ?weighted_count_ / ?count_all)), "%") AS ?perc) WHERE {
+  { SELECT ?country (SUM(1 / ?num_authors) AS ?weighted_count_) WHERE {
+    ?submission or:status "submitted" ; or:has_decision [ or:decision "Accept" ] .
+    ?submission or:num_authors ?num_authors .
+    ?submission or:author/or:country ?country .
+  } GROUP BY ?country }
+  { SELECT (COUNT(?submission) AS ?count_all) WHERE { ?submission or:status "submitted" ; or:has_decision [ or:decision "Accept" ] } }
+}
+ORDER BY DESC(?weighted_count)

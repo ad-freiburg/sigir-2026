@@ -1,0 +1,24 @@
+# Query: ../queries/mails/2026-02-21_emergency_reviewers_1.sparql
+To: (recipients computed by the query above)
+Subject: [SIGIR 2026] Additional assignment
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{firstname_or_fullname}},
+
+Thank [you]({{pc}}) very much for the {{done}} reviews you have already completed for the SIGIR 2026 full papers track.
+
+Most reviewers were initially assigned five reviews. As we wrote on January 19: "If you received fewer than five assignments, expect to get an extra assignment in the future."
+
+This future has now arrived, and we have assigned the following additional submission to you for review:
+
+{{number}} [{{title}}]({{submission}})
+
+Please try to complete the review as soon as possible, and at the very latest by February 27 AoE.
+
+In case you have already received an automated message from OpenReview about this assignment: that was redundant, and you can ignore it.
+
+Thank you very much for helping us with this!
+
+Hannah Bast, Marc Najork, and Min Zhang
+SIGIR 2026 Program Chairs, Full Papers Track

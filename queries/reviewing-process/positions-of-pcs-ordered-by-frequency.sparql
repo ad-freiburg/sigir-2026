@@ -1,0 +1,8 @@
+# Positions of PCs, ordered by frequency
+PREFIX or: <http://openreview.net/>
+SELECT ?position (COUNT(?pc_member) AS ?count) WHERE {
+  ?pc_member or:role or:PC .
+  ?pc_member or:position ?position .
+}
+GROUP BY ?position
+ORDER BY DESC(?count)

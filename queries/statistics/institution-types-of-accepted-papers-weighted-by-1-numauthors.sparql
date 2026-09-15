@@ -1,0 +1,19 @@
+# Institution types of accepted papers (weighted by 1/#authors)
+#defaultView:BarChart
+PREFIX or: <http://openreview.net/>
+SELECT ?institution_type (ROUND(10 * ?wc) / 10 AS ?weighted_count) WHERE {
+  { SELECT ?type (SUM(1 / (?num_authors * ?k)) AS ?wc) WHERE {
+    { SELECT ?author (COUNT(?inst2) AS ?k) WHERE {
+      ?author or:institution ?inst2 .
+      FILTER(?inst2 != <http://openreview.net/novalue>)
+    } GROUP BY ?author }
+    ?submission or:status "submitted" .
+    ?submission or:has_decision [ or:decision "Accept" ] .
+    ?submission or:num_authors ?num_authors .
+    ?submission or:author ?author .
+    ?author or:institution ?inst .
+    ?type or:has_institution ?inst .
+  } GROUP BY ?type }
+  BIND(STRAFTER(STR(?type), "http://openreview.net/") AS ?institution_type)
+}
+ORDER BY DESC(?weighted_count)

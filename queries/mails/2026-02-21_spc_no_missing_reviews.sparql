@@ -1,0 +1,15 @@
+# Query for mail ../../mails/2026-02-21_spc_no_missing_reviews.txt
+PREFIX or: <http://openreview.net/>
+PREFIX person: <https://openreview.net/profile?id=~>
+SELECT ?spc ?firstname_or_fullname WHERE {
+  ?spc or:role or:SPC; or:firstname_or_fullname ?firstname_or_fullname .
+  MINUS { VALUES ?spc { person:Hannah_Bast2 person:Marc_Najork2 person:Min_Zhang32 } }
+  MINUS { SELECT DISTINCT ?spc WHERE {
+    ?spc or:role or:SPC .
+    ?pc or:role or:PC .
+    ?submission or:status "submitted" ; or:assigned ?spc ; or:assigned ?pc .
+	MINUS { VALUES ?pc { person:Hannah_Bast2 person:Marc_Najork2 person:Min_Zhang32 } }
+    MINUS { ?submission or:has_review [ or:reviewer ?pc ] }
+  } }      
+}
+ORDER BY ?spc

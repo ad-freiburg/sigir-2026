@@ -1,0 +1,12 @@
+# TASK: DBLP and imported publications
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX or: <http://openreview.net/>
+SELECT ?author ?author_name ?position ?or_pubs ?dblp_status ?imported_publications ?disambiguation_url WHERE {
+  ?author rdfs:label ?author_name .
+  ?author or:position ?position .
+  ?author or:num_publications ?or_pubs .
+  ?author or:task_dblp_status ?dblp_status .
+  ?author or:task_dblp_disambiguation_url ?disambiguation_url .
+  ?author or:task_imported_publications ?imported_publications .
+}
+ORDER BY DESC(?or_pubs)

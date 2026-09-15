@@ -1,0 +1,21 @@
+# Query for mail ../../mails/2026-02-21_spc_missing_reviews.txt
+PREFIX or: <http://openreview.net/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX person: <https://openreview.net/profile?id=~>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT ?spc ?firstname_or_fullname (GROUP_CONCAT(?sub_with_rev; SEPARATOR="\n") AS ?missing) WHERE {
+  { SELECT ?spc ?firstname_or_fullname ?sub_with_rev WHERE {
+    ?spc or:role or:SPC .
+    ?spc or:firstname_or_fullname ?firstname_or_fullname .
+    ?pc or:role or:PC ; rdfs:label ?name; or:email ?email .
+    ?submission or:status "submitted" ; or:assigned ?spc ; or:assignment [ or:assigned ?pc; or:date ?date ]; or:title ?title; or:number ?num .
+	MINUS { VALUES ?spc { person:Hannah_Bast2 person:Marc_Najork2 person:Min_Zhang32 } }
+	MINUS { VALUES ?pc { person:Hannah_Bast2 person:Marc_Najork2 person:Min_Zhang32 } }
+	FILTER (?date < "2026-02-20T00:00:00Z"^^xsd:dateTime)
+    MINUS { ?submission or:has_review [ or:reviewer ?pc ] }
+    BIND (IF(EXISTS { ?pc or:role_invited or:PC }, "yes", "no") AS ?invited)
+    BIND (CONCAT(STR(?num), "   [", ?title, "](", STR(?submission), "), Reviewer: ", "[", ?name, "](", STR(?pc), "), Email: [", ?email, "](mailto:", ENCODE_FOR_URI(CONCAT("\"", ?name, "\" <", ?email, ">")), ")") AS ?sub_with_rev)
+  } INTERNAL SORT BY ?spc ?firstname_or_fullname ?num }      
+}
+GROUP BY ?spc ?firstname_or_fullname 
+ORDER BY ?spc

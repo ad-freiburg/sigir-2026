@@ -1,0 +1,16 @@
+# Query for mail ../../mails/2026-01-03_PC_add_Profile.txt
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX or: <http://openreview.net/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX dblp: <https://dblp.org/rdf/schema#>
+SELECT ?person ?label ?status ?position ?dblp_id ?imported_pubs ?dblp_pubs WHERE { 
+  ?person or:role or:PC .
+  ?person or:status ?status .
+  ?person rdfs:label ?label .
+  ?person or:position ?position .
+  ?person or:dblp_id ?dblp_id .
+  OPTIONAL { SELECT ?person (COUNT(*) AS ?imported_pubs) WHERE { ?person or:publication [] . } GROUP BY ?person }
+  OPTIONAL { SELECT ?dblp_id (COUNT(*) AS ?dblp_pubs) WHERE { [] dblp:authoredBy ?dblp_id . } GROUP BY ?dblp_id }
+  FILTER (?status = "accepted" && ?label = or:novalue)
+}
+ORDER BY DESC(?dblp_pubs)

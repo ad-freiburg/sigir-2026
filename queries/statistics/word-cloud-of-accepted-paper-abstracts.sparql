@@ -1,0 +1,26 @@
+# Word cloud of accepted-paper abstracts
+#defaultView:BubbleChart
+PREFIX or: <http://openreview.net/>
+PREFIX ql: <http://qlever.cs.uni-freiburg.de/builtin-functions/>
+PREFIX math: <http://www.w3.org/2005/xpath-functions/math#>
+SELECT ?word (?doc_count * ?idf AS ?score) WHERE {
+  {
+    SELECT ?word (COUNT(DISTINCT ?text) AS ?doc_count) WHERE {
+      ?submission or:status "submitted" ; or:abstract ?text .
+      ?submission or:has_decision [ or:decision "Accept" ] .
+      GRAPH ?tf { ?text ql:has-word ?word }
+    FILTER(?word NOT IN ("4open", "a", "achieve", "achieves", "achieving", "across", "additionally", "address", "addresses", "addressing", "all", "also", "among", "an", "and", "anonymous", "any", "approach", "approaches", "are", "art", "arxiv", "as", "at", "available", "based", "baseline", "baselines", "be", "been", "being", "between", "beyond", "both", "but", "by", "can", "challenge", "challenges", "code", "com", "consistently", "could", "demonstrate", "demonstrates", "demonstrating", "different", "doi", "driven", "during", "e", "e.g", "each", "effective", "effectively", "effectiveness", "efficient", "enable", "enables", "enabling", "enhancing", "etc", "existing", "experiment", "experimental", "experiments", "extensive", "extensively", "fine", "first", "for", "framework", "frameworks", "from", "further", "furthermore", "g", "github", "given", "had", "has", "have", "having", "hence", "high", "however", "http", "https", "i.e", "if", "improve", "improves", "improving", "in", "into", "introduce", "introduces", "introducing", "io", "is", "it", "its", "level", "leverage", "leverages", "leveraging", "low", "many", "may", "method", "methodology", "methods", "might", "mitigate", "mitigating", "modal", "more", "moreover", "most", "multiple", "must", "namely", "new", "no", "not", "novel", "of", "often", "on", "one", "only", "or", "org", "other", "our", "out", "outperforms", "over", "overall", "performance", "present", "presented", "presents", "propose", "proposed", "proposes", "proposing", "provide", "provides", "providing", "r", "real", "relies", "rely", "respectively", "result", "results", "s", "science", "several", "should", "show", "showing", "shown", "shows", "significant", "significantly", "single", "so", "some", "specific", "specifically", "state", "such", "textbf", "than", "that", "the", "their", "them", "then", "these", "they", "this", "those", "three", "through", "thus", "to", "toward", "towards", "two", "under", "url", "us", "use", "used", "using", "various", "via", "was", "we", "well", "were", "where", "which", "while", "who", "will", "with", "within", "without", "world", "would", "www"))
+      FILTER(!REGEX(?word, "^[0-9]"))
+    } GROUP BY ?word
+  }
+  {
+    SELECT (COUNT(DISTINCT ?text2) AS ?n) WHERE {
+      ?submission2 or:status "submitted" ; or:abstract ?text2 .
+      ?submission2 or:has_decision [ or:decision "Accept" ] .
+    }
+  }
+  BIND(1 AS ?idf)                       # idf disabled for now (score = tf only)
+  # BIND(math:log(?n / ?doc_count) AS ?idf)   # re-enable for df-idf
+}
+ORDER BY DESC(?score)
+LIMIT 50

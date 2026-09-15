@@ -1,0 +1,20 @@
+# Query: ../queries/mails/2026-01-15_authors_import_your_publications.sparql
+To: (recipients computed by the query above)
+Subject: [SIGIR 2026] Import your publications into OpenReview
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{author_name}},
+
+We noticed a discrepancy between the number of publications currently imported into your OpenReview profile and the number of importable publications we found for you on DBLP (we omitted books, datasets, editorships, and a few other types, which are not imported by OpenReview).
+
+[OpenReview]({{author}}): {{imported_pubs}} publications imported
+
+[DBLP]({{dblp_id}}): {{dblp_pubs}} importable publications found
+
+According to the [Call for Papers](https://sigir2026.org/en-AU/pages/submissions/full-papers-track), each author with a DBLP profile and at least 10 publications listed there **must** add their DBLP URL under "Personal Links" **and** click "Add DBLP Papers to Profile".
+
+Please tend to this immediately. Complete publication data is critical for reliable paper assignment and conflict-of-interest detection.
+
+Hannah Bast, Marc Najork, and Min Zhang
+SIGIR 2026 Program Chairs, Full Papers Track

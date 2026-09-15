@@ -1,0 +1,22 @@
+# Countries of PC members
+#defaultView:BubbleChart
+PREFIX or: <http://openreview.net/>
+SELECT ?label ?count WHERE {
+  { SELECT ?country (COUNT(?person) AS ?cnt) WHERE {
+    ?person or:role or:PC .
+    ?person or:country ?country .
+    FILTER(?country != <http://openreview.net/novalue>)
+  } GROUP BY ?country }
+  { SELECT (COUNT(?person2) AS ?total) WHERE {
+    ?person2 or:role or:PC .
+    ?person2 or:country ?country2 .
+    FILTER(?country2 != <http://openreview.net/novalue>)
+  } }
+  BIND(?cnt AS ?count)
+  BIND(?cnt / ?total * 100 AS ?pct)
+  BIND(ROUND(?cnt / ?total * 1000) AS ?p10)
+  BIND(FLOOR(?p10 / 10) AS ?whole)
+  BIND(?p10 - 10 * ?whole AS ?frac)
+  BIND(IF(?pct < 1, STR(?country), CONCAT(STR(?country), "\n", STR(?whole), ".", STR(?frac), "%")) AS ?label)
+}
+ORDER BY DESC(?count)

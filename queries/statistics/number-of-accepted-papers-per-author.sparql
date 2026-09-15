@@ -1,0 +1,12 @@
+# Number of accepted papers per author
+#defaultView:BarChart
+PREFIX or: <http://openreview.net/>
+SELECT ?num_accepted (COUNT(?author) AS ?num_authors) WHERE {
+  { SELECT ?author (SUM(?acc) AS ?na) WHERE {
+      ?sub or:status "submitted" ; or:author ?author .
+      BIND(IF(EXISTS { ?sub or:has_decision [ or:decision "Accept" ] }, 1, 0) AS ?acc)
+  } GROUP BY ?author }
+  BIND(STR(?na) AS ?num_accepted)
+}
+GROUP BY ?num_accepted ?na
+ORDER BY ?na

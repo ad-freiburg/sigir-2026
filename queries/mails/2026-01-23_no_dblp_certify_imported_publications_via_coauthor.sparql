@@ -1,0 +1,21 @@
+# Query for mail ../../mails/2026-01-23_no_dblp_certify_imported_publications_via_coauthor.txt
+PREFIX or: <http://openreview.net/>
+PREFIX dblp: <https://dblp.org/rdf/schema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT ?coauthor ?coauthor_name ?submission ?author ?author_name ?or_pubs WHERE {
+  { SELECT ?author WHERE {
+    { SELECT DISTINCT ?author WHERE { ?submission or:status "submitted" . ?submission or:author ?author } }
+    ?author or:dblp_id or:novalue .
+    MINUS { ?author or:role [] } 
+    MINUS { ?author or:task_dblp_status [] }
+  } }
+  ?submission or:author ?author .
+  ?submission or:author ?coauthor FILTER (?coauthor != ?author)
+  ?submission or:title ?title .
+  BIND (CONCAT("[", ?title, "](", STR(?submission), ")") AS ?paper)
+  ?author rdfs:label ?author_name .
+  # ?author or:dblp_id or:novalue .
+  ?coauthor rdfs:label ?coauthor_name . 
+  ?author or:num_publications ?or_pubs FILTER (?or_pubs >= 10)
+}
+ORDER BY DESC(?or_pubs)

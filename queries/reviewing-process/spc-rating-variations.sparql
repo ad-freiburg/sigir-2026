@@ -1,0 +1,11 @@
+# SPC rating variations
+PREFIX or: <http://openreview.net/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX person: <https://openreview.net/profile?id=~>
+SELECT ?spc (COUNT(?rating) AS ?count) (ROUND(100 * AVG(?rating)) / 100 AS ?avg) (ROUND(100 * STDEV(?rating)) / 100 AS ?stdev) WHERE {
+  ?spc or:role or:SPC .
+  ?review rdf:type or:Review; or:rating_value ?rating .
+  ?submission or:assigned ?spc; or:has_review ?review .
+}
+GROUP BY ?spc
+ORDER BY ASC(?stdev)

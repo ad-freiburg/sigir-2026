@@ -1,0 +1,11 @@
+# Submissions where number of metareviews is != 1
+PREFIX or: <http://openreview.net/>
+PREFIX person: <https://openreview.net/profile?id=~>
+SELECT ?submission  (STR(?number_) AS ?number) ?title ?ac (COUNT(?metareview) AS ?num_metareviews) WHERE {
+  ?submission or:status "submitted"; or:number ?number_; or:title ?title; or:assigned ?ac .
+  ?ac or:role or:AC .
+  ?submission or:has_metareview ?metareview .
+}
+GROUP BY ?submission ?number_ ?title ?ac
+HAVING(?num_metareviews != 1)
+ORDER BY ASC(?number_)

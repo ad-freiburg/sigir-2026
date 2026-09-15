@@ -1,0 +1,15 @@
+# Positions of author reviewers, ordered by frequency
+PREFIX or: <http://openreview.net/>
+PREFIX person: <http://openreview.net/profile?id=>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dblp: <https://dblp.org/rdf/schema#>
+PREFIX person: <https://openreview.net/profile?id=>
+PREFIX person: <https://openreview.net/profile?id=~>
+SELECT ?position (COUNT(?author_reviewer) AS ?count) (CONCAT(STR(ROUND(100 * ?count / ?count_all)), "%") AS ?perc) ?count_all WHERE {
+  ?submission or:status "submitted" .  
+  ?submission or:author_reviewer ?author_reviewer .
+  ?author_reviewer or:position ?position .
+  { SELECT (COUNT(?submission) AS ?count_all) WHERE { ?submission or:status "submitted" } }
+}
+GROUP BY ?position ?count_all
+ORDER BY DESC(?count)

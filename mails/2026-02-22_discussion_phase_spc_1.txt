@@ -1,0 +1,48 @@
+# Query: ../queries/mails/2026-02-22_discussion_phase_spc_1.sparql
+To: (recipients computed by the query above)
+Subject: [SIGIR 2026] Discussion phase begins, please read CAREFULLY
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{firstname_or_fullname}},
+
+Over the last three days, we have been busy chasing after missing reviews. There are now only a handful of submissions with fewer than three reviews, and we are ready to start the discussion phase.
+
+**Please read the following very CAREFULLY, and store this email so that [you]({{spc}}) can find it again easily when you need it. Please also read it if you are an experienced SIGIR member. If you have any questions at any point, please do not hesitate to ask us (e.g., by replying to this email).**
+
+First, here is a short table of contents:
+
+1\. Read the papers assigned to you, not just the reviews [details below]
+2\. Guidelines on how to conduct the discussion [details below]
+3\. Guidelines on how to write the meta-review [there will be a separate email about this]
+4\. A form for rating each of the reviews [there will be a separate email about this]
+
+And here are the details:
+
+**1. Read the papers assigned to you, not just the reviews**
+
+1.1 You should read them at enough depth to be able to form an independent opinion about the quality of the paper  
+1.2 In particular, you should be able to spot when a review has a strong negative bias against or a strong positive bias for a paper  
+1.3 You should also be able to spot when a reviewer makes unfounded or even false claims about a paper, or when they miss important aspects  
+1.4 If a paper appears to be AI-generated (in significant parts or in whole), please flag this to the Program Chairs (e.g., by replying to this email)  
+
+**2. Guidelines on how to conduct the discussion**
+
+2.1 If a review is shallow or generic, ask the reviewer to improve it; here is an extensive checklist of [lazy reasons to reject a paper](https://docs.google.com/document/d/1I4eTHDaMQ2-khs5MEv_1BjEcvhsPWAIcZvTFzE124II/view#heading=h.f5czy5vvku9i)
+2.2 If a review appears to be AI-generated, ask the reviewer (consider doing this via private email) whether this is the case, and whether the review contains their own thoughts and opinions
+2.3 If a review contains biases, unfounded claims, or misses important aspects, ask the reviewer to improve it
+2.4 If there is disagreement between the reviews, ask reviewers to get to the point where they understand each other's arguments (this can result in agreement, but it can also result in a better understanding of the disagreement)
+2.5 If a reviewer does not respond to a question, nag them via private email (stalling discussions are one of the biggest problems in the discussion phase); you have access to the reviewers' email addresses via the "Area Chairs Console"
+
+**3. Guidelines on how to write the meta-review**
+
+You cannot submit your meta-review yet; there will be a separate email about this in a few days. In a nutshell: You should **not** just summarize the reviews, but separate the wheat from the chaff, come to a conclusion based on the whole discussion and your own understanding of the paper, and clearly describe how you arrived at that conclusion. High-quality meta-reviews are **crucial** for the whole review process.
+
+**4. A form for rating each of the reviews**
+
+There will eventually be a form for you to rate each of the reviews, with a few simple questions (quality, usefulness to authors, degree of AI help). There will be a separate email about this in a few days.
+
+Thank you very much for your work. Your work as an SPC is absolutely crucial for the quality of the review process. We could not do this without you!
+
+Hannah Bast, Marc Najork, and Min Zhang
+SIGIR 2026 Program Chairs, Full Papers Track

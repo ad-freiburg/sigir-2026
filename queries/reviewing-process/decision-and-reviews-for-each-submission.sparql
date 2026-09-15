@@ -1,0 +1,19 @@
+# Decision and reviews for each submission
+PREFIX or: <http://openreview.net/>
+PREFIX person: <https://openreview.net/profile?id=~>
+SELECT ?number ?submission ?title ?decision_and_reviews WHERE {
+  ?submission or:status "submitted"; or:title ?title; or:number ?number .
+  ?submission or:assigned ?ac . ?ac or:role or:AC; or:id ?ac_id .
+  ?submission or:assigned ?spc . ?spc or:role or:SPC; or:id ?spc_id .
+  OPTIONAL { ?submission or:has_metareview [ or:text ?metareview ] }
+  OPTIONAL { ?submission or:has_decision [ or:decision ?decision ] }
+  OPTIONAL { SELECT ?submission (GROUP_CONCAT(?review; SEPARATOR="\n\n") AS ?reviews) WHERE {
+    ?submission or:has_review [ or:strengths ?strengths; or:weaknesses ?weaknesses; or:detailed_comments ?details; or:rating ?score; or:confidence ?confidence; or:reviewer/or:id ?pc ] .
+	BIND (CONCAT("*** REVIEW by ", STR(?pc), "; SCORE = ", STR(?score), "; CONFIDENCE = ", STR(?confidence),
+                 "\nSTRENGTHS\n", ?strengths, "\nWEAKNESSES\n", ?weaknesses, "\nDETAILED_COMMENTS\n", ?details) AS ?review)
+  } GROUP BY ?submission }
+  BIND (CONCAT("*** DECISION = ", COALESCE(?decision, "none"), "; AC = ", STR(?ac_id), "; SPC = ", STR(?spc_id), "\n\n",
+               "*** METAREVIEW = ", COALESCE(?metareview, "none"), "\n\n",
+			   COALESCE(?reviews, "no reviews")) AS ?decision_and_reviews)
+}
+ORDER BY ?number

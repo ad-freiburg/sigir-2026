@@ -1,0 +1,21 @@
+# Author vs invited reviewers: review scores
+#defaultView:BarChart
+PREFIX or: <http://openreview.net/>
+SELECT ?group (ROUND(?count / ?total * 1000) / 10 AS ?percentage) ?score WHERE {
+  {
+    SELECT ?group ?rating (COUNT(?review) AS ?count) WHERE {
+      ?submission or:status "submitted" ; or:has_review ?review .
+      ?review or:reviewer ?pc ; or:rating ?rating .
+      BIND(IF(EXISTS { ?pc or:role_invited or:PC }, "invited reviewers", "author reviewers") AS ?group)
+    } GROUP BY ?group ?rating
+  }
+  {
+    SELECT ?group (COUNT(?review2) AS ?total) WHERE {
+      ?submission2 or:status "submitted" ; or:has_review ?review2 .
+      ?review2 or:reviewer ?pc2 ; or:rating ?rating2 .
+      BIND(IF(EXISTS { ?pc2 or:role_invited or:PC }, "invited reviewers", "author reviewers") AS ?group)
+    } GROUP BY ?group
+  }
+  BIND(IF(?rating > 0, CONCAT("+", STR(?rating)), STR(?rating)) AS ?score)
+}
+ORDER BY ?group ?rating

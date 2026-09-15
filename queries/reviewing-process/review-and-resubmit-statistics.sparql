@@ -1,0 +1,10 @@
+# Review and resubmit statistics
+PREFIX or: <http://openreview.net/>
+SELECT ?stat (COUNT(?stat) AS ?count) WHERE {
+  { SELECT ?submission (SUM(IF(?rr = "Yes",1,0)) AS ?yes) (SUM(IF(?rr = "No",1,0)) AS ?no) (CONCAT("Y:", STR(?yes), ", N:", STR(?no)) AS ?stat) WHERE {
+    ?submission or:has_review [ or:review_and_resubmit ?rr ] .
+	# ?submission or:has_decision [ or:decision "Reject" ] .
+  } GROUP BY ?submission }
+}
+GROUP BY ?stat
+ORDER BY DESC(?count)

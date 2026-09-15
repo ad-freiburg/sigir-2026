@@ -1,0 +1,27 @@
+# Query for mail ../../mails/2026-01-21_many_coauthors_only_in_dblp.txt
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX or: <http://openreview.net/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX dblp: <https://dblp.org/rdf/schema#>
+SELECT ?author ?author_name ?dblp_id ?pubs_or ?pubs_dblp ?coa_only_dblp ?coa_dblp WHERE { 
+  ?author rdf:type or:Author MINUS { ?author or:role [] . ?author or:status "accepted" } .
+  ?author or:dblp_id ?dblp_id OPTIONAL { ?dblp_id dblp:is_ambiguous ?ambi } FILTER (?ambi = 0)
+  ?author rdfs:label ?author_name .
+  ?author or:num_publications ?pubs_or .
+  FILTER EXISTS { ?submission or:status "submitted" . ?submission or:author ?author }
+  OPTIONAL { ?dblp_id dblp:num_publications ?pubs_dblp . }
+  OPTIONAL { SELECT ?author (COUNT(?coauthor_only_or) AS ?coa_only_or) WHERE {
+    ?author or:has_coauthor ?coauthor_only_or
+    MINUS { ?author or:dblp_id/dblp:has_coauthor ?coauthor_only_or }
+  } GROUP BY ?author }
+  OPTIONAL { SELECT ?author (COUNT(?coauthor_only_dblp) AS ?coa_only_dblp) WHERE {
+    ?author or:dblp_id/dblp:has_coauthor ?coauthor_only_dblp
+    MINUS { ?author or:has_coauthor ?coauthor_only_dblp }
+  } GROUP BY ?author }
+  OPTIONAL { SELECT ?author (COUNT(?coauthor_dblp) AS ?coa_dblp) WHERE {
+    ?author or:dblp_id/dblp:has_coauthor ?coauthor_dblp
+  } GROUP BY ?author }
+  FILTER (?pubs_dblp >= 10)
+  FILTER (?coa_only_dblp >= 10 || (?coa_only_dblp >= 1 && ?pubs_or <= 0.9 * ?pubs_dblp))
+}
+ORDER BY DESC(?coa_only_dblp)

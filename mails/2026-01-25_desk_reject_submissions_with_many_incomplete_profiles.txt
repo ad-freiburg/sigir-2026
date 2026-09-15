@@ -1,0 +1,18 @@
+# Query: ../queries/mails/2026-01-25_desk_reject_submissions_with_many_incomplete_profiles.sparql
+To: (recipients computed by the query above)
+Subject: [SIGIR 2026] Desk rejection of submission with many incomplete profiles
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear authors,
+
+The Call for Papers (https://sigir2026.org/en-AU/pages/submissions/full-papers-track) clearly states that "All authors must complete their profile in OpenReview, and be responsive to any emails sent by the review system." In particular, the submission form had a field "Confirm That All Author Profiles are Complete: The authors confirm that they have read and understood this passage from the Call for Papers, and that all authors have completed their profile accordingly."
+
+Several of you have not completed your OpenReview profiles as required, and have not responded to multiple emails. In particular, you did not respond to the email with subject line '[SIGIR 2026] Complete the "DBLP and Imported Publications" task in OpenReview, FINAL CALL' sent on January 23, 2026 at 06:27 UTC. Here is the list of authors who did not take the required action:
+
+{{problematic_authors}}
+
+Therefore, we are desk rejecting your submission "{{title}}" ({{submission}}) without further review.
+
+Hannah Bast, Marc Najork, and Min Zhang
+SIGIR 2026 Program Chairs, Full Papers Track

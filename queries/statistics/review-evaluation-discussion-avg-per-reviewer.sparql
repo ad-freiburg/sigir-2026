@@ -1,0 +1,13 @@
+# Review evaluation — Discussion (avg per reviewer)
+#defaultView:BarChart
+PREFIX or: <http://openreview.net/>
+SELECT ?avg_score (COUNT(?reviewer) AS ?num_reviewers) WHERE {
+  {
+    SELECT ?reviewer (ROUND(AVG(?s) * 2) / 2 AS ?avg) WHERE {
+      ?r or:quality_evaluation_discussion_score ?s ; or:reviewer ?reviewer .
+    } GROUP BY ?reviewer
+  }
+  BIND(STR(?avg) AS ?avg_score)
+}
+GROUP BY ?avg_score ?avg
+ORDER BY ?avg

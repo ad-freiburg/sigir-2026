@@ -1,0 +1,11 @@
+# Everybody and their email address
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX or: <http://openreview.net/>
+SELECT ?person ?label ?role ?status ?email WHERE {
+  ?person a or:Person .
+  ?person rdfs:label ?label .
+  ?person or:email ?email .
+  OPTIONAL { ?person or:role ?role }
+  OPTIONAL { ?person or:status ?status }
+}
+ORDER BY ?person

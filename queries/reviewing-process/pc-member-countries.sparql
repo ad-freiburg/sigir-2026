@@ -1,0 +1,9 @@
+# PC member countries
+PREFIX or: <http://openreview.net/>
+SELECT ?country (COUNT(?country) as ?count) ?all (CONCAT(STR(ROUND(100 * ?count / ?all)), "%") AS ?perc) WHERE {
+  { SELECT (COUNT(*) AS ?all) WHERE { ?pcmember or:role [] . } }
+  ?pcmember or:role [] .
+  ?pcmember or:country ?country .
+}
+GROUP BY ?country ?all
+ORDER BY DESC(?count)

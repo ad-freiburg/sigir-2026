@@ -1,0 +1,19 @@
+# Query for mail ../../mails/2026-03-07_discussion_phase_missing_comments_pc_1a.txt
+PREFIX or: <http://openreview.net/>
+PREFIX person: <https://openreview.net/profile?id=~>
+SELECT  ?pc ?firstname_or_fullname ?assigned (COUNT(?submission) AS ?missing) (GROUP_CONCAT(?paper; SEPARATOR="\n") AS ?missing_submissions) ?inv_or_auth WHERE {
+  ?spc or:role or:SPC .
+  ?pc or:role or:PC; or:firstname_or_fullname ?firstname_or_fullname .
+  OPTIONAL { SELECT ?pc (COUNT(*) AS ?assigned) WHERE { [] or:status "submitted"; or:assigned ?pc } GROUP BY ?pc }
+  BIND (IF(EXISTS { ?pc or:role_invited or:PC }, "invited", "author") AS ?inv_or_auth)
+  MINUS { VALUES ?spc { person:Hannah_Bast2 person:Marc_Najork2 person:Min_Zhang32 } }
+  MINUS { VALUES ?pc { person:Hannah_Bast2 person:Marc_Najork2 person:Min_Zhang32 } }
+  ?submission a or:Submission; or:status "submitted"; or:assigned ?spc; or:assigned ?pc; or:number ?number; or:title ?title .
+  BIND (CONCAT(STR(?number), "   [", ?title, "](", STR(?submission), ")") AS ?paper)
+  BIND (EXISTS { ?submission or:has_comment ?comment . ?comment or:author ?spc } AS ?spc_active)
+  BIND (EXISTS { ?submission or:has_comment ?comment . ?comment or:author ?pc } AS ?pc_active)
+  FILTER (?spc_active = true && ?pc_active = false)
+}
+GROUP BY ?pc ?firstname_or_fullname ?assigned ?inv_or_auth
+HAVING (?missing = ?assigned)
+ORDER BY DESC(?missing)

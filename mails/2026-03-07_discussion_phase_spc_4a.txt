@@ -1,0 +1,24 @@
+# Query: ../queries/mails/2026-03-07_discussion_phase_spc_4a.sparql
+To: (recipients computed by the query above)
+Subject: [SIGIR 2026] Please start your discussions, URGENT
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{firstname_or_fullname}},
+
+The deadline for the meta-reviews is approaching, and [you]({{spc}}) still haven't started any discussions yet.
+
+**Please start the discussions NOW.** 
+
+Here are the papers assigned to you:
+
+{{missing}}
+
+We sent you an email with instructions on February 23 with the subject line "[SIGIR 2026] Discussion phase begins, please read CAREFULLY". Above all, your task is to "review the reviewers". That is, spot shortcomings or unclear points in the reviews, or contradictions between the reviews, and ask the reviewers to clarify or improve their reviews. You should also have a look at the papers assigned to you and make sure that you understand them well enough for this task.
+
+Please use the "Official Comment" button for all discussions. Use private email (or OpenReview's "Message" feature) only for chasing after unresponsive reviewers, or for matters that call for privacy. If you have conducted substantial discussions via private conversations already, please add an "Official Comment" that states that fact, and a quick summary of the outcome. This is important for the transparency of the process.
+
+When reading the reviews, we recommend rating them right away. We sent you an email about that four days ago as well, with the subject line "[SIGIR 2026] Rating the reviews and submitting meta-reviews". Rating a review is quick: it's a single vote on a 1-5 scale and an optional comment. You can revise your rating as often as you like.
+
+Hannah Bast, Marc Najork, and Min Zhang
+SIGIR 2026 Program Chairs, Full Papers Track

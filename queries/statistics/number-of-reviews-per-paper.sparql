@@ -1,0 +1,11 @@
+# Number of reviews per paper
+#Number of reviews per paper
+PREFIX or: <http://openreview.net/>
+SELECT ?num_reviews (COUNT(?submission) AS ?num_papers) WHERE {
+  { SELECT ?submission (COUNT(?review) AS ?num_reviews) WHERE {
+      ?submission or:status "submitted" .
+      OPTIONAL { ?submission or:has_review ?review }
+  } GROUP BY ?submission }
+}
+GROUP BY ?num_reviews
+ORDER BY ?num_reviews

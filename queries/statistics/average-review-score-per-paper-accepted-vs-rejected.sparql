@@ -1,0 +1,17 @@
+# Average review score per paper, accepted vs rejected
+#defaultView:BarChart
+PREFIX or: <http://openreview.net/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+SELECT ?score (COUNT(?submission) AS ?num_papers) ?decision WHERE {
+  {
+    SELECT ?submission ?dec (ROUND(AVG(?rating) * 2) / 2 AS ?avg_) WHERE {
+      ?submission or:status "submitted" ; or:has_review/or:rating ?rating ; or:has_decision [ or:decision ?dec ] .
+    } GROUP BY ?submission ?dec
+  }
+  BIND(IF(?avg_ = 0, 0, ?avg_) AS ?bin)
+  BIND(IF(?bin = 0, "0", IF(?bin > 0, CONCAT("+", STR(?bin)), STR(?bin))) AS ?score)
+  BIND(IF(?dec = "Accept", "Accepted", "Rejected") AS ?decision)
+  BIND(IF(?dec = "Accept", 2, 1) AS ?dec_order)
+}
+GROUP BY ?score ?bin ?decision ?dec_order
+ORDER BY ?bin ?dec_order

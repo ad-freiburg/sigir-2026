@@ -1,0 +1,18 @@
+# Metareviews with Pangram scores
+PREFIX pangram: <https://pangram.com/rdf/schema#>
+PREFIX or: <http://openreview.net/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX person: <https://openreview.net/profile?id=~>
+SELECT ?number ?submission (SUBSTR(?title,1,15) AS ?title_abbrv) ?fraction_ai ?dashboard_link (SUBSTR(?spc_name,1,15) AS ?spc_abbrv) (SUBSTR(?ac_name,1,15) AS ?ac_abbrv) WHERE {
+  ?submission or:assigned ?spc; or:assigned ?ac; or:number ?number; or:title ?title .
+  ?spc or:role or:SPC; rdfs:label ?spc_name .
+  ?ac or:role or:AC; rdfs:label ?ac_name .
+  OPTIONAL {
+    ?submission or:has_metareview ?metareview .
+    ?metareview rdf:type or:Metareview .
+    ?metareview pangram:fraction_ai ?fraction_ai .
+    ?metareview pangram:dashboard_link ?dashboard_link .
+  }
+}
+ORDER BY ?number

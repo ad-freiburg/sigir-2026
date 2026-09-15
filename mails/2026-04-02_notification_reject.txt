@@ -1,0 +1,33 @@
+# Query: ../queries/mails/2026-04-02_notification_reject.sparql
+To: (recipients computed by the query above)
+From: SIGIR 2026 Full Papers Track <sigir2026-pc-chairs@openreview.net>
+Subject: [SIGIR 2026] Your submission to the SIGIR 2026 Full Papers Track
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{full_name}},
+
+We regret to inform you that your submission [{{title}}]({{submission}}) has not been accepted to the Full Papers Track of SIGIR 2026. Thank you for considering SIGIR for your work, we hope that the feedback you have received will allow you to identify areas where you can improve your paper. If you choose to submit the work to ICTIR 2026 or to SIGIR-AP 2026, you have the option of sharing parts of the SIGIR reviews with those conferences. More details are below.
+
+We hope that you will still consider joining us at ACM SIGIR 2026. Registrations are now open, see https://sigir2026.org/en-AU/pages/attending/registration, and we’d love to see you here in Melbourne as part of the conference week. Early bird registration will remain available until 23 May Melbourne time.
+
+Hannah Bast, Marc Najork, Min Zhang  
+Program Chairs of the SIGIR 2026 Full Papers Track  
+
+### Accessing the Reviews
+
+This year we received 1271 valid submissions (after withdrawals and desk rejections) and accepted 234 (18.4%) of them. Your paper was reviewed by at least three reviewers, who based on their previous publications are knowledgeable about the topic of your submission. The review process was led by a Senior Program Committee (SPC, called Area Chair in OpenReview) member, who was chosen for their relevant domain knowledge, led the discussion of your submission, and wrote the meta-review. A group of 46 Area Chairs (called Senior Area Chair in OpenReview) supervised the review process, discussed each submission with the SPC, and met with the Program Chairs to discuss all submissions that were controversial in any way.  The Program Chairs made the final decisions. 
+
+You can find the final reviews for your paper on the submission page in OpenReview at {{submission}}.
+
+### Providing Feedback on the Review Process
+
+We encourage you to provide us with feedback on the quality of the reviews and your experience with the submission and review process. There will be a separate email about this in the next few days.
+
+### The Revise and Resubmit Process
+
+Note that both ICTIR (Melbourne, July 25, see https://sigir-ictir.github.io/ictir2026/, submission deadline 16 April) and SIGIR-AP (Singapore, anticipated as being held in mid-December) allow “Revise and Resubmit” (R&R) submission of SIGIR full and short research papers. Under this track you are expected to have revised your paper in line with the SIGIR referee comments, and provided a brief discussion appendix as part of the re-submission that summarizes the changes that have been made and any other responses you might have to the SIGIR referees. Where possible, your paper will then be re-reviewed by one or more of the SIGIR referees who read it originally. Papers from other SIGIR Tracks can also be resubmitted to ICTIR or SIGIR-AP if they fall within their respective scopes, but as “new” submissions that will be fully re-reviewed.
+
+### Travel and Visa Considerations
+
+The ACM SIGIR 2026 web pages include information about Australian visa requirements, see https://sigir2026.org/en-AU/pages/attending/visa-information. If you need to apply for a visa you should commence the application process as soon as possible.

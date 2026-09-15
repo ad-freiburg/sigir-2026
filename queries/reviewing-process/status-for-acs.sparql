@@ -1,0 +1,18 @@
+# Status for ACs
+PREFIX or: <http://openreview.net/>
+PREFIX person: <https://openreview.net/profile?id=~>
+PREFIX pangram: <https://pangram.com/rdf/schema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT ?number ?submission ?scores ?confs ?ratings ?comments ?metareviews (SUBSTR(?spc_name,1,12) AS ?spc_abbrv) (SUBSTR(?ac_name,1,12) AS ?ac_abbrv) WHERE {
+  ?submission a or:Submission; or:status "submitted"; or:number ?number; or:title ?title .
+  ?ac or:role or:AC; rdfs:label ?ac_name; ^or:assigned ?submission .
+  OPTIONAL { ?spc or:role or:SPC; rdfs:label ?spc_name; ^or:assigned ?submission . }
+  BIND (IF(STRLEN(?title) > 30,CONCAT(SUBSTR(?title,1,17), "..."),?title) AS ?title_abbrv)
+  OPTIONAL { SELECT ?submission (GROUP_CONCAT(CONCAT(STR(?score), IF(?fraction_ai = 1.0,"!","")); SEPARATOR=", ") AS ?scores) WHERE { SELECT ?submission ?pc ?review ?score ?fraction_ai ?link_ai WHERE { ?submission or:has_review ?review . ?review or:reviewer ?pc; or:rating ?score; pangram:fraction_ai ?fraction_ai; pangram:dashboard_link ?link_ai . ?pc or:role or:PC } INTERNAL SORT BY ?submission ?pc } GROUP BY ?submission }
+  OPTIONAL { SELECT ?submission (GROUP_CONCAT(STR(?conf); SEPARATOR=", ") AS ?confs) WHERE { SELECT ?submission ?pc ?conf WHERE { ?submission or:has_review ?review . ?review or:reviewer ?pc; or:confidence ?conf . ?pc or:role or:PC } INTERNAL SORT BY ?submission ?pc } GROUP BY ?submission }
+  OPTIONAL { SELECT ?submission (GROUP_CONCAT(COALESCE(STR(?rating),"-"); SEPARATOR=", ") AS ?ratings) WHERE { SELECT ?submission ?pc ?rating WHERE { ?submission or:has_review ?review. ?review or:reviewer ?pc . OPTIONAL { ?review or:rating_value ?rating } ?pc or:role or:PC } INTERNAL SORT BY ?submission ?pc } GROUP BY ?submission }
+  OPTIONAL { SELECT ?submission (CONCAT("len = ", STR(SUM(STRLEN(?text)))) AS ?reviews) WHERE { ?submission or:has_review ?review . ?review pangram:text ?text } GROUP BY ?submission }
+  OPTIONAL { SELECT ?submission (CONCAT("n = ", STR(COUNT(?comment)), ", len = ", STR(SUM(STRLEN(?text)))) AS ?comments) WHERE { ?submission or:has_comment ?comment . ?comment or:text ?text } GROUP BY ?submission }
+  OPTIONAL { SELECT ?submission (CONCAT(IF(SAMPLE(?rec) = "accept", "A" , IF(SAMPLE(?rec) = "reject", "R", "U")), IF(SAMPLE(?fraction_ai) = 1.0, "!", ""), ", len = ", STR(SUM(STRLEN(?text)))) AS ?metareviews) WHERE { ?submission or:has_metareview ?metareview . ?metareview or:text ?text; or:recommendation ?rec; pangram:fraction_ai ?fraction_ai; pangram:dashboard_link ?link_ai } GROUP BY ?submission }
+}
+ORDER BY ?number

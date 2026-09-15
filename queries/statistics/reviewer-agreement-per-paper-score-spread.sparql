@@ -1,0 +1,13 @@
+# Reviewer agreement: per-paper score spread
+#defaultView:BarChart
+PREFIX or: <http://openreview.net/>
+# Reviewer (dis)agreement per paper: std-dev of the reviewers' scores.
+# std 0 = reviewers gave identical scores; larger = more disagreement.
+SELECT ?score_spread (COUNT(?submission) AS ?num_papers) WHERE {
+  { SELECT ?submission (ROUND(STDEV(?r) * 4) / 4 AS ?sd) WHERE {
+      ?submission or:status "submitted" ; or:has_review/or:rating ?r .
+  } GROUP BY ?submission HAVING(COUNT(?r) >= 2) }
+  BIND(STR(?sd) AS ?score_spread)
+}
+GROUP BY ?score_spread ?sd
+ORDER BY ?sd

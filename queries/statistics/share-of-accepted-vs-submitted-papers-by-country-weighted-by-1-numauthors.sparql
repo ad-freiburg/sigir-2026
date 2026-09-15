@@ -1,0 +1,96 @@
+# Share of accepted vs submitted papers by country (weighted by 1/#authors)
+#Share of submitted vs accepted papers by country (weighted by 1/#authors)
+PREFIX or: <http://openreview.net/>
+SELECT ?country ?country_name
+       (ROUND(1000 * ?ws / ?total_submitted) / 10 AS ?percent_submitted)
+       (ROUND(1000 * COALESCE(?wa, 0) / ?total_accepted) / 10 AS ?percent_accepted)
+WHERE {
+  { SELECT ?country (SUM(1 / ?num_authors) AS ?ws) WHERE {
+      ?submission or:status "submitted" .
+      ?submission or:num_authors ?num_authors .
+      ?submission or:author/or:country ?country .
+      FILTER(?country != <http://openreview.net/novalue>)
+    } GROUP BY ?country }
+  { SELECT (SUM(1 / ?num_authors2) AS ?total_submitted) WHERE {
+      ?submission2 or:status "submitted" .
+      ?submission2 or:num_authors ?num_authors2 .
+      ?submission2 or:author/or:country ?country2 .
+      FILTER(?country2 != <http://openreview.net/novalue>)
+    } }
+  { SELECT (SUM(1 / ?num_authors3) AS ?total_accepted) WHERE {
+      ?submission3 or:status "submitted" .
+      ?submission3 or:has_decision [ or:decision "Accept" ] .
+      ?submission3 or:num_authors ?num_authors3 .
+      ?submission3 or:author/or:country ?country3 .
+      FILTER(?country3 != <http://openreview.net/novalue>)
+    } }
+  OPTIONAL {
+    { SELECT ?country (SUM(1 / ?num_authors4) AS ?wa) WHERE {
+        ?submission4 or:status "submitted" .
+        ?submission4 or:has_decision [ or:decision "Accept" ] .
+        ?submission4 or:num_authors ?num_authors4 .
+        ?submission4 or:author/or:country ?country .
+        FILTER(?country != <http://openreview.net/novalue>)
+      } GROUP BY ?country }
+  }
+  VALUES (?country ?country_name) {
+    ("AE" "United Arab Emirates")
+    ("AM" "Armenia")
+    ("AT" "Austria")
+    ("AU" "Australia")
+    ("AX" "Åland Islands")
+    ("BD" "Bangladesh")
+    ("BN" "Brunei")
+    ("BR" "Brazil")
+    ("CA" "Canada")
+    ("CH" "Switzerland")
+    ("CL" "Chile")
+    ("CN" "China")
+    ("CZ" "Czechia")
+    ("DE" "Germany")
+    ("DK" "Denmark")
+    ("DZ" "Algeria")
+    ("EG" "Egypt")
+    ("ES" "Spain")
+    ("FI" "Finland")
+    ("FR" "France")
+    ("GB" "United Kingdom")
+    ("GR" "Greece")
+    ("HK" "Hong Kong")
+    ("IE" "Ireland")
+    ("IL" "Israel")
+    ("IN" "India")
+    ("IR" "Iran")
+    ("IT" "Italy")
+    ("JP" "Japan")
+    ("KP" "North Korea")
+    ("KR" "South Korea")
+    ("KZ" "Kazakhstan")
+    ("LU" "Luxembourg")
+    ("MA" "Morocco")
+    ("MO" "Macau")
+    ("MY" "Malaysia")
+    ("NL" "Netherlands")
+    ("NO" "Norway")
+    ("NZ" "New Zealand")
+    ("PK" "Pakistan")
+    ("PL" "Poland")
+    ("PT" "Portugal")
+    ("QA" "Qatar")
+    ("RO" "Romania")
+    ("RU" "Russia")
+    ("RW" "Rwanda")
+    ("SA" "Saudi Arabia")
+    ("SE" "Sweden")
+    ("SG" "Singapore")
+    ("SK" "Slovakia")
+    ("TH" "Thailand")
+    ("TR" "Turkey")
+    ("TW" "Taiwan")
+    ("US" "United States")
+    ("VN" "Vietnam")
+    ("ZA" "South Africa")
+  }
+}
+ORDER BY DESC(?percent_accepted)
+LIMIT 10

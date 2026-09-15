@@ -1,0 +1,25 @@
+# All comments + metareview of an SPC
+PREFIX or: <http://openreview.net/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX person: <https://openreview.net/profile?id=~>
+SELECT ?spc (GROUP_CONCAT(CONCAT("Comments for Submission ", STR(?number), " [", ?scores, "]\n\n", COALESCE(?comments, "[no comments]"), "\n\nMetareview: \n\n", COALESCE(?metareviews, "[no metareview]")); SEPARATOR="\n\n\n") AS ?all_comments) (STRLEN(?all_comments) AS ?strlen) WHERE {
+  ?submission or:status "submitted"; or:number ?number; or:assigned ?spc .
+  ?spc or:role or:SPC; rdfs:label ?name MINUS { ?spc or:role or:AC } .
+  OPTIONAL { SELECT ?submission (GROUP_CONCAT(CONCAT(STR(?cdatetime_comment), ": ", ?comment_text); SEPARATOR="\n\n") AS ?comments) WHERE {
+    { SELECT ?submission ?cdatetime_comment ?comment_text {
+      ?spc or:role or:SPC MINUS { ?spc or:role or:AC }
+      ?submission or:status "submitted"; or:assigned ?spc; or:has_comment ?comment .
+      ?comment or:author ?spc; or:text ?comment_text; or:cdatetime ?cdatetime_comment .
+    } INTERNAL SORT BY ?submission ?cdatetime_comment }
+  } GROUP BY ?submission }
+  OPTIONAL { SELECT ?submission (GROUP_CONCAT(CONCAT(STR(?cdatetime_metareview), ": ", ?metareview_text); SEPARATOR="\n\n") AS ?metareviews) WHERE {
+    { SELECT ?submission ?cdatetime_metareview ?metareview_text {
+	  ?spc or:role or:SPC MINUS { ?spc or:role or:AC }
+      ?submission or:status "submitted"; or:assigned ?spc; or:has_metareview ?metareview .
+      ?metareview or:author ?spc; or:text ?metareview_text; or:cdatetime ?cdatetime_metareview .
+    } INTERNAL SORT BY ?submission ?cdatetime_metareview }
+  } GROUP BY ?submission }
+  OPTIONAL { SELECT ?submission (GROUP_CONCAT(STR(?score); SEPARATOR=", ") AS ?scores) WHERE { SELECT ?submission ?pc ?review ?score WHERE { ?submission or:has_review ?review . ?review or:reviewer ?pc; or:rating ?score . ?pc or:role or:PC } INTERNAL SORT BY ?submission ?pc } GROUP BY ?submission }
+}
+GROUP BY ?spc
+ORDER BY ASC(?strlen)

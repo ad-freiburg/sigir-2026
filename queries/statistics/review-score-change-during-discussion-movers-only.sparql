@@ -1,0 +1,14 @@
+# Review score change during discussion (movers only)
+#defaultView:BarChart
+PREFIX or: <http://openreview.net/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+SELECT ?change (COUNT(*) AS ?num_reviews) WHERE {
+  ?submission or:status "submitted" ; or:has_review ?rev ; or:has_original_review ?orig .
+  ?rev or:reviewer ?p ; or:rating ?cur .
+  ?orig or:reviewer ?p ; or:rating ?old .
+  BIND(?cur - ?old AS ?delta)
+  BIND(IF(?delta > 0, CONCAT("+", STR(?delta)), STR(?delta)) AS ?change)
+  FILTER(?delta != 0)
+}
+GROUP BY ?change ?delta
+ORDER BY ?delta

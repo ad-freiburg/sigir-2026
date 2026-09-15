@@ -1,0 +1,25 @@
+# Review-quality ratings by SPC country (rater; ≥50)
+#defaultView:BarChart
+PREFIX or: <http://openreview.net/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+SELECT ?country (ROUND(?count / ?total * 1000) / 10 AS ?percentage) ?rating WHERE {
+  {
+    SELECT ?country ?rv (COUNT(?review) AS ?count) WHERE {
+      ?submission or:has_review ?review ; or:assigned ?spc .
+      ?review or:rating_value ?rv .
+      ?spc or:role or:SPC ; or:country ?country .
+      FILTER(?country != <http://openreview.net/novalue>)
+    } GROUP BY ?country ?rv
+  }
+  {
+    SELECT ?country (COUNT(?review2) AS ?total) (SUM(IF(?rv2 <= 2, 1, 0)) AS ?poor) WHERE {
+      ?submission2 or:has_review ?review2 ; or:assigned ?spc2 .
+      ?review2 or:rating_value ?rv2 .
+      ?spc2 or:role or:SPC ; or:country ?country .
+      FILTER(?country != <http://openreview.net/novalue>)
+    } GROUP BY ?country HAVING(?total >= 50)
+  }
+  BIND(?poor / ?total AS ?poor_frac)
+  BIND(STR(?rv) AS ?rating)
+}
+ORDER BY DESC(?poor_frac) ?rv

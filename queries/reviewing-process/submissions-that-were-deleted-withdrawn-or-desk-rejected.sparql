@@ -1,0 +1,9 @@
+# Submissions that were deleted, withdrawn, or desk-rejected
+PREFIX or: <http://openreview.net/>
+SELECT ?submission ?title ?authors ?author_reviewer ?status WHERE {
+  ?submission or:authors ?authors .
+  ?submission or:author_reviewer ?author_reviewer .
+  ?submission or:title ?title .
+  ?submission or:status ?status .
+  FILTER (?status != "submitted")
+}

@@ -1,0 +1,7 @@
+# Assignment Quality, comments [F.2]
+PREFIX or: <http://openreview.net/>
+SELECT ?person ?role ?quality ?comment WHERE {
+  ?person or:role ?role .
+  ?person or:task_paper_assignment_quality ?quality .
+  ?person or:task_comments ?comment FILTER (?comment != or:novalue)
+}

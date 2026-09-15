@@ -1,0 +1,11 @@
+# Acceptance rate by number of authors
+#defaultView:BarChart
+PREFIX or: <http://openreview.net/>
+# Acceptance rate vs. number of authors (restricted to author-counts with >= 10 papers).
+SELECT ?num_authors (ROUND(1000 * ?accepted / ?total) / 10 AS ?acceptance_rate) WHERE {
+  { SELECT ?na (SUM(IF(?dec = "Accept", 1, 0)) AS ?accepted) (COUNT(?sub) AS ?total) WHERE {
+      ?sub or:status "submitted" ; or:num_authors ?na ; or:has_decision [ or:decision ?dec ] .
+  } GROUP BY ?na HAVING(?total >= 10) }
+  BIND(STR(?na) AS ?num_authors)
+}
+ORDER BY ?na

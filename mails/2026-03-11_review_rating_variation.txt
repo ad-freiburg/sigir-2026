@@ -1,0 +1,22 @@
+# Query: ../queries/mails/2026-03-11_review_rating_variation.sparql
+To: (recipients computed by the query above)
+Subject: [SIGIR 2026] Please check your review ratings
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{firstname}},
+
+Thank [you]({{spc}}) for your review ratings; they are an important part of our quality control.
+
+We noted a {{adverb}} low variance in your ratings:
+
+{{ratings}}
+
+Please double-check your ratings and make sure that they reflect your honest opinion about the helpfulness of the reviews.
+
+Note that only the PC chairs and the Senior Area Chair assigned to the submission can see these ratings. **The reviewers and the authors will NOT see these ratings at any point.**
+
+Thank you for helping us with this!
+
+Hannah Bast, Marc Najork, and Min Zhang
+SIGIR 2026 Program Chairs, Full Papers Track

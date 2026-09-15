@@ -1,0 +1,20 @@
+# Query: ../queries/mails/2026-03-07_discussion_phase_missing_comments_pc_1b.sparql
+To: (recipients computed by the query above)
+Subject: [SIGIR 2026] You haven't participated in some discussions yet
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{firstname_or_fullname}},
+
+The discussion phase is an integral part of the review process. Discussions started on February 22 and are planned to conclude on March 10 AoE.
+
+Thank you for the discussions you have already participated in. However, we have noticed that you haven't participated in some discussions yet.
+
+Here is a list of the submissions where the SPC (called Area Chair in OpenReview) has asked for input but [you]({{pc}}) haven't replied yet. Please do so NOW; it's important.
+
+{{missing_submissions}}
+
+Thank you for helping us with this important part of the review process.
+
+Hannah Bast, Marc Najork, and Min Zhang
+SIGIR 2026 Program Chairs, Full Papers Track

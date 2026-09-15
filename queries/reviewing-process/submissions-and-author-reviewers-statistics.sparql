@@ -1,0 +1,20 @@
+# Submissions and author reviewers, statistics
+PREFIX or: <http://openreview.net/>
+PREFIX person: <http://openreview.net/profile?id=>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dblp: <https://dblp.org/rdf/schema#>
+PREFIX person: <https://openreview.net/profile?id=>
+PREFIX person: <https://openreview.net/profile?id=~>
+SELECT ?submission ?num ?authors (?person AS ?author_reviewer) ?position ?dblp_id ?imported_pubs ?dblp_pubs WHERE {
+  ?submission or:status "submitted" .  
+  ?submission or:author_reviewer ?person .
+  ?submission or:num_authors ?num .
+  ?submission or:author_ids ?authors .
+  BIND (EXISTS { ?submission or:author ?person } AS ?is_author)
+  ?person or:position ?position .
+  ?person rdfs:label ?label .
+  ?person or:dblp_id ?dblp_id .
+  OPTIONAL { ?person or:num_publications ?imported_pubs }
+  OPTIONAL { ?dblp_id dblp:num_publications ?dblp_pubs }
+}
+ORDER BY DESC(?dblp_pubs) ?author_reviewer

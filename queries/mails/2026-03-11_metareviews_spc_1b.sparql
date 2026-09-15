@@ -1,0 +1,18 @@
+# Query for mail ../../mails/2026-03-11_metareviews_spc_1b.txt
+PREFIX or: <http://openreview.net/>
+PREFIX person: <https://openreview.net/profile?id=~>
+SELECT ?spc ?firstname_or_fullname ?num_all ?num_done ?num_missing ?submissions WHERE {
+  { SELECT ?spc (COUNT(?done) AS ?num_all) (SUM(?done = true) AS ?num_done) (SUM(?done = false) AS ?num_missing) (GROUP_CONCAT(?submission_; SEPARATOR="\n") AS ?submissions) WHERE {
+    SELECT ?spc ?number ?done ?submission_ {
+      ?spc or:role or:SPC .
+      MINUS { VALUES ?spc { person:Hannah_Bast2 person:Marc_Najork2 person:Min_Zhang32 } }
+      ?submission a or:Submission; or:assigned ?spc; or:status "submitted"; or:number ?number; or:title ?title .
+      BIND (EXISTS { ?submission or:has_metareview ?metareview . ?metareview or:author ?spc } AS ?done)
+      BIND (IF(?done, "done", "MISSING") AS ?status)
+      BIND (CONCAT(STR(?number), "   [", ?title, "](", STR(?submission), ")") AS ?submission_)
+    } INTERNAL SORT BY ?spc ?number
+  } GROUP BY ?spc }
+  FILTER (?num_done = 0)
+  ?spc or:firstname_or_fullname ?firstname_or_fullname 
+}
+ORDER BY DESC(?num_done)

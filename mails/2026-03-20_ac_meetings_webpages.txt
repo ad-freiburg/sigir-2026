@@ -1,0 +1,24 @@
+# Query: ../queries/mails/2026-03-20_ac_meetings_webpages.sparql
+To: (recipients computed by the query above)
+From: Hannah Bast <sigir2026-pc-chairs@openreview.net>
+Subject: [SIGIR 2026] Overview of your submissions
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{firstname}},
+
+Here is an overview of the {{count}} submissions that were assigned to [you]({{ac}}) as an Area Chair. It's the same table that you have been receiving several times already by mail, except that this one is (or should be) automatically updated every five minutes and contains some more information. The version you are seeing now is from **{{timestamp}}**.
+
+The table also provides, for each submission, your current decision and comment. After each SPC's name, there are two numbers: your rating of their performance in handling that submission, and our rating of their performance in handling *all* of their submissions.
+
+We also added a column with the original review scores (before the discussion). A row is marked in **light orange** if the sum of the current scores deviates by 2 or more from the sum of the original scores, if the "Decision" deviates from the recommendation of the meta-review, or if the SPC's work was rated 1 or 2 by you or by us. These submissions are worth double-checking, in case you didn't want to discuss them with us anyway. A row is marked **yellow** if the decision is "Discuss" (entered by either you or us).
+
+You currently recommend accept for {{accept}} out of the {{count}} submissions; that is an **acceptance rate of {{rate}}%** for your batch. The typical acceptance rate for SIGIR is around 20%.
+
+We are looking forward to the meeting with you!
+
+Hannah, Min, and Marc
+
+----------
+
+{{table}}

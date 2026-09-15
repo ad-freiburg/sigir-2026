@@ -1,0 +1,18 @@
+# Query: ../queries/mails/2026-01-22_no_dblp_certify_imported_publications_ten_or_less_publications.sparql
+To: (recipients computed by the query above)
+Subject: [SIGIR 2026] Complete the "DBLP and Imported Publications" task in OpenReview
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{author_name}},
+
+You have submitted a paper to the SIGIR 2026 Full Papers Track, but you have not entered a DBLP profile URL in your OpenReview profile:
+
+{{author}}
+
+Please log into OpenReview, click on "Tasks" in the top right corner (to the left of your name), click on the small triangle to the left of "ACM SIGIR 2026 Conference", and then click on "DBLP and Imported Publications". A form will appear. Please fill out this form truthfully (and take the corresponding actions), then click on "Submit". If you make a mistake, you can edit the form and submit it again.
+
+Please tend to this immediately, as we need this information for the paper assignment and conflict-of-interest detection process, which is starting soon.
+
+Hannah Bast, Marc Najork, and Min Zhang
+SIGIR 2026 Program Chairs, Full Papers Track

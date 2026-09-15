@@ -1,0 +1,14 @@
+# Scores for all submissions
+PREFIX or: <http://openreview.net/>
+PREFIX person: <https://openreview.net/profile?id=~>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT ?number ?submission ?title ?scores ?avg ?comments ?d ?spc_name ?ac_name WHERE {
+   ?ac or:role or:AC; rdfs:label ?ac_name .
+   ?spc or:role or:SPC; rdfs:label ?spc_name .
+   ?submission a or:Submission; or:status "submitted"; or:assigned ?ac; or:assigned ?spc; or:number ?number; or:title ?title .
+  OPTIONAL { SELECT ?submission (ROUND(AVG(?score) * 100) / 100 AS ?avg) (MAX(?score) AS ?max_score) (MIN(?score) AS ?min_score) (GROUP_CONCAT(STR(?score); SEPARATOR=", ") AS ?scores) WHERE { ?submission or:has_review ?review . ?review or:rating ?score } GROUP BY ?submission }
+  OPTIONAL { SELECT ?submission (CONCAT("n = ", STR(COUNT(?comment)), ", len = ", STR(SUM(STRLEN(?text)))) AS ?comments) WHERE { ?submission or:has_comment ?comment; or:assigned ?ac . ?ac or:role or:AC . ?comment or:text ?text } GROUP BY ?submission }
+  OPTIONAL { SELECT ?submission (CONCAT(IF(SAMPLE(?rec) = "accept", "A" , IF(SAMPLE(?rec) = "reject", "R", "U"))) AS ?d) WHERE { ?submission or:has_metareview ?metareview . ?metareview or:recommendation ?rec } GROUP BY ?submission }
+  # FILTER (?max_score >= 2 && ?min_score >= -1)
+}
+ORDER BY DESC(?avg)

@@ -1,0 +1,13 @@
+# Author feedback, statistics
+PREFIX or: <http://openreview.net/>
+SELECT ?what ?rating ?count (CONCAT(STR(ROUND(100 * ?count / ?all)), "%") AS ?perc) WHERE {
+  { { SELECT ?rating (COUNT(?rating) AS ?count) { ?submission or:number ?number; or:has_review [ or:author_feedback_rating ?rating ] } GROUP BY ?rating }
+    { SELECT (COUNT(?rating) AS ?all) { ?submission or:number ?number; or:has_review [ or:author_feedback_rating ?rating ] } }
+	BIND ("reviews" AS ?what) } UNION 
+  { { SELECT ?rating (COUNT(?rating) AS ?count) { ?submission or:number ?number; or:has_metareview [ or:author_feedback_rating ?rating ] } GROUP BY ?rating }
+    { SELECT (COUNT(?rating) AS ?all) { ?submission or:number ?number; or:has_metareview [ or:author_feedback_rating ?rating ] } }
+	BIND ("meta-reviews" AS ?what) } UNION
+  { { SELECT ?rating (COUNT(?rating) AS ?count) { ?submission or:number ?number; or:has_decision [ or:author_feedback_rating ?rating ] } GROUP BY ?rating }
+    { SELECT (COUNT(?rating) AS ?all) { ?submission or:number ?number; or:has_decision [ or:author_feedback_rating ?rating ] } }
+	BIND ("overall" AS ?what) }
+}

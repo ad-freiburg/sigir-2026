@@ -1,0 +1,13 @@
+# Author feedback, statistics conditional
+PREFIX or: <http://openreview.net/>
+SELECT ?what ?decision ?rating ?count (CONCAT(STR(ROUND(100 * ?count / ?all)), "%") AS ?perc) WHERE {
+  { { SELECT ?decision ?rating (COUNT(?rating) AS ?count) { ?submission or:number ?number; or:has_decision [ or:decision ?decision ]; or:has_review [ or:author_feedback_rating ?rating ] } GROUP BY ?decision ?rating ORDER BY ?decision ?rating }
+    { SELECT ?decision (COUNT(?rating) AS ?all) { ?submission or:number ?number; or:has_decision [ or:decision ?decision ]; or:has_review [ or:author_feedback_rating ?rating ] } GROUP BY ?decision }
+	BIND ("reviews" AS ?what) } UNION 
+  { { SELECT ?decision ?rating (COUNT(?rating) AS ?count) { ?submission or:number ?number; or:has_decision [ or:decision ?decision ]; or:has_metareview [ or:author_feedback_rating ?rating ] } GROUP BY ?decision ?rating  ORDER BY ?decision ?rating}
+    { SELECT ?decision (COUNT(?rating) AS ?all) { ?submission or:number ?number; or:has_decision [ or:decision ?decision ]; or:has_metareview [ or:author_feedback_rating ?rating ] } GROUP BY ?decision }
+	BIND ("meta-reviews" AS ?what) } UNION
+  { { SELECT ?decision ?rating (COUNT(?rating) AS ?count) { ?submission or:number ?number; or:has_decision [ or:decision ?decision ]; or:has_decision [ or:author_feedback_rating ?rating ] } GROUP BY ?decision ?rating  ORDER BY ?decision ?rating}
+    { SELECT ?decision (COUNT(?rating) AS ?all) { ?submission or:number ?number; or:has_decision [ or:decision ?decision ]; or:has_decision [ or:author_feedback_rating ?rating ] } GROUP BY ?decision }
+	BIND ("overall" AS ?what) }
+}

@@ -1,0 +1,13 @@
+# Query for mail ../../mails/2026-04-02_notification_accept_2.txt
+PREFIX or: <http://openreview.net/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX person: <https://openreview.net/profile?id=~>
+SELECT ?author ?full_name ?number ?submission ?title ?count WHERE {
+  ?submission or:status "submitted"; or:number ?number; or:title ?title; or:has_decision [ or:decision "Accept" ] .
+  ?submission or:author ?author .
+  ?author rdfs:label ?full_name .
+  { SELECT ?author (COUNT(?submission) AS ?count) WHERE {
+    ?submission or:status "submitted"; or:number ?number; or:title ?title; or:has_decision [ or:decision "Accept" ] .
+    ?submission or:author ?author .
+  } GROUP BY ?author HAVING (?count > 1) }
+}

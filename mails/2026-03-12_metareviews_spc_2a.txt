@@ -1,0 +1,24 @@
+# Query: ../queries/mails/2026-03-12_metareviews_spc_2a.sparql
+To: (recipients computed by the query above)
+Subject: [SIGIR 2026] Please finish your meta-reviews, URGENT
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{firstname_or_fullname}},
+
+The deadline for the meta-reviews (March 10, AoE) has passed, but we still have not received any meta-reviews from you.
+
+**Please drop us a line and let us know what is going on. Can you complete your meta-reviews by March 13, AoE?**
+
+While [you]({{spc}}) are working on a meta-review and reading the reviews for the respective submission, please also take a minute to rate those reviews (using the "Rating" button on the bottom right of each review). It's just a simple rating on a 1-5 scale. Please be honest in your ratings, and note that neither the reviewers nor the authors will see those ratings.
+
+Please carefully read the instructions at the top of the meta-review form. Very importantly, a meta-review should **not** just summarize or average the reviews, but it should separate the wheat from the chaff.
+
+If the discussion on a submission hasn't concluded yet, it is high time to conclude it now. If some of your reviewers are unresponsive, don't give up on them yet, and keep sending them personal reminders by email.
+
+Here are the papers assigned to you:
+
+{{submissions}}
+
+Hannah Bast, Marc Najork, and Min Zhang
+SIGIR 2026 Program Chairs, Full Papers Track

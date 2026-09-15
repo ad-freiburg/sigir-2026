@@ -1,0 +1,18 @@
+# Query: ../queries/mails/2026-01-21_profile_inactive.sparql
+To: (recipients computed by the query above)
+Subject: [SIGIR 2026] Author with inactive profile
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{author_name}},
+
+You are the author of a SIGIR 2026 submission, but your OpenReview profile is shown as inactive.
+
+Submission: [{{title}}]({{submission}})
+Profile: {{author}}
+Email: {{email}}
+
+Could you please provide a short explanation?
+
+Hannah Bast, Marc Najork, and Min Zhang
+SIGIR 2026 Program Chairs, Full Papers Track

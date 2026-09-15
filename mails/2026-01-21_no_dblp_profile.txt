@@ -1,0 +1,28 @@
+# Query: (none, recipients were listed explicitly)
+To: (list of recipients removed)
+Subject: [SIGIR 2026] Your OpenReview profile is missing publications, ACTION REQUIRED
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{author_name}},
+
+In the section "Desk Rejection Policy" of the [Call for Papers for the SIGIR'26 Full Papers Track](https://sigir2026.org/en-AU/pages/submissions/full-papers-track), it states under the first bullet point that
+
+> Each author with a DBLP profile and at least 10 of their publications listed in that profile must provide the corresponding DBLP URL and click the "Add DBLP Papers to Profile" button
+
+We noticed that you have not entered a DBLP URL in your OpenReview profile.
+
+
+It appears that you have not done that. In particular, we found the following information for your profiles in OpenReview and DBLP (editorships, datasets, and papers under submission are excluded from the counts):
+
+OpenReview profile: {{author}}
+DBLP profile: {{dblp_id}}
+Publications listed in OpenReview: {{pubs_or}}
+Publications listed in DBLP: {{pubs_dblp}}
+Number of co-authors listed in DBLP: {{coa_dblp}}
+Number of co-authors only in DBLP but not in OpenReview: {{coa_only_dblp}}
+
+Please fix this immediately. Log into OpenReview, click on "Profile" (under your name in the top right corner), then on "Edit Profile", then on "Personal Links". Verify that your DBLP URL is correct, and then click on "Add DBLP Papers to Profile". In the dialog that opens, it is easiest to click on "Select All" and then "Add to Your Profile". You may exclude individual papers for good reasons (for example, because they were assigned to your DBLP profile by mistake), but you must not exclude any of your co-authors in this process.
+
+Hannah Bast, Marc Najork, and Min Zhang
+SIGIR 2026 Program Chairs, Full Papers Track

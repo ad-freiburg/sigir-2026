@@ -1,0 +1,12 @@
+# Number of submitted papers per author
+#Number of submitted papers per author
+PREFIX or: <http://openreview.net/>
+SELECT ?num_papers (COUNT(?author) AS ?num_authors) WHERE {
+  { SELECT ?author (COUNT(?s) AS ?n) WHERE {
+      ?s or:status "submitted" ; or:author ?author .
+  } GROUP BY ?author }
+  BIND(IF(?n >= 9, "9+", STR(?n)) AS ?num_papers)
+  BIND(IF(?n >= 9, 9, ?n) AS ?order)
+}
+GROUP BY ?num_papers ?order
+ORDER BY ?order

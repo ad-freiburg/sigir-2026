@@ -1,0 +1,22 @@
+# Query: ../queries/mails/2026-03-01_discussion_phase_spc_2a.sparql
+To: (recipients computed by the query above)
+Subject: [SIGIR 2026] Please start your discussions
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{firstname_or_fullname}},
+
+We have noticed that [you]({{spc}}) haven't started any of the discussions for the papers assigned to you yet. We are already one week into the discussion phase, and discussions take time.
+
+**Please start the discussions.** We have sent you an email with instructions on February 23 with subject line "[SIGIR 2026] Discussion phase begins, please read CAREFULLY".
+
+Above all, your task is to "review the reviewers". That is, spot shortcomings or unclear points in the reviews, or contradictions between the reviews, and ask the reviewers for clarifications or improvements. You should also have a look at the papers assigned to you, and make sure that you understand them well enough for this task.
+
+When reading the reviews, we recommend rating them right away. We sent you an email about that two hours ago. Rating a review is quick: it's a single vote on a 1 - 5 scale and an optional comment. You can revise your rating as often as you like.
+
+Here are the papers assigned to you:
+
+{{missing}}
+
+Hannah Bast, Marc Najork, and Min Zhang
+SIGIR 2026 Program Chairs, Full Papers Track

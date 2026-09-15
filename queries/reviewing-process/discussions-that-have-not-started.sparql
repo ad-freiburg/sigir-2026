@@ -1,0 +1,12 @@
+# Discussions that have not started
+PREFIX or: <http://openreview.net/>
+PREFIX person: <https://openreview.net/profile?id=~>
+SELECT ?spc ?firstname_or_fullname (SUM(?active = true) AS ?started) (SUM(?active = false) AS ?waiting) (GROUP_CONCAT(?paper; SEPARATOR="\n") AS ?missing) WHERE {
+  ?spc or:role or:SPC; or:firstname_or_fullname ?firstname_or_fullname .
+  ?submission a or:Submission; or:assigned ?spc; or:status "submitted"; or:number ?number; or:title ?title .
+  BIND (CONCAT(STR(?number), "   [", ?title, "](", STR(?submission), ")") AS ?paper)
+  BIND (EXISTS { ?submission or:has_comment ?comment . ?comment or:author ?spc . ?spc or:role or:SPC } AS ?active)
+}
+GROUP BY ?spc ?firstname_or_fullname
+HAVING(?started = 0)
+ORDER BY ?waiting

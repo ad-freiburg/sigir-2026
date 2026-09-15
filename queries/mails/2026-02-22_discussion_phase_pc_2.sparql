@@ -1,0 +1,15 @@
+# Query for mail ../../mails/2026-02-22_discussion_phase_pc_2.txt
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX or: <http://openreview.net/>
+PREFIX person: <https://openreview.net/profile?id=~>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT ?pc ?name ?firstname_or_fullname ?ass ?done ?eme WHERE {
+  ?pc or:role or:PC .
+  ?pc rdfs:label ?name .
+  ?pc or:firstname_or_fullname ?firstname_or_fullname .
+  OPTIONAL { SELECT ?pc (COUNT(*) AS ?ass) WHERE { [] or:status "submitted"; or:assignment [ or:assigned ?pc; or:date ?date ] FILTER(?date < "2026-02-20"^^xsd:date) } GROUP BY ?pc }
+  OPTIONAL { SELECT ?pc (COUNT(*) AS ?eme) WHERE { [] or:status "submitted"; or:assignment [ or:assigned ?pc; or:date ?date ] FILTER(?date >= "2026-02-20"^^xsd:date) } GROUP BY ?pc }
+  OPTIONAL { SELECT ?pc (COUNT(*) AS ?done) WHERE { [] or:status "submitted"; or:assignment [ or:assigned ?pc; or:date ?date ]; or:has_review [ or:reviewer ?pc ] FILTER(?date < "2026-02-20"^^xsd:date) } GROUP BY ?pc } 
+  MINUS { VALUES ?pc { person:Hannah_Bast2 person:Marc_Najork2 person:Min_Zhang32 } }
+  FILTER (?done = ?ass && BOUND(?eme))
+}

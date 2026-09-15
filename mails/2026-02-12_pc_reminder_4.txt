@@ -1,0 +1,18 @@
+# Query: ../queries/mails/2026-02-12_pc_reminder_4.sparql
+To: (recipients computed by the query above)
+Subject: [SIGIR 2026] Missing reviews, IMPORTANT
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{firstname_or_fullname}},
+
+The deadline for your reviews for the SIGIR 2026 full-papers track has passed more than one day ago (February 17, 2026, AoE), and we are still missing {{missing}} reviews from you.
+
+Please let us know your plan for the remaining reviews. We can give you an extension of up to two days, provided that you commit to the extended deadline.
+
+Here are the papers assigned to you, with the information whether the review has been DONE or is still MISSING:
+
+{{papers}}
+
+Hannah Bast, Marc Najork, and Min Zhang
+SIGIR 2026 Program Chairs, Full Papers Track

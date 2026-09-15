@@ -1,0 +1,12 @@
+# SPC rating vs. our quality evaluation (per review)
+#defaultView:BarChart
+PREFIX or: <http://openreview.net/>
+# Per-review correlation of the SPC's rating and our quality evaluation.
+# Mean of our quality-evaluation score grouped by the SPC's rating_value;
+# a monotonic rise = positive correlation (Pearson r = 0.55, N = 3134).
+SELECT ?spc_rating (ROUND(AVG(?q) * 100) / 100 AS ?avg_our_quality_score) WHERE {
+  ?r or:rating_value ?rv ; or:quality_evaluation_quality_score ?q .
+  BIND(STR(?rv) AS ?spc_rating)
+}
+GROUP BY ?spc_rating ?rv
+ORDER BY ?rv

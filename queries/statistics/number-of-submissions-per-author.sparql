@@ -1,0 +1,11 @@
+# Number of submissions per author
+#defaultView:BarChart
+PREFIX or: <http://openreview.net/>
+SELECT ?num_submissions (COUNT(?author) AS ?num_authors) WHERE {
+  { SELECT ?author (COUNT(?sub) AS ?ns) WHERE {
+      ?sub or:status "submitted" ; or:author ?author .
+  } GROUP BY ?author }
+  BIND(STR(?ns) AS ?num_submissions)
+}
+GROUP BY ?num_submissions ?ns
+ORDER BY ?ns

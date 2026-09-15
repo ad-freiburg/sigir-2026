@@ -1,0 +1,13 @@
+# AI-generated reviews
+PREFIX pangram: <https://pangram.com/rdf/schema#>
+PREFIX or: <http://openreview.net/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+SELECT * WHERE {
+  ?review rdf:type or:Review .
+  ?review or:reviewer ?reviewer .
+  ?review pangram:fraction_ai ?pure_ai .
+  ?review pangram:fraction_ai_assisted ?ai_assisted .
+  ?review pangram:fraction_human ?human .
+  ?review pangram:dashboard_link ?dashboard_link .
+}
+ORDER BY DESC(?pure_ai) DESC(?ai_assisted) DESC(?human)

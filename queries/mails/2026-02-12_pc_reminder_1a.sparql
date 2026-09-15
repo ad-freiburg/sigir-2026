@@ -1,0 +1,17 @@
+# Query for mail ../../mails/2026-02-12_pc_reminder_1a.txt
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX or: <http://openreview.net/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX person: <https://openreview.net/profile?id=~>
+SELECT ?pc ?firstname_or_fullname (COUNT(?submission) AS ?assigned) (COUNT(?review) AS ?done) (GROUP_CONCAT(?paper; SEPARATOR="\n") AS ?papers) WHERE {
+  ?pc or:role or:PC .
+  ?pc or:firstname_or_fullname ?firstname_or_fullname .
+  ?submission or:assigned ?pc .
+  ?submission or:title ?title .
+  BIND (CONCAT("[", ?title, "](", STR(?submission), ")") AS ?paper) 
+  OPTIONAL { ?submission or:has_review ?review . ?review or:reviewer ?pc }
+  MINUS { VALUES ?pc { person:Hannah_Bast2 person:Marc_Najork2 person:Min_Zhang32 } }
+}
+GROUP BY ?pc ?firstname_or_fullname
+HAVING (?done = 0)
+ORDER BY ASC(?assigned)

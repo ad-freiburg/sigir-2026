@@ -1,0 +1,20 @@
+# Query: ../queries/mails/2026-01-15_authors_no_dblp_profile.sparql
+To: (recipients computed by the query above)
+Subject: [SIGIR 2026] Create your DBLP profile and import your publications
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{author_name}},
+
+You have submitted a paper to the SIGIR 2026 Full Papers Track, but you have not entered your DBLP profile URL in your OpenReview profile:
+
+{{author}}
+
+According to the [Call for Papers](https://sigir2026.org/en-AU/pages/submissions/full-papers-track), each author with a DBLP profile and at least 10 publications listed there **must** add their DBLP URL under "Personal Links" **and** click "Add DBLP Papers to Profile".
+
+If you do not have a DBLP profile or have fewer than 10 publications listed there, please associate your publications with your ORCID instead (create one if you do not have it yet) and then import them into your OpenReview profile by clicking "Add ORCID Papers to Profile".
+
+Please tend to this immediately. Complete publication data is critical for reliable paper assignment and conflict-of-interest detection.
+
+Hannah Bast, Marc Najork, and Min Zhang
+SIGIR 2026 Program Chairs, Full Papers Track

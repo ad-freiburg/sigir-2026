@@ -1,0 +1,12 @@
+# Query for mail ../../mails/2026-03-11_review_rating_variation.txt
+PREFIX or: <http://openreview.net/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX person: <https://openreview.net/profile?id=~>
+SELECT ?spc ?firstname (COUNT(?rating) AS ?count) (ROUND(100 * AVG(?rating)) / 100 AS ?avg) (ROUND(100 * STDEV(?rating)) / 100 AS ?stdev) (GROUP_CONCAT(STR(?rating)) AS ?ratings) (IF(MIN(?rating) >= 4, "very", "relatively") AS ?adverb) WHERE {
+  ?spc or:role or:SPC; or:firstname_or_fullname ?firstname MINUS { VALUES ?spc { person:Hannah_Bast2 person:Marc_Najork2 person:Min_Zhang32 } }
+  ?review rdf:type or:Review; or:rating_value ?rating .
+  ?submission or:assigned ?spc; or:has_review ?review .
+}
+GROUP BY ?spc ?firstname
+HAVING (?count > 10 && MIN(?rating) >= 3)
+ORDER BY ASC(?stdev)

@@ -1,0 +1,39 @@
+# Query: ../queries/mails/2026-01-23_no_dblp_certify_imported_publications_final.sparql
+From: SIGIR 2026 PC Chairs <sigir2026-pc-chairs@openreview.net>
+To: (recipients computed by the query above)
+Subject: [SIGIR 2026] One of your co-authors has not replied to our emails
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{author_name}},
+
+Your co-author, {{coauthor_name}}, has not yet provided their complete publication and co-authorship information, despite multiple emails sent by us to them (please note that the CfP also states that “be responsive to any emails sent by the review system”).  This puts your submission at risk of desk-rejection. 
+
+
+
+Dear {{name}}.
+
+We are the Program Chairs of the Full Paper track of SIGIR 2026, where you submitted a paper titled “{{submission_title}}” (submission {{submission_num}}). We are working hard to ensure the integrity of the review process.  One important part of this task is to avoid assigning a submission to reviewers who have a conflict of interest, arising for example from having co-authored papers with you in the past. For that, we rely on co-authorship information in OpenReview, which in turn relies on both authors and committee members supplying their publication history. 
+
+OpenReview uses DBLP as one of the main sources of bibliographic information.  Each user of OpenReview is asked to supply their DBLP information in their profile, and then to import their publications from DBLP.  If that is not possible for any reason (say because the person has never published before, or does not have a DBLP page, or has a DBLP page that conflates multiple persons of the same name), they are asked to add their publications directly into OpenReview.  As stated in the Call for Papers, each author must fully complete their OpenReview profile, including publication and co-authorship information. Not doing so may result in their submission being desk-rejected.
+
+Please reach out to {{coauthor_name}} and encourage them to provide the needed information by Saturday January 24 end-of-day anywhere-on-earth (that deadline is 48 hours past the submission deadline). We count on your cooperation in this matter.  We would like to see a strong collection of papers at SIGIR 2026, and are not keen on rejecting submissions on non-technical grounds, but we simply cannot ensure the integrity of the process without your cooperation. 
+
+There is no need to reply to this email.  We do not have the capacity to answer every incoming request, and we have automated tooling to track completion. 
+
+Thank you for your help, and best regards!
+
+Hannah Bast, Marc Najork and Min Zhang
+Program Chairs of the SIGIR 2026  Full Papers Track
+
+
+You have submitted a paper to the SIGIR 2026 Full Papers Track, but you have not entered a DBLP profile URL in your OpenReview profile:
+
+{{author}}
+
+Please log into OpenReview, click on "Tasks" in the top right corner (to the left of your name), click on the small triangle to the left of "ACM SIGIR 2026 Conference", and then click on "DBLP and Imported Publications". A form will appear. Please fill out this form truthfully (and take the corresponding actions), then click on "Submit". If you make a mistake, you can edit the form and submit it again.
+
+Please tend to this IMMEDIATELY, as we need this information for the paper assignment and conflict-of-interest detection process, which is starting soon.
+
+Hannah Bast, Marc Najork, and Min Zhang
+SIGIR 2026 Program Chairs, Full Papers Track

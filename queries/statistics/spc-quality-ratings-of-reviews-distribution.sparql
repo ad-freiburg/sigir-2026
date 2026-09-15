@@ -1,0 +1,10 @@
+# SPC quality ratings of reviews (distribution)
+#defaultView:BarChart
+PREFIX or: <http://openreview.net/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+SELECT ?rating (COUNT(?review) AS ?num_reviews) WHERE {
+  ?review rdf:type or:Review ; or:rating_value ?rv .
+  BIND(STR(?rv) AS ?rating)
+}
+GROUP BY ?rating ?rv
+ORDER BY ?rv

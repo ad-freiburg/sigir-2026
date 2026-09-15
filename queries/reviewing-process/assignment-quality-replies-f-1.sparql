@@ -1,0 +1,12 @@
+# Assignment Quality, replies [F.1]
+PREFIX or: <http://openreview.net/>
+SELECT ?question ?choice (COUNT(?person) AS ?count) ?all (CONCAT(STR(ROUND(100 * ?count / ?all)), "%") AS ?perc) WHERE {
+  VALUES ?question { or:task_paper_assignment_quality or:task_comparison_to_previous_years }
+  ?person ?question ?choice
+  { SELECT (COUNT(DISTINCT ?person) AS ?all) WHERE {
+      VALUES ?question { or:task_paper_assignment_quality or:task_comparison_to_previous_years }
+      ?person ?question []
+  } }
+}
+GROUP BY ?question ?choice ?all
+ORDER BY DESC(?question) DESC(?count)

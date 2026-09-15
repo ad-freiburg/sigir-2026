@@ -1,0 +1,24 @@
+# Reviewer agreement coefficient (ICC)
+PREFIX or: <http://openreview.net/>
+# Inter-reviewer agreement as ICC(1), one-way intraclass correlation on the
+# review scores (or:rating). 1 = reviewers perfectly agree, 0 = random.
+# ICC = (MSB - MSW) / (MSB + (m0 - 1) * MSW) via one-way ANOVA variance components.
+SELECT
+  (ROUND(1000 * ?ICC) / 1000 AS ?icc_agreement)
+  (ROUND(1000 * (1 - ?MSW / (?ss_total / (?N - 1))) ) / 1000 AS ?variance_explained)
+  ?N (?k AS ?num_papers)
+WHERE {
+  { SELECT (SUM(?np) AS ?N) (COUNT(*) AS ?k) (SUM(?sp) AS ?gsum)
+           (SUM(?sqp) AS ?tsq) (SUM(?sp * ?sp / ?np) AS ?sum_sp2_np) WHERE {
+      SELECT ?submission (SUM(?r) AS ?sp) (COUNT(?r) AS ?np) (SUM(?r * ?r) AS ?sqp) WHERE {
+        ?submission or:status "submitted" ; or:has_review/or:rating ?r .
+      } GROUP BY ?submission
+  } }
+  BIND(?tsq - ?gsum * ?gsum / ?N AS ?ss_total)
+  BIND(?sum_sp2_np - ?gsum * ?gsum / ?N AS ?ss_between)
+  BIND(?ss_total - ?ss_between AS ?ss_within)
+  BIND(?N / ?k AS ?m0)
+  BIND(?ss_between / (?k - 1) AS ?MSB)
+  BIND(?ss_within / (?N - ?k) AS ?MSW)
+  BIND((?MSB - ?MSW) / (?MSB + (?m0 - 1) * ?MSW) AS ?ICC)
+}

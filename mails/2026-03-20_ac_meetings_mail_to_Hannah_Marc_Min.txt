@@ -1,0 +1,18 @@
+# Query: ../queries/mails/2026-03-20_ac_meetings_mail_to_Hannah_Marc_Min.sparql
+To: (recipients computed by the query above)
+From: Hannah Bast <sigir2026-pc-chairs@openreview.net>
+Subject: [SIGIR 2026] Webpages for the AC meetings
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{firstname}},
+
+Here are the webpages for our AC meetings in the week of March 23 - 27.
+
+{{table}}
+
+Each of the webpages refreshes automatically every five minutes with the latest information from OpenReview.
+
+Please have a look, and let me know whether you want to change something or add information.
+
+Hannah

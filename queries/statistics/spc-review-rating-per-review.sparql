@@ -1,0 +1,9 @@
+# SPC review rating (per review)
+#defaultView:BarChart
+PREFIX or: <http://openreview.net/>
+SELECT ?score (COUNT(?review) AS ?num_reviews) WHERE {
+  ?review or:rating_value ?rv .
+  BIND(STR(?rv) AS ?score)
+}
+GROUP BY ?score ?rv
+ORDER BY ?rv

@@ -1,0 +1,11 @@
+# Desk rejects recommended by SAC and AC
+PREFIX or: <http://openreview.net/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+SELECT ?submission ?number ?status ?ac_rec ?sac_rec WHERE {
+  ?submission rdf:type or:Submission .
+  ?submission or:number ?number .
+  ?submission or:status ?status .
+  OPTIONAL { ?submission or:task_initial_check_by_ac_recommendation ?ac_rec . }
+  OPTIONAL { ?submission or:task_initial_check_by_sac_recommendation ?sac_rec . }
+  FILTER (STRSTARTS(?ac_rec, "No") || STRSTARTS(?sac_rec, "No"))
+}

@@ -1,0 +1,103 @@
+# Query: ../queries/mails/2026-04-02_notification_accept_2.sparql
+To: (recipients computed by the query above)
+From: SIGIR 2026 Full Papers Track <sigir2026-pc-chairs@openreview.net>
+Subject: [SIGIR 2026] Your submission to the SIGIR 2026 Full Papers Track
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+*[Please excuse the previous duplicate emails]*
+
+Dear {{full_name}},
+
+It is our pleasure to inform you that your submission [{{title}}]({{submission}}) has been accepted to the Full Papers Track of SIGIR 2026. Please read the remainder of this message carefully, as it contains important information about next steps.
+
+Congratulations on this achievement! We are looking forward to meeting you at SIGIR 2026 in Melbourne!
+
+Hannah Bast, Marc Najork, Min Zhang  
+Program Chairs of the SIGIR 2026 Full Papers Track  
+
+### Accessing the Reviews
+
+This year we received 1271 valid submissions (after withdrawals and desk rejections) and accepted 234 (18.4%) of them. Your paper was reviewed by at least three reviewers, who based on their previous publications are knowledgeable about the topic of your submission. The review process was led by a Senior Program Committee (SPC, called Area Chair in OpenReview) member, who was chosen for their relevant domain knowledge, led the discussion of your submission, and wrote the meta-review. A group of 46 Area Chairs (called Senior Area Chair in OpenReview) supervised the review process, discussed each submission with the SPC, and met with the Program Chairs to discuss all submissions that were controversial in any way.  The Program Chairs made the final decisions. 
+
+You can find the final reviews for your paper on the submission page in OpenReview at {{submission}}.
+
+### Providing Feedback on the Review Process
+
+We encourage you to provide us with feedback on the quality of the reviews and your experience with the submission and review process. There will be a separate email about this in the next few days.
+
+### Camera-Ready Deadline and Final Paper Versions
+
+Final papers MUST be submitted on or before April 29, AoE time. Failure to comply with this requirement may result in your work being removed from the conference proceedings. You will receive two emails before then: One from ACM RightsReview to the first author only, for the ACM eform to be completed, which will also provide you with your unique DOI string to be included in your final paper; plus one from submissions@scomminc.com containing a submission id number, and a link to submit/upload your final version.
+
+Information about the Author Rights Assignment for SIGIR 2026 is provided at https://www.scomminc.com/pp/acmsig/sigir2026.htm.
+
+The current ACM guidance with regard to format and LaTeX templates is provided at https://www.acm.org/publications/proceedings-template. Please ensure that you are using the current version of the style file.
+
+### Authorship
+
+SIGIR 2026 will not permit changes to author lists of final papers, as was previously advised at https://sigir2026.org/en-AU/pages/submissions/submission-policies-and-information. Changes to an institutional affiliation may be made if they are needed.
+
+All authors will be required to supply valid ORCIDs (see https://orcid.org/) at the time they submit their final paper.
+
+### Final Version Page Lengths
+
+The required formats for final camera-ready submission for all SIGIR 2026 paper types are available at https://www.scomminc.com/pp/acmsig/sigir.htm
+
+In most cases, the reviews contain actionable feedback that you should use to improve the final version of your paper. To allow for the author block to be included and acknowledgements added, and to allow for any referee requests to be appropriately handled, **the page limit for full papers has been increased by one page** relative to the initial submission.
+
+Note that where the instructions say “10 Page Limit + extra pages for references only (all ACM sections, including CCS Concepts, Author Keywords, ACM Reference Format, and ACM CR Block required)”, that means “10 pages to cover title, authors, and abstract; all mandatory ACM sections, including CCS Concepts, Author Keywords, ACM Reference Format, and ACM rights Block; all author-generated technical content; and all acknowledgments, software links, and other non-references content. The only element that may appear after 10 pages is the references”.
+
+### Author Page Charges
+
+The newly-established ACM Author Page Charge policies, part of the ACM Open initiative, https://www.acm.org/publications/openaccess,  will apply to ACM SIGIR 2026. The page at https://sigir.org/acm-open/ provides further information in regard to the SIGIR implementation of those policies. Note that the page charges apply primarily to research papers, see https://libraries.acm.org/acmopen/article-types. At this stage we anticipate that the page charges will not be applied to abstracts such as Doctoral Colloquium proposals, Tutorial and Workshop summaries, and Low Resource proposals.
+
+Waivers for geographic or financial hardship reasons can be requested at the time you submit your ACM rights review form; and information about waivers can be found at https://www.acm.org/publications/policies/policy-on-discretionary-open-access-apc-waivers and at https://sigir.org/acm-open/.
+
+Authors should also note that their selection of the “corresponding author” when they submit their Rights Review form is important, since papers which have their designated “corresponding author” from an institution that is a participating institution in the ACM Open initiative (see https://libraries.acm.org/acmopen/open-participants) will not be required to pay the page charges at time of final paper submission provided that the associated email address for that author is their institutional one. Again, further explanation can be found at https://sigir.org/acm-open/.
+
+### Author Registration Deadline
+
+A condition of acceptance is that one author of each accepted work MUST register as a three-day or five-day SIGIR 2026 attendee (any registration category) by the deadline of 29 April Melbourne time. The registration form asks you to identify the paper (or papers) that this author will be presenting. Please make sure that you complete that information correctly using the paper number you can see in the reviewing tool (OpenReview or EasyChair). 
+
+Papers without a presenting author having registered by that deadline (or not claiming the paper when they did so) risk being excluded from the proceedings.
+
+The Registration page is at https://sigir2026.org/en-AU/pages/attending/registration, and includes the option of reserving hotel accommodation. And another reminder, the author registration deadline is *Melbourne* time. That (broadly) corresponds to April 28, AoE time.
+
+### Presentation Formats 
+
+Details of presentation formats for each type of paper will be provided in separate emails in a few weeks.
+
+### Videos
+
+The ACM Digital Library offers the option of hosting a short video in conjunction with the final version of your paper. If you wish to make use of this service you will need to prepare the video well before the conference itself, while you are preparing the final version of your paper. ACM SIGIR 2026 will not allow online or by-video presentations except in connection with the Low Resource Environments Track. In cases where for reasons that could not have been reasonably anticipated the nominated presenting author is prevented from attending SIGIR after they have registered, another author should present the work. If that is also not possible, the authors may, as a last resort, request that a non-author be permitted to present the work as a surrogate presenter.
+
+### Student Travel Grants
+
+SIGIR is pleased to offer Student Travel Grants for students presenting their accepted contributions at the conference.
+
+For the selected awardees, the grant will cover the cost of the full student registration and also a stipend of USD1,200 towards travel and accommodation costs. To be eligible, the student must: (1) be an author of an accepted contribution; (2) be the person presenting the accepted contribution; and (3) be a SIGIR member (SIGIR student travel grants are only open to SIGIR members).
+
+Please note that these awards are competitive, meaning that not every applicant will receive a grant. Priority will be given to students presenting accepted contributions across all tracks at the conference, including the Doctoral Colloquium, and including students who have been listed as organizers in workshop proposals; to students from underrepresented countries; and to students who have not received a grant in the past.
+
+To be considered for a grant, students must submit the following application, and their thesis advisor must complete a statement of support by the deadline April 10, 2026, 11:59pm AoE.
+
+Student: https://docs.google.com/forms/d/e/1FAIpQLSd5JlOiLk3UcZ1kK5JuxLehbf26yeFLoL9gNbAq78SuN1OrOA/viewform
+
+Advisor: https://docs.google.com/forms/d/e/1FAIpQLSf9zQ1SMcJoQmJaFt8CzZvGLCL58UKAodDa-qfOa337RUDh4w/viewform
+
+Both student application and advisor support form must be received to be considered for this grant. We strongly encourage the student applicant to make sure their advisor submits their form before the deadline.
+
+Notifications will be sent by around April 20, 2026, so that the awardees can register before the author registration deadline (April 29, Melbourne time). Please do NOT register for the conference ahead of the travel notifications, as SIGIR Awards cannot reimburse you for registrations that have already been paid. If you are awarded this grant, you will receive specific instructions in regard to how to complete your conference registration, and will not need to make a payment to the conference.
+
+### Acknowledgment of Country
+
+ACM SIGIR 2026 is being hosted on Aboriginal land. It is a growing custom in Australia to respect that connection via an Acknowledgment of Country, see https://www.reconciliation.org.au/reconciliation/acknowledgement-of-country-and-welcome-to-country/#AcknowledgementofCountry. As a completely optional addition to your paper, you may choose to add the following text as part of your Acknowledgments:
+
+> The authors acknowledge the peoples of the Woi Wurrung and Boon Wurrung language groups of the eastern Kulin Nation on whose unceded lands ACM SIGIR 2026 was hosted. We pay our respects to their Elders past and present, and extend that respect to all Aboriginal and Torres Strait Islander peoples today and their continuing connection to land, sea, sky, and community.
+
+If you also wish to acknowledge the First Nations groups on whose lands you have conducted your research, please feel free to do so. Resources like Native Land (https://native-land.ca/) or dedicated pages in local institutions such as libraries and universities can help you to identify Indigenous and First Nations territories and appropriate forms of acknowledgment.
+
+### Travel and Visa Considerations
+
+The ACM SIGIR 2026 web pages include information about Australian visa requirements, see https://sigir2026.org/en-AU/pages/attending/visa-information. If you need to apply for a visa you should commence the application process as soon as possible.

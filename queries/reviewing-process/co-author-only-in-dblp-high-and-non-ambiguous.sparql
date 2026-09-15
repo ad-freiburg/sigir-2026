@@ -1,0 +1,21 @@
+# Co-author only in DBLP high and non-ambiguous
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX or: <http://openreview.net/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX dblp: <https://dblp.org/rdf/schema#>
+SELECT ?person ?dblp_id ?ambi ?pubs_or ?pubs_dblp ?coa_only_or ?coa_only_dblp WHERE { 
+  ?person rdf:type or:Author MINUS { ?person or:role [] . ?person or:status "accepted" } .
+  ?person or:dblp_id ?dblp_id OPTIONAL { ?dblp_id dblp:is_ambiguous ?ambi }
+  ?person rdfs:label ?label .
+  ?person or:num_publications ?pubs_or .
+  OPTIONAL { ?dblp_id dblp:num_publications ?pubs_dblp . }
+  OPTIONAL { SELECT ?person (COUNT(?coauthor_only_or) AS ?coa_only_or) WHERE {
+    ?person or:has_coauthor ?coauthor_only_or
+    MINUS { ?person or:dblp_id/dblp:has_coauthor ?coauthor_only_or }
+  } GROUP BY ?person }
+  OPTIONAL { SELECT ?person (COUNT(?coauthor_only_dblp) AS ?coa_only_dblp) WHERE {
+    ?person or:dblp_id/dblp:has_coauthor ?coauthor_only_dblp
+    MINUS { ?author or:has_coauthor ?coauthor_only_dblp }
+  } GROUP BY ?person }
+}
+ORDER BY DESC(1 - ?ambi) DESC(?coa_only_dblp)

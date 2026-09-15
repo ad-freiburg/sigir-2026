@@ -1,0 +1,20 @@
+# Query: ../queries/mails/2026-01-18_author_reviewer_not_author.sparql
+To: (recipients computed by the query above)
+Subject: [SIGIR 2026] Nominated reviewer is not author, URGENT
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{author_name}},
+
+For the following submission of yours, you have nominated a reviewer who is not listed as an author.
+
+Paper: {{paper}} {{author_ids}}
+
+Nominated reviewer: {{author_reviewer}}
+
+This is a serious error and violates a requirement stated in the [Call for Papers](https://sigir2026.org/en-AU/pages/submissions/full-papers-track): "For each submission to SIGIR 2026, we ask ONE OF THE AUTHORS to agree to serve as a reviewer."
+
+Please resolve this immediately by editing your submission, and let us know when you have done so.
+
+Hannah Bast, Marc Najork, and Min Zhang
+SIGIR 2026 Program Chairs, Full Papers Track

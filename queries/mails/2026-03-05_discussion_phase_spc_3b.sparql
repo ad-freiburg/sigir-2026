@@ -1,0 +1,14 @@
+# Query for mail ../../mails/2026-03-05_discussion_phase_spc_3b.txt
+PREFIX or: <http://openreview.net/>
+PREFIX person: <https://openreview.net/profile?id=~>
+SELECT ?spc ?firstname_or_fullname (COUNT(?done) AS ?num_all) (SUM(?done = true) AS ?num_done) (SUM(?done = false) AS ?num_missing) (GROUP_CONCAT(?paper; SEPARATOR="\n") AS ?missing) WHERE {
+  ?spc or:role or:SPC; or:firstname_or_fullname ?firstname_or_fullname .
+  MINUS { VALUES ?spc { person:Hannah_Bast2 person:Marc_Najork2 person:Min_Zhang32 } }
+  ?submission a or:Submission; or:assigned ?spc; or:status "submitted"; or:number ?number; or:title ?title .
+  BIND (EXISTS { ?submission or:has_metareview ?metareview . ?metareview or:author ?spc } AS ?done)
+  BIND (IF(?done, "done", "MISSING") AS ?status)
+  BIND (CONCAT(STR(?number), "   [", ?title, "](", STR(?submission), ")   ", ?status) AS ?paper)
+}
+GROUP BY ?spc ?firstname_or_fullname
+HAVING(?num_done < ?num_all)
+ORDER BY DESC(?num_done)

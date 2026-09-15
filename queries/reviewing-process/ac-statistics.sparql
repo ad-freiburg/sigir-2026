@@ -1,0 +1,15 @@
+# AC statistics
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX or: <http://openreview.net/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX dblp: <https://dblp.org/rdf/schema#>
+SELECT ?person ?label ?status ?position ?dblp_id ?imported_pubs ?dblp_pubs WHERE { 
+  ?person or:role or:AC .
+  ?person or:status ?status .
+  ?person rdfs:label ?label .
+  ?person or:position ?position .
+  ?person or:dblp_id ?dblp_id .
+  OPTIONAL { ?person or:num_publications ?imported_pubs }
+  OPTIONAL { ?dblp_id dblp:num_publications ?dblp_pubs }
+}
+ORDER BY DESC(?dblp_pubs)

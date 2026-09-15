@@ -1,0 +1,24 @@
+# Query: ../queries/mails/2026-02-22_discussion_phase_pc_3.sparql
+To: (recipients computed by the query above)
+Subject: [SIGIR 2026] Discussion phase begins, please read CAREFULLY
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{firstname_or_fullname}},
+
+Thank you for the reviews you have already submitted, and please submit your remaining reviews very soon. Despite the missing reviews, we have decided to start the discussion phase now.
+
+Each discussion will be led by a Senior Program Committee (SPC) member, called "Area Chair" in OpenReview. You will not see their name, unless they choose to reveal it or they send you a private email.
+
+**Your most important task in the discussion phase is to be responsive.** So please watch out for emails from OpenReview, and please reply to them as soon as possible. SPCs have been instructed to nag you via email if you do not reply to their questions within a reasonable time frame. But please do not let it come to that.
+
+**With the hard work of writing the reviews already behind you, the discussion phase can actually be fun and rewarding.** We hope that you experience a little bit of that.
+
+For your information, we asked the SPCs to watch out for shallow or generic reviews, strong biases, unfounded claims, important aspects that are missed, and undue AI assistance. In particular, we sent them this checklist of [lazy reasons to reject a paper](https://docs.google.com/document/d/1I4eTHDaMQ2-khs5MEv_1BjEcvhsPWAIcZvTFzE124II/view#heading=h.f5czy5vvku9i).
+
+When there is a disagreement with another reviewer, you should get to the point where you understand each other's arguments. This can result in agreement, but it can also result in a better understanding of the disagreement.
+
+Please help us make the discussion phase a success by being responsive and by improving the reviews as much as possible. The better the reviews, the better the decisions, and the better the conference. Thank you!
+
+Hannah Bast, Marc Najork, and Min Zhang
+SIGIR 2026 Program Chairs, Full Papers Track

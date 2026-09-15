@@ -1,0 +1,23 @@
+# Topic over/under-representation among accepted (accepted % − submitted %)
+#defaultView:BarChart
+PREFIX or: <http://openreview.net/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+SELECT ?topic ?discrepancy WHERE {
+  { SELECT ?topic_ (COUNT(?s) AS ?n_sub) WHERE {
+      ?s rdf:type or:Submission ; or:topic_coarse ?topic_ .
+      FILTER(?topic_ != "Other")
+  } GROUP BY ?topic_ }
+  OPTIONAL { SELECT ?topic_ (COUNT(?sa) AS ?n_acc) WHERE {
+      ?sa rdf:type or:Submission ; or:topic_coarse ?topic_ ; or:has_decision [ or:decision "Accept" ] .
+      FILTER(?topic_ != "Other")
+  } GROUP BY ?topic_ }
+  { SELECT (COUNT(?t1) AS ?tot_sub) WHERE {
+      ?t1 rdf:type or:Submission ; or:topic_coarse ?x1 . FILTER(?x1 != "Other") } }
+  { SELECT (COUNT(?t2) AS ?tot_acc) WHERE {
+      ?t2 rdf:type or:Submission ; or:topic_coarse ?x2 ; or:has_decision [ or:decision "Accept" ] . FILTER(?x2 != "Other") } }
+  BIND(CONCAT(?topic_, " (", STR(?n_sub), ")") AS ?topic)
+  BIND(?n_sub / ?tot_sub * 100 AS ?pct_sub)
+  BIND(COALESCE(?n_acc, 0) / ?tot_acc * 100 AS ?pct_acc)
+  BIND(ROUND(10 * (?pct_acc - ?pct_sub)) / 10 AS ?discrepancy)
+}
+ORDER BY DESC(?discrepancy)

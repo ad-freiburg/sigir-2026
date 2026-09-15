@@ -1,0 +1,49 @@
+# Query: ../queries/mails/2026-04-27_assignment_quality.sparql
+To: (recipients computed by the query above)
+From: Hannah Bast <sigir2026-pc-chairs@openreview.net>
+Subject: [SIGIR 2026] Your feedback please
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{firstname_or_fullname}},
+
+Thank you for all your efforts during the reviewing process!  As you may have seen, the list of [accepted papers](https://sigir2026.org/en-AU/pages/program/accepted-papers) is now available. For the full papers track, the acceptance rate was 18.4% (discounting desk-rejected and withdrawn submissions).  We believe we have selected a strong set of papers, and we could not have done it without your help!
+
+On January 29 we sent a survey to all 46 Area Chairs and all 194 Senior PC members asking for their feedback on the quality of the automatic review assignments. We received responses from 40 of the 46 ACs (response rate 87%) and 164 of the 194 SPCs (response rate 85%).
+
+The first question asked you to judge what fraction of assignments matched your expertise. Possible responses were “All”, “Most”, “Some”, “Few” and “None”.   The results were:
+
+| Response | AC       | SPC      |
+|:-------- |:-------- |:-------- |
+| All      | 11 (27%) | 51 (31%) |
+| Most     | 16 (40%) | 69 (42%) |
+| Some     |  7 (18%) | 28 (17%) |
+| Few      |  6 (15%) | 10  (6%) |
+| None     |  0  (0%) |  6  (4%) |
+
+In other words, about two-thirds of the surveyed committee members felt that the assignments mostly matched their expertise.
+
+The second question asked you to compare the assignment quality to previous years, when assignment was based on explicit paper bidding.  For context, manual paper bidding was becoming increasingly problematic, between a substantial number of committee members not entering bids and the risk of collusion.
+
+Possible responses were “significantly better”, “more or less the same”, “significantly worse”, and “I haven’t been AC/SPC for the full-papers track in the past three years”.  The results were:
+
+| Response | AC       | SPC      |
+|:-------- |:-------- |:-------- |
+| Better   |  8 (20%) | 28 (17%) |
+| Same     | 19 (48%) | 59 (36%) |
+| Worse    | 10 (25%) | 19 (12%) |
+| N/A      |  3  (8%) | 58 (35%) |
+
+In other words, SPCs preferred the automatic assignment mechanism, whereas ACs were neutral to slightly negative on automatic assignment. 
+
+We also received free-form feedback from 55 of those surveyed. Sifting through the critical feedback, we identified a few themes:
+* SPCs and ACs received many recommender systems papers even when their own expertise is only tangentially in recommender systems. We believe this suggests that future chairs should be more aggressive than we have been in enriching the committee with senior members from the RecSys community.
+* ACs with very focused research interests found that many of the papers assigned to them were outside their area of expertise. Our recommendation to future chairs will be to recruit generalists to AC roles.
+* Multiple SPCs and ACs observed that the assignment mechanism does not distinguish between their core area of expertise and areas that they have published in but that are not in their core area.  Our recommendation to future chairs will be to modify the assignment mechanism to put emphasis on the core areas of expertise of each committee member.
+
+We hope to see you in Melbourne, less than three months from now!
+
+All the best,
+
+Hannah, Min and Marc
+SIGIR 2026 Program Chairs

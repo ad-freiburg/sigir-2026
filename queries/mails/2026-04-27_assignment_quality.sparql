@@ -1,0 +1,9 @@
+# Query for mail ../../mails/2026-04-27_assignment_quality.txt
+PREFIX or: <http://openreview.net/>
+PREFIX person: <https://openreview.net/profile?id=~>
+SELECT ?person ?firstname_or_fullname WHERE { 
+  VALUES ?role { or:AC or:SPC  }
+  ?person or:role ?role .
+  ?person or:firstname_or_fullname ?firstname_or_fullname
+  MINUS { VALUES ?person { person:Hannah_Bast2 person:Marc_Najork2 person:Min_Zhang32 } }
+}

@@ -1,0 +1,11 @@
+# All decisions ranked by avg score
+PREFIX or: <http://openreview.net/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX person: <https://openreview.net/profile?id=~>
+SELECT ?submission ?title (STR(?number_) AS ?number) ?avg_score ?scores ?decision ?ac WHERE {
+  ?submission rdf:type or:Submission; or:status "submitted"; or:number ?number_; or:title ?title; or:assigned ?ac .
+  ?ac or:role or:AC .
+  OPTIONAL { ?submission or:has_decision [ or:decision ?decision ] }
+  { SELECT ?submission (ROUND(100 * AVG(?score)) / 100 AS ?avg_score) (GROUP_CONCAT(STR(?score); SEPARATOR=", ") AS ?scores) WHERE { ?submission or:has_review/or:rating ?score } GROUP BY ?submission }
+}
+ORDER BY DESC(?avg_score)

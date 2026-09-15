@@ -1,0 +1,13 @@
+# Review ratings by reviewer
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX or: <http://openreview.net/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+SELECT ?reviewer ?name  (GROUP_CONCAT(STR(?rv); SEPARATOR="|") AS ?ratings) (GROUP_CONCAT(STR(?num); SEPARATOR="|") AS ?subs) (SAMPLE(?review) AS ?sample) (ROUND(10 * AVG(?rv)) / 10 AS ?avg) (GROUP_CONCAT(?rc; SEPARATOR="|") AS ?comments) (MIN(?rv) AS ?min) (MAX(?rv) AS ?max) WHERE {
+  ?review rdf:type or:Review .
+  ?review or:rating_value ?rv OPTIONAL { ?review or:rating_comment ?rc }
+  ?review or:reviewer ?reviewer .
+  ?reviewer or:firstname_or_fullname ?name .
+  ?submission or:has_review ?review ; or:number ?num .
+}
+GROUP BY ?reviewer ?name
+ORDER BY ASC(?avg)

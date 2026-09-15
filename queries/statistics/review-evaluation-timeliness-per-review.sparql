@@ -1,0 +1,9 @@
+# Review evaluation — Timeliness (per review)
+#defaultView:BarChart
+PREFIX or: <http://openreview.net/>
+SELECT ?score (COUNT(?r) AS ?num_reviews) WHERE {
+  ?r or:quality_evaluation_timeliness_score ?s .
+  BIND(STR(?s) AS ?score)
+}
+GROUP BY ?score ?s
+ORDER BY ?s

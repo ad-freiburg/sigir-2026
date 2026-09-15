@@ -1,0 +1,19 @@
+# Query for mail ../../mails/2026-01-18_author_reviewer_not_author.txt
+PREFIX or: <http://openreview.net/>
+PREFIX person: <https://openreview.net/profile?id=~>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT ?author ?author_name ?r ?author_reviewer ?submission ?n ?paper ?author_ids {
+  ?submission or:status "submitted" .
+  ?submission or:author_reviewer ?author_reviewer .
+  ?submission or:author_ids ?author_ids .
+  ?submission or:num_authors ?n .
+  ?submission or:title ?title .
+  MINUS {
+    ?submission or:author ?author_reviewer .
+  }
+  BIND (CONCAT("[", ?title, "](", STR(?submission), ") ") AS ?paper)
+  { SELECT DISTINCT ?submission ?author WHERE { ?submission or:author ?author } }
+  BIND (IF(?author = ?author_reviewer, 1, 0) AS ?r)
+  ?author rdfs:label ?author_name .
+}
+ORDER BY ASC(?submission) DESC(?r)

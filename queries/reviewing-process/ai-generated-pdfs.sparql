@@ -1,0 +1,14 @@
+# AI-generated PDFs
+PREFIX pangram: <https://pangram.com/rdf/schema#>
+PREFIX or: <http://openreview.net/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+SELECT * WHERE {
+  ?submission rdf:type or:Submission .
+  ?submission or:number ?num .
+  ?submission or:author_names ?author_names .
+  ?submission pangram:fraction_ai ?pure_ai .
+  ?submission pangram:fraction_ai_assisted ?ai_assisted .
+  ?submission pangram:fraction_human ?human .
+  ?submission pangram:dashboard_link ?dashboard_link .
+}
+ORDER BY DESC(?pure_ai) DESC(?ai_assisted) DESC(?human)

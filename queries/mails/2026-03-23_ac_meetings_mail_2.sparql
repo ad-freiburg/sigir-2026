@@ -1,0 +1,15 @@
+# Query for mail ../../mails/2026-03-23_ac_meetings_mail_2.txt
+PREFIX or: <http://openreview.net/>
+PREFIX person: <https://openreview.net/profile?id=~>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT ?ac ?firstname ?all ?decisions ?accept (xsd:int(ROUND(100 * ?accept / ?all)) AS ?rate) ?discuss ?webpage WHERE {
+  { SELECT ?ac (COUNT(?submission) AS ?all) (COUNT(?decision) AS ?decisions) (SUM(IF(BOUND(?decision) && ?decision = "Accept",1,0)) AS ?accept) (SUM(IF(BOUND(?decision) && STRSTARTS(?decision, "Discuss"),1,0)) AS ?discuss) WHERE {
+    ?ac or:role or:AC . MINUS { VALUES ?ac { person:Hannah_Bast2 person:Marc_Najork2 person:Min_Zhang32 } }
+	?submission or:assigned ?ac; or:status "submitted" .
+	OPTIONAL { ?submission or:has_decision [ or:decision ?decision ] . }
+  } GROUP BY ?ac }
+  ?ac or:firstname_or_fullname ?firstname; or:uuid ?uuid .
+  BIND (CONCAT("https://qlever.dev/ac-meetings/?id=", ?uuid) AS ?webpage) 
+}
+ORDER BY ?ac

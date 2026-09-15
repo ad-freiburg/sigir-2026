@@ -1,0 +1,23 @@
+# Query: ../queries/mails/2026-02-07_email_address_is_private.sparql
+To: (recipients computed by the query above)
+Subject: [SIGIR 2026] Nominated reviewer is not author, DESK REJECTION imminent
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{fullname}},
+
+We have noticed that your email address is not visible to us as PC chairs.
+
+
+For the following submission of yours, you have nominated a reviewer who is not listed as an author.
+
+Paper: {{paper}} {{author_ids}}
+
+Nominated reviewer: {{author_reviewer}}
+
+This is a serious error and violates a requirement stated in the [Call for Papers](https://sigir2026.org/en-AU/pages/submissions/full-papers-track): "For each submission to SIGIR 2026, we ask ONE OF THE AUTHORS to agree to serve as a reviewer."
+
+We have sent two notifications about this issue already. If this is not resolved by the full-paper submission deadline, your submission will be desk-rejected without further review.
+
+Hannah Bast, Marc Najork, and Min Zhang
+SIGIR 2026 Program Chairs, Full Papers Track

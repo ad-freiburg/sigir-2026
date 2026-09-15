@@ -1,0 +1,20 @@
+# Number of meta-reviews over time (cumulative)
+#defaultView:BarChart
+PREFIX or: <http://openreview.net/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT (STR(?day) AS ?date) ?num_metareviews WHERE {
+  {
+    SELECT ?day (SUM(?cdate <= ?day) AS ?num_metareviews) WHERE {
+      {
+        SELECT DISTINCT ?day WHERE {
+          { ?m rdf:type or:Metareview ; or:cdate ?day . }
+          UNION { VALUES ?day { "2026-02-22"^^xsd:date "2026-03-20"^^xsd:date } }
+          FILTER(?day >= "2026-02-22"^^xsd:date && ?day <= "2026-03-20"^^xsd:date)
+        }
+      }
+      ?metareview rdf:type or:Metareview ; or:cdate ?cdate .
+    } GROUP BY ?day
+  }
+}
+ORDER BY ?day

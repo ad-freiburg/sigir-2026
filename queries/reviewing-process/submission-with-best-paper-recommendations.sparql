@@ -1,0 +1,7 @@
+# Submission with best paper recommendations
+PREFIX or: <http://openreview.net/>
+SELECT (STR(?number) AS ?paper) ?submission ?title ?decision (COUNT(*) AS ?count) WHERE {
+  ?submission or:number ?number; or:title ?title; or:has_review [ or:best_paper_award "Yes" ]; or:has_decision [ or:decision ?decision ]
+}
+GROUP BY ?submission ?number ?title ?decision
+ORDER BY DESC(?count)

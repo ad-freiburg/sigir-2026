@@ -1,0 +1,12 @@
+# Average review score by day submitted
+#defaultView:LineChart
+PREFIX or: <http://openreview.net/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+# Maximal range with >= 50 reviews submitted every day: 2026-02-09 to 2026-02-24.
+SELECT (STRDT(CONCAT(STR(?day), "T00:00:00Z"), xsd:dateTime) AS ?date) (ROUND(AVG(?rating) * 100) / 100 AS ?avg_score) WHERE {
+  ?review rdf:type or:Review ; or:cdate ?day ; or:rating ?rating .
+  FILTER(?day >= "2026-02-09"^^xsd:date && ?day <= "2026-02-24"^^xsd:date)
+}
+GROUP BY ?day
+ORDER BY ?day

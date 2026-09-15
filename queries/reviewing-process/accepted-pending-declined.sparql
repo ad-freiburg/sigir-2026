@@ -1,0 +1,11 @@
+# Accepted, pending, declined
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX or: <http://openreview.net/>
+PREFIX person: <https://openreview.net/profile?id=~>
+SELECT ?role (SUM(?status = "accepted") AS ?accepted) (SUM(?status = "pending") AS ?pending) (SUM(?status = "declined") AS ?declined) (?accepted + ?pending + ?declined AS ?total) WHERE {
+  VALUES (?role ?sortkey) { (or:AC 1) (or:SPC 2) (or:PC 3) }
+  ?member or:role ?role .
+  ?member or:status ?status .
+}
+GROUP BY ?role
+ORDER BY SAMPLE(?sortkey)

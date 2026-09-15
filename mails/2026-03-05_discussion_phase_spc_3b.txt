@@ -1,0 +1,22 @@
+# Query: ../queries/mails/2026-03-05_discussion_phase_spc_3b.sparql
+To: (recipients computed by the query above)
+Subject: [SIGIR 2026] Please start your remaining discussions
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{firstname_or_fullname}},
+
+Thank you again for the discussions you have already started.
+
+The deadline for the meta-reviews is only five days away (March 10, AoE). Please also start the remaining discussions.
+
+If reviewers do not respond, please follow up by sending personal emails to them. That is the best way to get a response.
+
+Please use the "Official Comment" button for all discussions. Use private email (or OpenReview's "Message" feature) only for chasing after unresponsive reviewers, or for matters that call for privacy. If you have conducted substantial discussions via private conversations already, please add an "Official Comment" that states that fact, and a quick summary of the outcome. This is important for the transparency of the process.
+
+Here are the papers assigned to you, together with the information about which discussions you have already started:
+
+{{missing}}
+
+Hannah Bast, Marc Najork, and Min Zhang
+SIGIR 2026 Program Chairs, Full Papers Track

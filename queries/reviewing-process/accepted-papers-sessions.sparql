@@ -1,0 +1,7 @@
+# Accepted papers, sessions
+PREFIX or: <http://openreview.net/>
+SELECT ?session_title ?number ?submission ?title  WHERE {
+  ?submission or:has_decision [ or:decision "Accept" ] .
+  ?submission or:number ?number; or:title ?title; or:session ?session_title .
+}
+ORDER BY ?session_title ?number

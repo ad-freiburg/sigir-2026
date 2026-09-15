@@ -1,0 +1,11 @@
+# Author feedback, comments
+PREFIX or: <http://openreview.net/>
+SELECT (STR(?number) AS ?paper) ?decision ?what ?share ?what_label ?comment WHERE {
+  { { SELECT ?number ?decision ?what ?share ?comment WHERE { ?submission or:number ?number; or:has_decision [ or:decision ?decision ]; or:has_review ?what . ?what or:author_feedback_comment ?comment . OPTIONAL { ?what or:author_feedback_share ?share } } }
+	BIND ("reviews" AS ?what_label) } UNION 
+  { { SELECT ?number ?decision ?what ?share ?comment WHERE { ?submission or:number ?number; or:has_decision [ or:decision ?decision ]; or:has_metareview ?what . ?what or:author_feedback_comment ?comment  . OPTIONAL { ?what or:author_feedback_share ?share } } }
+    BIND ("meta-reviews" AS ?what_label) } UNION
+  { { SELECT ?number ?decision ?what ?share ?comment WHERE { ?submission or:number ?number; or:has_decision [ or:decision ?decision ]; or:has_decision ?what . ?what or:author_feedback_comment ?comment . OPTIONAL { ?what or:author_feedback_share ?share } } }
+	BIND ("overall" AS ?what_label) }
+}
+ORDER BY ?number

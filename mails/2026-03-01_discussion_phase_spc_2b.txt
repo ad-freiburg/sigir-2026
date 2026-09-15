@@ -1,0 +1,20 @@
+# Query: ../queries/mails/2026-03-01_discussion_phase_spc_2b.sparql
+To: (recipients computed by the query above)
+Subject: [SIGIR 2026] Please start your discussions
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{firstname_or_fullname}},
+
+We are one week into the discussion phase, and we have seen that [you]({{spc}}) have already started some discussions. Thank you for this!
+
+**Please also start the remaining discussions.** If reviewers do not respond, please follow up by sending personal emails to them. That is the best way to get a response. It is also what we as PC chairs spend a significant portion of our time on.
+
+When reading the reviews, we recommend rating them right away. We sent you an email about that a few hours ago. Rating a review is quick: it's a single vote on a 1 - 5 scale and an optional comment. You can revise your rating as often as you like.
+
+Here are the papers assigned to you, together with the information on which discussions you have already started:
+
+{{missing}}
+
+Hannah Bast, Marc Najork, and Min Zhang
+SIGIR 2026 Program Chairs, Full Papers Track

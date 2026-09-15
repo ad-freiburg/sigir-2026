@@ -1,0 +1,16 @@
+# Number of reviews per submission
+#defaultView:BarChart
+PREFIX or: <http://openreview.net/>
+SELECT ?num_reviews (COALESCE(?count_, 0) AS ?count) WHERE {
+  VALUES ?n { 0 1 2 3 4 5 }
+  OPTIONAL {
+    SELECT ?n (COUNT(?n) AS ?count_) WHERE {
+      { SELECT ?submission (COUNT(?review) AS ?n) WHERE {
+          ?submission or:status "submitted" .
+          OPTIONAL { ?submission or:has_review ?review }
+      } GROUP BY ?submission }
+    } GROUP BY ?n
+  }
+  BIND(STR(?n) AS ?num_reviews)
+}
+ORDER BY ?n

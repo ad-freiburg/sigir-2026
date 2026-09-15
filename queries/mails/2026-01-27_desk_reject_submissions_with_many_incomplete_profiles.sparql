@@ -1,0 +1,24 @@
+# Query for mail ../../mails/2026-01-27_desk_reject_submissions_with_many_incomplete_profiles.txt
+PREFIX or: <http://openreview.net/>
+PREFIX dblp: <https://dblp.org/rdf/schema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX person: <https://openreview.net/profile?id=~>
+SELECT ?submission ?title ?author_reviewer ?num_authors (COUNT(DISTINCT ?author) AS ?num_problematic) (GROUP_CONCAT(DISTINCT ?author_name_and_id; SEPARATOR="\n") AS ?problematic_authors) WHERE {
+  { SELECT DISTINCT ?author WHERE { ?submission or:status "submitted" . ?submission or:author ?author } }
+  ?author or:dblp_id or:novalue .
+  ?author rdfs:label ?author_name .
+  ?author or:position ?position .
+  ?author or:institution ?institution .
+  ?author or:id ?author_id .
+  BIND (CONCAT(?author_name, "   ", STR(?author)) AS ?author_name_and_id)
+  ?submission or:author ?author .
+  ?submission or:title ?title .
+  ?submission or:num_authors ?num_authors .
+  ?submission or:author_reviewer ?author_reviewer .
+  MINUS { ?author or:role [] } 
+  ?author or:num_publications ?or_pubs .
+  MINUS { ?author or:task_dblp_status [] }
+}
+GROUP BY ?submission ?title ?num_authors ?author_reviewer
+ORDER BY DESC(?num_problematic)
+LIMIT 12

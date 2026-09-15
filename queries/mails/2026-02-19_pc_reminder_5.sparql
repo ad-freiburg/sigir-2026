@@ -1,0 +1,19 @@
+# Query for mail ../../mails/2026-02-19_pc_reminder_5.txt
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX or: <http://openreview.net/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX person: <https://openreview.net/profile?id=~>
+SELECT ?pc ?firstname_or_fullname (COUNT(?submission) AS ?assigned) (COUNT(?review) AS ?done) (?assigned - ?done AS ?missing) (GROUP_CONCAT(?paper; SEPARATOR="\n") AS ?papers) WHERE {
+  ?pc or:role or:PC .
+  ?pc or:firstname_or_fullname ?firstname_or_fullname .
+  ?submission or:assigned ?pc .
+  ?submission or:status "submitted" .
+  ?submission or:title ?title .
+  OPTIONAL { ?submission or:has_review ?review . ?review or:reviewer ?pc }
+  BIND (CONCAT("[", ?title, "](", STR(?submission), ") ", IF(BOUND(?review), "DONE", "MISSING")) AS ?paper) 
+  MINUS { VALUES ?pc { person:Hannah_Bast2 person:Marc_Najork2 person:Min_Zhang32 } }
+  MINUS { VALUES ?pc { person:Redacted_Name1 person:Redacted_Name2 person:Redacted_Name3 person:Redacted_Name4 person:Redacted_Name5 person:Redacted_Name6 person:Redacted_Name7 person:Redacted_Name8 person:Redacted_Name9 person:Redacted_Name10 person:Redacted_Name11 person:Redacted_Name12 person:Redacted_Name13 person:Redacted_Name14 person:Redacted_Name15 person:Redacted_Name16 person:Redacted_Name17 person:Redacted_Name18 person:Redacted_Name19 person:Redacted_Name20 person:Redacted_Name21 person:Redacted_Name22 person:Redacted_Name23 person:Redacted_Name24 person:Redacted_Name25 person:Redacted_Name26 person:Redacted_Name27 person:Redacted_Name28 person:Redacted_Name29 person:Redacted_Name30 person:Redacted_Name31 person:Redacted_Name32 person:Redacted_Name33 person:Redacted_Name34 person:Redacted_Name35 person:Redacted_Name36 person:Redacted_Name37 person:Redacted_Name38 person:Redacted_Name39 person:Redacted_Name40 person:Redacted_Name41 person:Redacted_Name42 person:Redacted_Name43 person:Redacted_Name44 person:Redacted_Name45 person:Redacted_Name46 person:Redacted_Name47 person:Redacted_Name48 person:Redacted_Name49 person:Redacted_Name50 person:Redacted_Name51 person:Redacted_Name52 person:Redacted_Name53 person:Redacted_Name54 person:Redacted_Name55 person:Redacted_Name56 person:Redacted_Name57 person:Redacted_Name58 person:Redacted_Name59 } }
+}
+GROUP BY ?pc ?firstname_or_fullname
+HAVING (?missing = 1)
+ORDER BY ASC(?assigned)

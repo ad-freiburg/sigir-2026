@@ -1,0 +1,18 @@
+# Query: ../queries/mails/2026-01-31_assignment_quality_reminder.sparql
+To: (recipients computed by the query above)
+Subject: [SIGIR 2026] Paper Assignment Quality, REMINDER
+Cc: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
+
+Dear {{firstname_or_fullname}},
+
+We have sent you an email two days ago, asking for your feedback on the quality of your paper assignment. You haven't responded to that yet.
+
+It's two quick questions, which only take a minute.
+
+Log in to OpenReview, then click on "Tasks" (on the upper right, to the left of your name), then click on the small triangle to the left of "ACM SIGIR 2026 Conference", then click on "{{role_str}}s Assignment Quality Feedback".
+
+Thank you!
+
+Hannah Bast, Marc Najork, and Min Zhang
+SIGIR 2026 Program Chairs, Full Papers Track

@@ -1,0 +1,13 @@
+# Review score distribution, accepted vs rejected
+#defaultView:BarChart
+PREFIX or: <http://openreview.net/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+SELECT ?score (COUNT(?review) AS ?num_reviews) ?decision WHERE {
+  ?submission or:status "submitted" ; or:has_review ?review ; or:has_decision [ or:decision ?dec ] .
+  ?review or:rating ?rating .
+  BIND(IF(?rating > 0, CONCAT("+", STR(?rating)), STR(?rating)) AS ?score)
+  BIND(IF(?dec = "Accept", "Accepted", "Rejected") AS ?decision)
+  BIND(IF(?dec = "Accept", 2, 1) AS ?dec_order)
+}
+GROUP BY ?score ?rating ?decision ?dec_order
+ORDER BY ?rating ?dec_order

@@ -1,0 +1,10 @@
+# Submitted, withdrawn, desk rejected, etc.
+PREFIX or: <http://openreview.net/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+SELECT ?status (COUNT(?submission) as ?count) (SUM(IF(?has_pdf,0,1)) AS ?without_pdf) WHERE {
+  ?submission rdf:type or:Submission .
+  ?submission or:status ?status .
+  ?submission or:has_pdf ?has_pdf .
+}
+GROUP BY ?status 
+ORDER BY DESC(?count)
