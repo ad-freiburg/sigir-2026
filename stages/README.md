@@ -13,6 +13,11 @@ format in which it was deployed with `ortler`
 - Full OpenReview invitation format; deployed with `ortler review-stage FILE`
   or `ortler stage FILE`. The fields are under
   `edit.invitation.edit.note.content`; the dates under `edit.invitation`.
+  A field given as `{"delete": true}` removes one of OpenReview's default
+  fields (for example `title` and `review` in `review.json`).
+
+All files were checked against the invitations live on OpenReview on
+2026-11-07: the fields, options, descriptions and invitees match.
 
 Role names follow SIGIR usage: PC members are OpenReview's `Reviewers`, SPCs
 are `Area_Chairs`, and ACs are `Senior_Area_Chairs`. The file names use the
