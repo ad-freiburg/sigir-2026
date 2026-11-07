@@ -31,7 +31,7 @@ mails that announced the stage are linked.
 
 ## Before reviewing
 
-### `registration-dblp-and-imported-publications.json`
+### [`registration-dblp-and-imported-publications.json`](registration-dblp-and-imported-publications.json)
 Authors, January 21 to 24. One form per author. Asks whether the author has a
 DBLP author page, a disambiguation page, or none (with the URL), and a
 certification that all their publications have been imported into their
@@ -45,7 +45,7 @@ Relevant mails:
 [`2026-01-22_no_dblp_certify_imported_publications_all.txt`](../mails/2026-01-22_no_dblp_certify_imported_publications_all.txt) (same text as final call, authors with 10 or more publications),
 [`2026-01-25_desk_reject_submissions_with_many_incomplete_profiles.txt`](../mails/2026-01-25_desk_reject_submissions_with_many_incomplete_profiles.txt) (desk rejection for incomplete profiles).
 
-### `initial-check-spc.json`, `initial-check-ac.json`
+### [`initial-check-spc.json`](initial-check-spc.json), [`initial-check-ac.json`](initial-check-ac.json)
 SPCs and ACs, January 25 to 27, for each assigned submission. A quick
 one-to-two-minute look with one answer: proceed to review, or desk-reject
 for exceeding the page limit, missing anonymization, wrong formatting, being
@@ -53,7 +53,7 @@ off-topic, or another reason given in a comment. Both roles see the same
 form; the two files differ only in the committee. The answers were the input
 for the program chairs' desk-rejection decisions.
 
-### `assignment-quality-feedback-spc.json`, `assignment-quality-feedback-ac.json`
+### [`assignment-quality-feedback-spc.json`](assignment-quality-feedback-spc.json), [`assignment-quality-feedback-ac.json`](assignment-quality-feedback-ac.json)
 SPCs and ACs, January 30 to February 18. One form per person: how many of
 the assigned papers match their expertise (five levels), how this compares
 to previous years, and free comments. Used to evaluate the automatic
@@ -65,7 +65,7 @@ Relevant mails:
 
 ## Reviewing and discussion
 
-### `review.json`
+### [`review.json`](review.json)
 PC members, January 29 to February 18 (deadline February 17 AoE), one review
 per assigned submission. Fields: an acknowledgment of the responsible
 reviewing policy from the call for papers; strengths; weaknesses; detailed
@@ -85,7 +85,7 @@ Relevant mails:
 [`2026-02-12_pc_reminder_4.txt`](../mails/2026-02-12_pc_reminder_4.txt) (deadline passed, reviews missing),
 [`2026-02-22_discussion_phase_pc_1.txt`](../mails/2026-02-22_discussion_phase_pc_1.txt) (what PC members do in the discussion phase).
 
-### `review-rating.json`
+### [`review-rating.json`](review-rating.json)
 SPCs, March 1 to 11, one rating per review on their submissions. A single
 score from 5 (exemplary, very helpful) to 1 (very generic, superficial,
 unfounded or short) plus an optional comment. The rating is visible to the
@@ -97,7 +97,7 @@ reviewing.
 Relevant mails:
 [`2026-03-01_review_rating_and_meta_review_spc_1.txt`](../mails/2026-03-01_review_rating_and_meta_review_spc_1.txt) (forms deployed, how to use them).
 
-### `meta-review.json`
+### [`meta-review.json`](meta-review.json)
 SPCs, March 1 to 11, one per submission. Fields: the meta-review (up to
 5000 characters, Markdown), confidential remarks, a recommendation
 (accept, reject, undecided), and confidence from 5 to 1. The invitation
@@ -110,7 +110,7 @@ Relevant mails:
 
 ## Decisions
 
-### `decision-recommendation-ac.json`
+### [`decision-recommendation-ac.json`](decision-recommendation-ac.json)
 ACs, March 19 to 28, one per submission. A decision (accept, reject, or
 "discuss with PC chairs", to be used sparingly), a comment, and a rating of
 the SPC's work on this submission from 5 (exemplary) to 1 (essentially
@@ -124,7 +124,7 @@ Relevant mails:
 
 ## After notification
 
-### `author-feedback-review.json`, `author-feedback-meta-review.json`, `author-feedback-process.json`
+### [`author-feedback-review.json`](author-feedback-review.json), [`author-feedback-meta-review.json`](author-feedback-meta-review.json), [`author-feedback-process.json`](author-feedback-process.json)
 Authors, April 6 to 30. One form per review, per meta-review, and per
 submission for the process as a whole. Each asks for a rating from 5 to 1
 and an optional comment; the review and meta-review forms also ask whether
