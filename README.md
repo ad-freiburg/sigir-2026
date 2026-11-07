@@ -1,6 +1,7 @@
-# Tools surrounding the SIGIR 2026 Full Paper Research Track (and maybe also other tracks)
+# Materials surrounding the SIGIR 2026 Full Paper Research Track (and maybe also other tracks)
 
-All tools that were previously in this repository have been merged into a
-single tool, called `ortler`, which now has its own repository:
+This reposistory contains mails sent by the PC chairs and the queries
+used for managaing the processing, for the mails, and for a variety of
+statistics.
 
-https://github.com/ad-freiburg/ortler
+For the `ortler` too, see https://github.com/ad-freiburg/ortler
