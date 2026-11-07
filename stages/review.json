@@ -1,0 +1,346 @@
+{
+  "id": "ACM.org/SIGIR/2026/Conference/-/Official_Review",
+  "cdate": 1769695200000,
+  "readers": [
+    "ACM.org/SIGIR/2026/Conference"
+  ],
+  "writers": [
+    "ACM.org/SIGIR/2026/Conference"
+  ],
+  "invitees": [
+    "ACM.org/SIGIR/2026/Conference"
+  ],
+  "signatures": [
+    "ACM.org/SIGIR/2026/Conference"
+  ],
+  "content": {
+    "source": {
+      "value": {
+        "venueid": [
+          "ACM.org/SIGIR/2026/Conference",
+          "ACM.org/SIGIR/2026/Conference/Submission",
+          "ACM.org/SIGIR/2026/Conference/Rejected_Submission"
+        ]
+      }
+    },
+    "rating_field_name": {
+      "value": "rating"
+    },
+    "confidence_field_name": {
+      "value": "confidence"
+    },
+    "review_process_script": {
+      "value": "def process(client, edit, invitation):\n\n    domain = client.get_group(edit.domain)\n    venue_id = domain.id\n    meta_invitation_id = domain.content['meta_invitation_id']['value']\n    short_name = domain.get_content_value('subtitle')\n    contact = domain.get_content_value('contact')\n    authors_name = domain.get_content_value('authors_name')\n    submission_name = domain.get_content_value('submission_name')\n    reviewers_name = domain.get_content_value('reviewers_name')\n    area_chairs_name = domain.get_content_value('area_chairs_name')\n    senior_area_chairs_name = domain.get_content_value('senior_area_chairs_name')\n    reviewers_submitted_name = domain.get_content_value('reviewers_submitted_name')\n    review_name = domain.get_content_value('review_name')\n    sender = domain.get_content_value('message_sender')\n\n    parent_invitation = client.get_invitation(invitation.invitations[0])\n\n    users_to_notify = parent_invitation.get_content_value('users_to_notify', [])\n    email_pcs = parent_invitation.get_content_value('email_program_chairs') or 'program_chairs' in users_to_notify\n    email_area_chairs = parent_invitation.get_content_value('email_area_chairs') or 'submission_area_chairs' in users_to_notify\n    email_reviewers = parent_invitation.get_content_value('email_reviewers') or 'submission_reviewers' in users_to_notify\n    email_authors = parent_invitation.get_content_value('email_authors') or 'submission_authors' in users_to_notify\n\n    submission = client.get_note(edit.note.forum)\n    paper_group_id=f'{venue_id}/{submission_name}{submission.number}'\n    paper_reviewers_id = f'{paper_group_id}/{reviewers_name}'\n    paper_reviewers_submitted_id = f'{paper_reviewers_id}/{reviewers_submitted_name}'\n    paper_area_chairs_id = f'{paper_group_id}/{area_chairs_name}'\n    paper_senior_area_chairs_id = f'{paper_group_id}/{senior_area_chairs_name}'\n\n    review = client.get_note(edit.note.id)\n\n    ## run process function for the first edit only\n    review_edits = client.get_note_edits(note_id=review.id, invitation=invitation.id, sort='tcdate:asc')\n    if edit.id != review_edits[0].id:\n        print('not first edit, exiting...')\n        return\n    \n    def create_group(group_id, members=[]):\n        readers=[venue_id]\n        if senior_area_chairs_name:\n            readers.append(paper_senior_area_chairs_id)\n        if area_chairs_name:\n            readers.append(paper_area_chairs_id)\n        readers.append(group_id)\n        client.post_group_edit(\n            invitation=meta_invitation_id,\n            readers=[venue_id],\n            writers=[venue_id],\n            signatures=[venue_id],\n            group=openreview.api.Group(id=group_id,\n                readers=readers,\n                writers=[venue_id],\n                signatures=[venue_id],\n                signatories=[venue_id],\n                members={\n                    'add': members\n                }\n            )\n        )\n\n    create_group(paper_reviewers_submitted_id, [review.signatures[0]])\n\n    capital_review_name = review_name.replace('_', ' ')\n    review_name = capital_review_name.lower()\n\n    ignore_groups = review.nonreaders if review.nonreaders else []\n    ignore_groups.append(edit.tauthor)    \n\n    content = f'To view the {review_name}, click here: https://openreview.net/forum?id={submission.id}&noteId={edit.note.id}'\n\n    if email_pcs:\n        client.post_message(\n            invitation=meta_invitation_id,\n            signature=venue_id,\n            sender=sender,\n            recipients=[domain.get_content_value('program_chairs_id')],\n            ignoreRecipients=ignore_groups,\n            subject=f'''[{short_name}] A {review_name} has been received on Paper number: {submission.number}, Paper title: \"{submission.content['title']['value']}\"''',\n            message=f'''We have received a review on a submission to {short_name}.\n            \n{content}\n'''\n        )\n\n    # always email tauthor\n    client.post_message(\n        invitation=meta_invitation_id,\n        signature=venue_id,\n        sender=sender,\n        recipients=review.signatures,\n        replyTo=contact,\n        subject=f'''[{short_name}] Your {review_name} has been received on your assigned Paper number: {submission.number}, Paper title: \"{submission.content['title']['value']}\"''',\n        message=f'''We have received a review on a submission to {short_name}.\n\nPaper number: {submission.number}\n\nPaper title: {submission.content['title']['value']}        \n        \n{content}\n''')                  \n\n    if area_chairs_name and email_area_chairs and ('everyone' in review.readers or paper_area_chairs_id in review.readers):\n        client.post_message(\n            invitation=meta_invitation_id,\n            signature=venue_id,\n            sender=sender,\n            recipients=[paper_area_chairs_id],\n            ignoreRecipients=ignore_groups,\n            replyTo=contact,\n            subject=f'''[{short_name}] {capital_review_name} posted to your assigned Paper number: {submission.number}, Paper title: \"{submission.content['title']['value']}\"''',\n            message=f'''A submission to {short_name}, for which you are an official area chair, has received a review.\n\nPaper number: {submission.number}\n\nPaper title: {submission.content['title']['value']}\n\n{content}\n'''\n        )\n\n    if email_reviewers:\n        if 'everyone' in review.readers or paper_reviewers_id in review.readers:\n            client.post_message(\n                invitation=meta_invitation_id,\n                signature=venue_id,\n                sender=sender,\n                recipients=[paper_reviewers_id],\n                ignoreRecipients=ignore_groups,\n                replyTo=contact,\n                subject=f'''[{short_name}] {capital_review_name} posted to your assigned Paper number: {submission.number}, Paper title: \"{submission.content['title']['value']}\"''',\n                message=f'''A submission to {short_name}, for which you are a reviewer, has received a review.\n\nPaper number: {submission.number}\n\nPaper title: {submission.content['title']['value']}\n\n{content}\n'''\n            )\n        elif paper_reviewers_submitted_id in review.readers:\n            print('emailing reviewers who have submitted')\n            client.post_message(\n                invitation=meta_invitation_id,\n                signature=venue_id,\n                sender=sender,\n                recipients=[paper_reviewers_submitted_id],\n                ignoreRecipients=ignore_groups,\n                replyTo=contact,\n                subject=f'''[{short_name}] {capital_review_name} posted to your assigned Paper number: {submission.number}, Paper title: \"{submission.content['title']['value']}\"''',\n                message=f'''A submission to {short_name}, for which you are a reviewer, has received a review.\n\nPaper number: {submission.number}\n\nPaper title: {submission.content['title']['value']}\n\n{content}\n'''\n            )\n\n    paper_authors_id = f'{paper_group_id}/{authors_name}'\n    if email_authors and 'everyone' in review.readers or paper_authors_id in review.readers:\n        client.post_message(\n            invitation=meta_invitation_id,\n            signature=venue_id,\n            sender=sender,\n            recipients=[paper_authors_id],\n            ignoreRecipients=ignore_groups,\n            replyTo=contact,\n            subject=f'''[{short_name}] {capital_review_name} posted to your submission - Paper number: {submission.number}, Paper title: \"{submission.content['title']['value']}\"''',\n            message=f'''Your submission to {short_name} has received a review.\n\n{content}\n'''\n        )        \n    \n\n    #create children invitation if applicable\n    openreview.tools.create_replyto_invitations(client, submission, review)"
+    },
+    "email_program_chairs": {
+      "value": false
+    },
+    "email_area_chairs": {
+      "value": true
+    },
+    "email_reviewers": {
+      "value": true
+    },
+    "email_authors": {
+      "value": true
+    }
+  },
+  "dateprocesses": [
+    {
+      "dates": [
+        "#{4/edit/invitation/cdate}",
+        "#{4/mdate} + 5000"
+      ],
+      "script": "def process(client, invitation):\n    meta_invitation = client.get_invitation(\"ACM.org/SIGIR/2026/Conference/-/Edit\")\n    script = meta_invitation.content[\"invitation_edit_script\"]['value']\n    funcs = {\n        'openreview': openreview,\n        'datetime': datetime,\n        'date_index': date_index\n    }\n    exec(script, funcs)\n    funcs['process'](client, invitation)\n"
+    }
+  ],
+  "edit": {
+    "signatures": [
+      "ACM.org/SIGIR/2026/Conference"
+    ],
+    "readers": [
+      "ACM.org/SIGIR/2026/Conference"
+    ],
+    "writers": [
+      "ACM.org/SIGIR/2026/Conference"
+    ],
+    "content": {
+      "noteNumber": {
+        "value": {
+          "param": {
+            "type": "integer"
+          }
+        }
+      },
+      "noteId": {
+        "value": {
+          "param": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "replacement": true,
+    "invitation": {
+      "id": "ACM.org/SIGIR/2026/Conference/Submission${2/content/noteNumber/value}/-/Official_Review",
+      "signatures": [
+        "ACM.org/SIGIR/2026/Conference"
+      ],
+      "readers": [
+        "ACM.org/SIGIR/2026/Conference",
+        "ACM.org/SIGIR/2026/Conference/Submission${3/content/noteNumber/value}/Reviewers"
+      ],
+      "writers": [
+        "ACM.org/SIGIR/2026/Conference"
+      ],
+      "invitees": [
+        "ACM.org/SIGIR/2026/Conference",
+        "ACM.org/SIGIR/2026/Conference/Submission${3/content/noteNumber/value}/Reviewers"
+      ],
+      "maxReplies": 1,
+      "cdate": 1769695200000,
+      "edit": {
+        "signatures": {
+          "param": {
+            "items": [
+              {
+                "prefix": "ACM.org/SIGIR/2026/Conference/Submission${7/content/noteNumber/value}/Reviewer_.*",
+                "optional": true
+              }
+            ]
+          }
+        },
+        "readers": [
+          "${2/note/readers}"
+        ],
+        "nonreaders": [
+          "${2/note/nonreaders}"
+        ],
+        "writers": [
+          "ACM.org/SIGIR/2026/Conference"
+        ],
+        "note": {
+          "id": {
+            "param": {
+              "withInvitation": "ACM.org/SIGIR/2026/Conference/Submission${6/content/noteNumber/value}/-/Official_Review",
+              "optional": true
+            }
+          },
+          "forum": "${4/content/noteId/value}",
+          "replyto": "${4/content/noteId/value}",
+          "ddate": {
+            "param": {
+              "range": [
+                0,
+                9999999999999
+              ],
+              "optional": true,
+              "deletable": true
+            }
+          },
+          "signatures": [
+            "${3/signatures}"
+          ],
+          "readers": [
+            "ACM.org/SIGIR/2026/Conference/Program_Chairs",
+            "ACM.org/SIGIR/2026/Conference/Submission${5/content/noteNumber/value}/Senior_Area_Chairs",
+            "ACM.org/SIGIR/2026/Conference/Submission${5/content/noteNumber/value}/Area_Chairs",
+            "ACM.org/SIGIR/2026/Conference/Submission${5/content/noteNumber/value}/Reviewers/Submitted",
+            "${3/signatures}"
+          ],
+          "nonreaders": [
+            "ACM.org/SIGIR/2026/Conference/Submission${5/content/noteNumber/value}/Authors"
+          ],
+          "writers": [
+            "ACM.org/SIGIR/2026/Conference",
+            "${3/signatures}"
+          ],
+          "content": {
+            "title": {
+              "delete": true
+            },
+            "review": {
+              "delete": true
+            },
+            "responsible_reviewing": {
+              "order": 1,
+              "description": "Please carefully read the [Call for Papers for the Full-Papers Track](https://sigir2026.org/en-AU/pages/submissions/full-papers-track). In particular, it contains a section about **responsible reviewing**; here are some excerpts:\n* The acceptance decisions will take into account manuscript novelty, technical depth, elegance, practical or theoretical impact, and presentation [...] Reviewers are expected to disclose any conflicts of interest they may have (see the [ACM Conflict of Interest Policy](https://www.acm.org/publications/policies/conflict-of-interest)), treat submissions as confidential, carefully read their assigned submissions, and provide fair, thoughtful and respectful reviews.\n* Here are examples of \"highly irresponsible\" reviews: (1) reviews that are not submitted in a timely fashion; (2) reviews that lack content, are generic or irrelevant to the submission; (3) reviews that insult the authors; (4) reviews that are generated by a large language model; see https://www.acm.org/publications/policies/peer-review-faq\n* If a review is flagged as \"highly irresponsible\", it will undergo an oversight process managed by the Program Chairs. Any reviewer whose review is deemed to be \"highly irresponsible\" will be reported to the SIGIR Executive Committee, and at the discretion of the Executive Committee may be banned from submitting work to future instances of conferences sponsored by SIGIR.",
+              "value": {
+                "param": {
+                  "type": "string[]",
+                  "items": [
+                    {
+                      "value": "yes",
+                      "description": "I have carefully read and understood the Call for Papers, in particular, the section about responsible reviewing",
+                      "optional": true
+                    }
+                  ],
+                  "input": "checkbox"
+                }
+              }
+            },
+            "strengths": {
+              "order": 2,
+              "description": "What are the strengths of this submission? You can add formatting using Markdown and formulas using LaTeX.",
+              "value": {
+                "param": {
+                  "type": "string",
+                  "maxLength": 200000,
+                  "markdown": true,
+                  "input": "textarea"
+                }
+              }
+            },
+            "weaknesses": {
+              "order": 3,
+              "description": "What are the weaknesses of this submission? You can add formatting using Markdown and formulas using LaTeX.",
+              "value": {
+                "param": {
+                  "type": "string",
+                  "maxLength": 200000,
+                  "markdown": true,
+                  "input": "textarea"
+                }
+              }
+            },
+            "detailed_comments": {
+              "order": 4,
+              "description": "Detailed comments, questions, and suggestions for the authors. You can add formatting using Markdown and formulas using LaTeX.",
+              "value": {
+                "param": {
+                  "type": "string",
+                  "maxLength": 200000,
+                  "markdown": true,
+                  "input": "textarea"
+                }
+              }
+            },
+            "ai_generated_content": {
+              "order": 6,
+              "description": "Your assessment of whether the submission used AI in an unduly manner (if yes, please say more about it in your review)",
+              "value": {
+                "param": {
+                  "type": "string",
+                  "enum": [
+                    "No, I don't think this submission used AI in an unduly manner",
+                    "Yes, I think this submission used AI in an unduly manner"
+                  ],
+                  "input": "radio"
+                }
+              }
+            },
+            "rating": {
+              "order": 7,
+              "description": "Your overall recommendation for this submission",
+              "value": {
+                "param": {
+                  "type": "integer",
+                  "enum": [
+                    {
+                      "value": 2,
+                      "description": "2: Accept: a solid paper with no or only minor weaknesses"
+                    },
+                    {
+                      "value": 1,
+                      "description": "1: Weak Accept: a solid paper with some weaknesses, but nothing serious"
+                    },
+                    {
+                      "value": 0,
+                      "description": "0: Borderline: I have carefully reviewed the paper, but I still cannot make up my mind"
+                    },
+                    {
+                      "value": -1,
+                      "description": "-1: Weak Reject: a paper with some merit, but too many problems to be acceptable in its current form"
+                    },
+                    {
+                      "value": -2,
+                      "description": "-2: Reject: a paper with serious issues that is not acceptable in its current form"
+                    }
+                  ],
+                  "input": "radio"
+                }
+              }
+            },
+            "confidence": {
+              "order": 8,
+              "description": "Your confidence that your evaluation is correct",
+              "value": {
+                "param": {
+                  "type": "integer",
+                  "enum": [
+                    {
+                      "value": 5,
+                      "description": "5: I am very confident that my evaluation is correct and very familar with the topic and the literature"
+                    },
+                    {
+                      "value": 4,
+                      "description": "4: I am confident, but not absolutely certain that my evaluation is correct"
+                    },
+                    {
+                      "value": 3,
+                      "description": "3: I am fairly confident that my evaluation is correct, but I have significant doubts"
+                    },
+                    {
+                      "value": 2,
+                      "description": "2: Despite effort, I did not understand central parts of the paper and I am very unsure of my evaluation"
+                    },
+                    {
+                      "value": 1,
+                      "description": "1: If anything, my review is an educated guess"
+                    }
+                  ],
+                  "input": "radio"
+                }
+              }
+            },
+            "review_and_resubmit": {
+              "order": 9,
+              "description": "I am willing for my review and my identity to be communicated to the ICTIR and/or SIGIR-AP PC Chairs should it be requested by the authors",
+              "value": {
+                "param": {
+                  "type": "string",
+                  "enum": ["Yes", "No"],
+                  "input": "radio"
+                }
+              }
+            },
+            "best_paper_award": {
+              "order": 10,
+              "description": "This submission should be considered for the Best Paper Award",
+              "value": {
+                "param": {
+                  "type": "string",
+                  "enum": ["Yes", "No"],
+                  "input": "radio"
+                }
+              }
+            },
+            "confidential_remarks": {
+              "order": 5,
+              "description": "These remarks will only be visible to program committee members assigned to this submission, and to the PC chairs, but not the authors",
+              "value": {
+                "param": {
+                  "type": "string",
+                  "maxLength": 200000,
+                  "markdown": true,
+                  "input": "textarea",
+                  "optional": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "process": "def process(client, edit, invitation):\n    meta_invitation = client.get_invitation(invitation.invitations[0])\n    script = meta_invitation.content['review_process_script']['value']\n    funcs = {\n        'openreview': openreview\n    }\n    exec(script, funcs)\n    funcs['process'](client, edit, invitation)\n",
+      "duedate": 1771416000000,
+      "expdate": 1775131200000,
+      "description": {
+        "param": {
+          "const": {
+            "delete": true
+          }
+        }
+      }
+    }
+  }
+}

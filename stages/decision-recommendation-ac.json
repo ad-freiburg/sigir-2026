@@ -1,0 +1,74 @@
+{
+  "name": "Decision",
+  "description": "SAC recommendation for accept/reject decision",
+  "title": "SAC Decision Recommendation",
+  "instructions": "Please enter your recommendation for this submission. Choose \"Discuss with PC Chairs\" only if you believe the case genuinely requires PC-level discussion (e.g., significant disagreement between meta-review and reviews, ethical concerns, or policy questions).",
+  "invitees": ["senior_area_chairs_assigned"],
+  "readers": ["program_chairs", "senior_area_chairs_assigned"],
+  "reply_to": "forum",
+  "source": "all_submissions",
+  "start_date": "2026-03-19",
+  "due_date": "2026-03-28",
+  "exp_date": "2026-04-04",
+  "content": {
+    "decision": {
+      "order": 1,
+      "description": "What is your recommendation for this submission?",
+      "value": {
+        "param": {
+          "type": "string",
+          "enum": [
+            "Accept",
+            "Reject",
+            "Discuss with PC Chairs (use sparingly)"
+          ],
+          "input": "radio"
+        }
+      }
+    },
+    "comment": {
+      "order": 2,
+      "description": "Write a short comment as a basis for the discussion with the PC Chairs. If the decision is clear, a very short comment suffices. If you feel we should discuss this, please write what we should discuss and why. Your comment is and will be visible only for the PC Chairs, and neither for the authors, nor the reviewers, nor the SPCs.",
+      "value": {
+        "param": {
+          "type": "string",
+          "maxLength": 5000,
+          "input": "textarea",
+          "optional": false
+        }
+      }
+    },
+    "spc_rating": {
+      "order": 3,
+      "description": "Please rate the performance of the SPC for this submission, taking into account how they conducted the discussion and the quality of the meta-review. Please be honest. This information will only be visible to the PC Chairs. It will not be shared with anyone else.",
+      "value": {
+        "param": {
+          "type": "integer",
+          "input": "radio",
+          "enum": [
+            {
+              "value": 5,
+              "description": "5: Exemplary: the SPC engaged deeply with the paper, facilitated a productive discussion, and wrote a very helpful meta-review"
+            },
+            {
+              "value": 4,
+              "description": "4: Solid: the SPC managed the discussion well and wrote a reasonable meta-review"
+            },
+            {
+              "value": 3,
+              "description": "3: Adequate: the SPC did the basic work, but the discussion or meta-review could have been more thorough"
+            },
+            {
+              "value": 2,
+              "description": "2: Superficial: the SPC showed little engagement; the discussion or meta-review is generic or shallow"
+            },
+            {
+              "value": 1,
+              "description": "1: Poor: the SPC was essentially absent; no meaningful discussion was facilitated and/or the meta-review is unhelpful"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "name": "Assignment_Quality_Feedback",
+  "description": "Feedback on the quality of paper assignments from ACs and SPCs",
+  "title": "Paper Assignment Quality Feedback",
+  "instructions": "Please provide your feedback on the quality of your paper assignment. Your feedback will help us improve the assignment process.",
+  "committee": "senior_area_chairs",
+  "remove_fields": ["profile_confirmed", "expertise_confirmed"],
+  "start_date": "2026-01-30",
+  "due_date": "2026-02-18",
+  "exp_date": "2026-03-11",
+  "content": {
+    "paper_assignment_quality": {
+      "order": 1,
+      "description": "How do you perceive the quality of your paper assignment?",
+      "value": {
+        "param": {
+          "type": "string",
+          "enum": [
+            "All of the papers assigned to me match my expertise reasonably well",
+            "Most of the papers assigned to me match my expertise reasonably well",
+            "Some papers assigned to me match my expertise well, but more than a few do not",
+            "Few of the papers assigned to me match my expertise reasonably well",
+            "None of the papers assigned to me match my expertise reasonably well"
+          ],
+          "input": "radio"
+        }
+      }
+    },
+    "comparison_to_previous_years": {
+      "order": 2,
+      "description": "If you have been AC or SPC for the full-papers track in the last three years, how do you judge the quality of the assignment now compared to the median of those previous years?",
+      "value": {
+        "param": {
+          "type": "string",
+          "enum": [
+            "I haven't been AC or SPC for the full-papers track in the last three years",
+            "More or less the same",
+            "Significantly better",
+            "Significantly worse"
+          ],
+          "input": "radio"
+        }
+      }
+    },
+    "comments": {
+      "order": 3,
+      "description": "Anything else you want to comment regarding this issue?",
+      "value": {
+        "param": {
+          "type": "string",
+          "maxLength": 5000,
+          "optional": true,
+          "input": "textarea"
+        }
+      }
+    }
+  }
+}
