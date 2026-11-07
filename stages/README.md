@@ -87,7 +87,9 @@ Relevant mails: [`2026-03-01_review_rating_and_meta_review_spc_1.txt`](../mails/
 SPCs, March 1 to 11, one per submission. Fields: the meta-review (up to
 5000 characters, Markdown), confidential remarks, a recommendation
 (accept, reject, undecided), and confidence from 5 to 1. The invitation
-was later extended so that ACs can also edit meta-reviews. Mails:
+was later extended so that ACs can also edit meta-reviews.
+
+Relevant mails:
 [`2026-02-22_discussion_phase_spc_1.txt`](../mails/2026-02-22_discussion_phase_spc_1.txt), [`2026-03-11_metareviews_spc_1a.txt`](../mails/2026-03-11_metareviews_spc_1a.txt).
 
 ## Decisions
