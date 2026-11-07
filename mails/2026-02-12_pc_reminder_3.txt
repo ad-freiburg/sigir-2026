@@ -8,7 +8,7 @@ Dear {{firstname_or_fullname}},
 
 The deadline for your reviews for the SIGIR 2026 full-papers track is only a few hours away (February 17, 2026, AoE), and we haven't received any reviews from you yet.
 
-Please finish at least one review TODAY, and let us know your plan for the remaining reviews. We can give you an extension of two or thre days, provided that you commit to the extended deadline.
+Please finish at least one review TODAY, and let us know your plan for the remaining reviews. We can give you an extension of two or three days, provided that you commit to the extended deadline.
 
 Here are the papers assigned to you:
 

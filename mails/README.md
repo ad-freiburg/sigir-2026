@@ -50,7 +50,6 @@ Complete profiles with all publications are what OpenReview's conflict-of-intere
 - [`2026-01-22_no_dblp_certify_imported_publications_all.txt`](2026-01-22_no_dblp_certify_imported_publications_all.txt): same text as final call, authors with 10 or more publications.
 - [`2026-01-23_no_dblp_certify_imported_publications_all_again.txt`](2026-01-23_no_dblp_certify_imported_publications_all_again.txt): final call with step-by-step instructions.
 - [`2026-01-23_no_dblp_certify_imported_publications_single_author.txt`](2026-01-23_no_dblp_certify_imported_publications_single_author.txt): same for authors with few prior publications.
-- [`2026-01-23_no_dblp_certify_imported_publications_via_coauthor.txt`](2026-01-23_no_dblp_certify_imported_publications_via_coauthor.txt): to the co-authors of an unresponsive author, asking them to intervene.
 - [`2026-01-23_no_dblp_certify_imported_publications_final.txt`](2026-01-23_no_dblp_certify_imported_publications_final.txt): to the co-authors, last warning that the submission will be desk-rejected.
 - [`2026-01-25_desk_reject_submissions_with_many_incomplete_profiles.txt`](2026-01-25_desk_reject_submissions_with_many_incomplete_profiles.txt): notification of desk rejection because of incomplete profiles.
 - [`2026-01-27_desk_reject_submissions_with_many_incomplete_profiles.txt`](2026-01-27_desk_reject_submissions_with_many_incomplete_profiles.txt): same, second batch.
@@ -59,7 +58,6 @@ Complete profiles with all publications are what OpenReview's conflict-of-intere
 
 - [`2026-01-30_info_to_everyone.txt`](2026-01-30_info_to_everyone.txt): announcement of the Slack channel for the track.
 - [`2026-01-31_assignment_quality_reminder.txt`](2026-01-31_assignment_quality_reminder.txt): SPCs and ACs, reminder to fill out the assignment-quality survey.
-- [`2026-02-07_email_address_is_private.txt`](2026-02-07_email_address_is_private.txt): PC members whose email address is hidden from the chairs (the subject line in the file is a copy-and-paste leftover).
 
 ## Review deadline (February 12 to 21)
 

@@ -6,7 +6,7 @@ Reply-To: SIGIR 2026 PC Chairs <program-chairs@sigir2026.org>
 
 Dear {{firstname_or_fullname}},
 
-The deadline for submitting your meta-reviews and review ratings is just a litte more than one day away (March 10 AoE).
+The deadline for submitting your meta-reviews and review ratings is just a little more than one day away (March 10 AoE).
 
 If you need input from reviewers a
 
