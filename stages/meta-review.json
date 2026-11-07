@@ -1,0 +1,234 @@
+{
+  "id": "ACM.org/SIGIR/2026/Conference/-/Meta_Review",
+  "cdate": 1772366400000,
+  "readers": [
+    "ACM.org/SIGIR/2026/Conference"
+  ],
+  "writers": [
+    "ACM.org/SIGIR/2026/Conference"
+  ],
+  "invitees": [
+    "ACM.org/SIGIR/2026/Conference"
+  ],
+  "signatures": [
+    "ACM.org/SIGIR/2026/Conference"
+  ],
+  "content": {
+    "source": {
+      "value": {
+        "venueid": [
+          "ACM.org/SIGIR/2026/Conference",
+          "ACM.org/SIGIR/2026/Conference/Submission",
+          "ACM.org/SIGIR/2026/Conference/Rejected_Submission"
+        ]
+      }
+    },
+    "recommendation_field_name": {
+      "value": "recommendation"
+    },
+    "metareview_process_script": {
+      "value": "def process(client, edit, invitation):\n\n    domain = client.get_group(edit.domain)\n    venue_id = domain.id\n    submission_name = domain.content['submission_name']['value']\n\n    metareview = client.get_note(edit.note.id)\n    submission = client.get_note(edit.note.forum)\n\n    #create children invitation if applicable\n    openreview.tools.create_replyto_invitations(client, submission, metareview)\n"
+    }
+  },
+  "dateprocesses": [
+    {
+      "dates": [
+        "#{4/edit/invitation/cdate}",
+        "#{4/mdate} + 5000"
+      ],
+      "script": "def process(client, invitation):\n    meta_invitation = client.get_invitation(\"ACM.org/SIGIR/2026/Conference/-/Edit\")\n    script = meta_invitation.content[\"invitation_edit_script\"]['value']\n    funcs = {\n        'openreview': openreview,\n        'datetime': datetime,\n        'date_index': date_index\n    }\n    exec(script, funcs)\n    funcs['process'](client, invitation)\n"
+    }
+  ],
+  "edit": {
+    "signatures": [
+      "ACM.org/SIGIR/2026/Conference"
+    ],
+    "readers": [
+      "ACM.org/SIGIR/2026/Conference"
+    ],
+    "writers": [
+      "ACM.org/SIGIR/2026/Conference"
+    ],
+    "content": {
+      "noteNumber": {
+        "value": {
+          "param": {
+            "type": "integer"
+          }
+        }
+      },
+      "noteId": {
+        "value": {
+          "param": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "replacement": true,
+    "invitation": {
+      "id": "ACM.org/SIGIR/2026/Conference/Submission${2/content/noteNumber/value}/-/Meta_Review",
+      "signatures": [
+        "ACM.org/SIGIR/2026/Conference"
+      ],
+      "readers": [
+        "ACM.org/SIGIR/2026/Conference",
+        "ACM.org/SIGIR/2026/Conference/Submission${3/content/noteNumber/value}/Area_Chairs"
+      ],
+      "writers": [
+        "ACM.org/SIGIR/2026/Conference"
+      ],
+      "invitees": [
+        "ACM.org/SIGIR/2026/Conference",
+        "ACM.org/SIGIR/2026/Conference/Submission${3/content/noteNumber/value}/Area_Chairs"
+      ],
+      "noninvitees": [
+        "ACM.org/SIGIR/2026/Conference/Submission${3/content/noteNumber/value}/Authors"
+      ],
+      "maxReplies": 1,
+      "cdate": 1772366400000,
+      "edit": {
+        "signatures": {
+          "param": {
+            "items": [
+              {
+                "value": "ACM.org/SIGIR/2026/Conference/Program_Chairs",
+                "optional": true
+              },
+              {
+                "prefix": "ACM.org/SIGIR/2026/Conference/Submission${7/content/noteNumber/value}/Area_Chair_.*",
+                "optional": true
+              }
+            ]
+          }
+        },
+        "readers": [
+          "ACM.org/SIGIR/2026/Conference/Submission${4/content/noteNumber/value}/Senior_Area_Chairs",
+          "ACM.org/SIGIR/2026/Conference/Submission${4/content/noteNumber/value}/Area_Chairs",
+          "ACM.org/SIGIR/2026/Conference/Submission${4/content/noteNumber/value}/Reviewers/Submitted",
+          "ACM.org/SIGIR/2026/Conference/Program_Chairs"
+        ],
+        "nonreaders": [
+          "ACM.org/SIGIR/2026/Conference/Submission${4/content/noteNumber/value}/Authors"
+        ],
+        "writers": [
+          "ACM.org/SIGIR/2026/Conference"
+        ],
+        "note": {
+          "id": {
+            "param": {
+              "withInvitation": "ACM.org/SIGIR/2026/Conference/Submission${6/content/noteNumber/value}/-/Meta_Review",
+              "optional": true
+            }
+          },
+          "forum": "${4/content/noteId/value}",
+          "replyto": "${4/content/noteId/value}",
+          "ddate": {
+            "param": {
+              "range": [
+                0,
+                9999999999999
+              ],
+              "optional": true,
+              "deletable": true
+            }
+          },
+          "signatures": [
+            "${3/signatures}"
+          ],
+          "readers": [
+            "ACM.org/SIGIR/2026/Conference/Submission${5/content/noteNumber/value}/Senior_Area_Chairs",
+            "ACM.org/SIGIR/2026/Conference/Submission${5/content/noteNumber/value}/Area_Chairs",
+            "ACM.org/SIGIR/2026/Conference/Submission${5/content/noteNumber/value}/Reviewers/Submitted",
+            "ACM.org/SIGIR/2026/Conference/Program_Chairs"
+          ],
+          "nonreaders": [
+            "ACM.org/SIGIR/2026/Conference/Submission${5/content/noteNumber/value}/Authors"
+          ],
+          "writers": [
+            "ACM.org/SIGIR/2026/Conference",
+            "ACM.org/SIGIR/2026/Conference/Submission${5/content/noteNumber/value}/Senior_Area_Chairs",
+            "${3/signatures}"
+          ],
+          "content": {
+            "metareview": {
+              "order": 1,
+              "description": "Please provide your meta-review following the guidelines above (max 5000 characters). Add formatting using Markdown and formulas using LaTeX. For more information see https://openreview.net/faq",
+              "value": {
+                "param": {
+                  "type": "string",
+                  "maxLength": 5000,
+                  "markdown": true,
+                  "input": "textarea"
+                }
+              }
+            },
+            "confidential_remarks": {
+              "order": 2,
+              "description": "These remarks will only be visible to program committee members assigned to this submission, and to the PC chairs, but not the authors",
+              "value": {
+                "param": {
+                  "type": "string",
+                  "maxLength": 200000,
+                  "markdown": true,
+                  "input": "textarea",
+                  "optional": true
+                }
+              }
+            },
+            "recommendation": {
+              "order": 3,
+              "description": "Please try to commit to \"Accept\" or \"Reject\", and only choose the third option as an exception.",
+              "value": {
+                "param": {
+                  "type": "string",
+                  "enum": [
+                    {"value": "accept", "description": "Accept"},
+                    {"value": "reject", "description": "Reject"},
+                    {"value": "undecided", "description": "I am really conflicted on this one"}
+                  ],
+                  "input": "radio"
+                }
+              }
+            },
+            "confidence": {
+              "order": 4,
+              "value": {
+                "param": {
+                  "type": "integer",
+                  "enum": [
+                    {
+                      "value": 5,
+                      "description": "5: I am absolutely certain that the evaluation is correct and very familiar with the relevant literature"
+                    },
+                    {
+                      "value": 4,
+                      "description": "4: I am confident but not absolutely certain that the evaluation is correct"
+                    },
+                    {
+                      "value": 3,
+                      "description": "3: I am fairly confident that the evaluation is correct"
+                    },
+                    {
+                      "value": 2,
+                      "description": "2: I am willing to defend the evaluation, but it is quite likely that I did not understand central parts of the paper"
+                    },
+                    {
+                      "value": 1,
+                      "description": "1: My evaluation is an educated guess"
+                    }
+                  ],
+                  "input": "radio"
+                }
+              }
+            }
+          }
+        }
+      },
+      "process": "def process(client, edit, invitation):\n    meta_invitation = client.get_invitation(invitation.invitations[0])\n    script = meta_invitation.content['metareview_process_script']['value']\n    funcs = {\n        'openreview': openreview\n    }\n    exec(script, funcs)\n    funcs['process'](client, edit, invitation)\n",
+      "duedate": 1773230400000,
+      "expdate": 1775131200000,
+      "description": "The meta-review is key for the review process and serves two purposes: it helps the program chairs to arrive at an accept/reject decision, and it explains that accept/reject decision to the authors. Please make sure that your meta-review is informative to both audiences. Specifically:\n\n1. Your meta-review should **not** merely summarize the reviews, but \"separate the wheat from the chaff\". That is, you should carefully weigh the different arguments, which entails discarding arguments that lack evidence or are unconvincing.\n\n2. If there is substantial disagreement between the reviewers, your meta-review should explain how input from the reviewers factored into the decision. Also factor in your own understanding of the paper, but please be aware of your own biases.\n\n3. Provide actionable feedback for the camera-ready submission or resubmission of the paper. If such feedback is provided in the reviews, you don\u2019t have to copy it to your meta-review, but you can refer to it with a short summary.\n\n4. If parts of the explanation are sensitive and should not be provided to the authors, please enter it in the \u201cconfidential remarks\u201d section instead. \n\nAgain, high-quality meta-reviews are crucial for the whole review process. Thank you!"
+    }
+  }
+}

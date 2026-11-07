@@ -1,0 +1,66 @@
+{
+  "name": "DBLP_and_Imported_Publications",
+  "description": "Certify that all publications of the author have been imported into OpenReview",
+  "title": "Certify your DBLP status and that all publications are imported",
+  "instructions": "Please fill out this form **truthfully**. It is crucial for the integrity of the review process. Providing false information may lead to rejection of your submission or other sanctions.",
+  "committee": "authors",
+  "start_date": "2026-01-21",
+  "due_date": "2026-01-24",
+  "exp_date": "2026-02-04",
+  "remove_fields": ["profile_confirmed", "expertise_confirmed"],
+  "content": {
+    "dblp_status": {
+      "order": 1,
+      "description": "Is there a DBLP author URL for you, just a DBLP disambiguation page, or no DBLP URL at all? An example of a DBLP author URL is https://dblp.org/pid/m/AlistairMoffat.html, an example of a DBLP disambiguation page is https://dblp.org/pid/30/2395",
+      "value": {
+        "param": {
+          "type": "string",
+          "enum": [
+            "There is a DBLP author URL for me, I have entered it into my OpenReview profile, and at least 90% of the publications listed there are indeed mine",
+            "There is a DBLP author URL for me, I have entered it into my OpenReview profile, but less than 90% of the publications listed there are mine",
+            "There is only a DBLP disambiguation page for my name",
+            "There is no DBLP URL at all for my name"
+          ],
+          "ortler": [
+            "own profile",
+            "mixed profile",
+            "disambiguation page",
+            "no profile"
+          ],
+          "input": "radio"
+        }
+      }
+    },
+    "dblp_disambiguation_url": {
+      "order": 2,
+      "description": "If there is a DBLP disambiguation page for your name, please provide the URL here (OpenReview does not allow entering disambiguation pages in the profile). If there is a DBLP author URL or no URL at all, please leave this field blank.",
+      "value": {
+        "param": {
+          "type": "string",
+          "optional": true,
+          "input": "text"
+        }
+      }
+    },
+    "imported_publications": {
+      "order": 3,
+      "description": "Please certify that you have imported **all** your publications into your OpenReview profile. The \"Add DBLP Papers to Profile\" and \"Add ORCID Papers to Profile\" buttons can be found in your OpenReview profile under Edit profile → Personal Links. The \"OpenReview Archive Direct Upload\" can be found at https://openreview.net/group?id=OpenReview.net/Archive#tab-publications.",
+      "value": {
+        "param": {
+          "type": "string",
+          "enum": [
+            "There is a DBLP author URL for me, I have entered it into my OpenReview profile, and I have imported all publications from that URL that are mine into my OpenReview profile using the \"Add DBLP Papers to Profile\" button",
+            "There is no DBLP author URL for me (only a disambiguation page or no DBLP presence at all), and I have imported all my publications into my OpenReview profile using the \"Add ORCID Papers to Profile\" button or the \"OpenReview Archive Direct Upload\"",
+            "There are no publications in my name yet"
+          ],
+          "ortler": [
+            "dblp",
+            "direct upload",
+            "no publications"
+          ],
+          "input": "radio"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "name": "Initial_Check_by_SAC",
+  "description": "Quick check of assigned submissions",
+  "title": "Quick check of assigned submissions",
+  "instructions": "Please take a quick look at this submission (1-2 minutes for each) and indicate whether it should proceed to review or be desk rejected for one of the listed reasons.",
+  "invitees": ["senior_area_chairs_assigned"],
+  "readers": ["program_chairs", "senior_area_chairs_assigned"],
+  "reply_to": "forum",
+  "source": "all_submissions",
+  "start_date": "2026-01-25",
+  "due_date": "2026-01-27",
+  "exp_date": "2026-02-08",
+  "content": {
+    "recommendation": {
+      "order": 1,
+      "description": "Based on your quick check, should this paper proceed to full review (\"Yes, ...\") or be desk rejected for one of the listed reasons (\"No, ...\")?",
+      "value": {
+        "param": {
+          "type": "string",
+          "enum": [
+            "Yes, it should be reviewed",
+            "No, it exceeds the page limit",
+            "No, it is not properly anonymized",
+            "No, it is not properly formatted",
+            "No, it is clearly off-topic",
+            "No, for another reason (please specify in the comments)"
+          ],
+          "input": "radio"
+        }
+      }
+    },
+    "comment": {
+      "order": 2,
+      "description": "Additional comments (required if you selected \"No, for another reason\" above):",
+      "value": {
+        "param": {
+          "type": "string",
+          "input": "textarea",
+          "optional": true
+        }
+      }
+    }
+  }
+}
