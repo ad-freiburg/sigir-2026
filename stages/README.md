@@ -38,9 +38,9 @@ interest detection relies on; submissions with many incomplete profiles
 were desk-rejected.
 
 Relevant mails:
-[`2026-01-22_no_dblp_certify_imported_publications_one_publication.txt`](../mails/2026-01-22_no_dblp_certify_imported_publications_one_publication.txt) (authors without DBLP URL, one submission),
-[`2026-01-22_no_dblp_certify_imported_publications_ten_or_less_publications.txt`](../mails/2026-01-22_no_dblp_certify_imported_publications_ten_or_less_publications.txt) (same, few publications),
-[`2026-01-22_no_dblp_certify_imported_publications_all.txt`](../mails/2026-01-22_no_dblp_certify_imported_publications_all.txt) (final call),
+[`2026-01-22_no_dblp_certify_imported_publications_one_publication.txt`](../mails/2026-01-22_no_dblp_certify_imported_publications_one_publication.txt) (authors without DBLP URL and a single publication in their profile),
+[`2026-01-22_no_dblp_certify_imported_publications_ten_or_less_publications.txt`](../mails/2026-01-22_no_dblp_certify_imported_publications_ten_or_less_publications.txt) (same text, authors with 2 to 10 publications),
+[`2026-01-22_no_dblp_certify_imported_publications_all.txt`](../mails/2026-01-22_no_dblp_certify_imported_publications_all.txt) (same text as final call, authors with 10 or more publications),
 [`2026-01-25_desk_reject_submissions_with_many_incomplete_profiles.txt`](../mails/2026-01-25_desk_reject_submissions_with_many_incomplete_profiles.txt) (desk rejection for incomplete profiles).
 
 ### `initial-check-spc.json`, `initial-check-ac.json`
