@@ -8,11 +8,13 @@ format in which it was deployed with `ortler`
 
 - Compact format with `name`, `title`, `instructions`, `committee` or
   `invitees`, dates, and `content` (the fields); deployed with
-  `ortler custom-stage FILE` (per-submission stages) or
-  `ortler registration-stage FILE` (one form per person).
-- Full OpenReview invitation format; deployed with `ortler review-stage FILE`
-  or `ortler stage FILE`. The fields are under
+  `ortler custom-stage --deploy FILE` (per-submission stages) or
+  `ortler registration-stage --deploy FILE` (one form per person).
+- Full OpenReview invitation format, as accepted by `post_invitation_edit`
+  of `openreview-py`. The fields are under
   `edit.invitation.edit.note.content`; the dates under `edit.invitation`.
+  We deployed these with the `ortler` commands `review-stage` and `stage`,
+  which are not yet in the public `ortler` repository.
   A field given as `{"delete": true}` removes one of OpenReview's default
   fields (for example `title` and `review` in `review.json`).
 
@@ -86,8 +88,9 @@ Relevant mails:
 ### `review-rating.json`
 SPCs, March 1 to 11, one rating per review on their submissions. A single
 score from 5 (exemplary, very helpful) to 1 (very generic, superficial,
-unfounded or short) plus an optional comment. The rating is visible to ACs
-and program chairs only, never to reviewers or authors. It was the basis of
+unfounded or short) plus an optional comment. The rating is visible to the
+SPCs and ACs of the submission and to the program chairs, never to reviewers
+or authors. It was the basis of
 the best-reviewer awards and of the consequences for irresponsible
 reviewing.
 
